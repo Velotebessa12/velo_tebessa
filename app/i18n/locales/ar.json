@@ -1,0 +1,221 @@
+
+
+{
+   "home": {
+    "delivery": "التوصيل متوفر في جميع الولايات",
+    "searchPlaceholder": "ابحث عن الدراجات، القطع، الإكسسوارات…",
+    "searchButton": "بحث",
+    "allCategories": "جميع الفئات",
+    "sortBy": "ترتيب حسب",
+    "shopByCategory": "تسوق حسب الفئة",
+    "viewAll": "عرض الكل",
+    "clear": "مسح",
+    "results": "نتائج",
+    "noProductsTitle": "لا توجد منتجات",
+    "noProductsDesc": "جرّب كلمات بحث أو فلاتر مختلفة."
+  },
+  "cart": {
+    "title": "سلة التسوق",
+    "item": "عنصر",
+    "items": "عناصر",
+    "emptyTitle": "سلة التسوق فارغة",
+    "continueShopping": "متابعة التسوق",
+    "orderSummary": "ملخص الطلب",
+    "promoCode": "رمز الخصم",
+    "promoPlaceholder": "أدخل الرمز",
+    "apply": "تطبيق",
+    "applying": "جارٍ التطبيق…",
+    "subtotal": "المجموع الفرعي",
+    "discount": "الخصم",
+    "shipping": "الشحن",
+    "shippingNote": "يتم الحساب عند الدفع",
+    "total": "الإجمالي",
+    "checkout": "إتمام الطلب"
+  },
+  "navbar": {
+    "home": "الرئيسية",
+    "products": "المنتجات",
+    "categories": "الفئات",
+    "selectLanguage": "اختر اللغة",
+    "profile": "ملفي الشخصي",
+    "orders": "طلباتي"
+  },
+  "orders": {
+    "title": "طلباتي",
+    "subtitle": "تتبع وإدارة طلباتك",
+    "empty": "لا توجد طلبات حديثة",
+    "order": "طلب",
+    "delivery": "التوصيل",
+    "standard": "عادي",
+    "tracking": "التتبع",
+    "total": "الإجمالي",
+    "payLater": "يتم دفع التوصيل لاحقًا مع الموزع",
+    "deliveryFee": "التوصيل",
+    "view": "عرض"
+  },
+  "profile": {
+    "notLoggedIn": "غير مسجل الدخول",
+    "loginRequired": "يرجى تسجيل الدخول لعرض ملفك الشخصي.",
+    "goToLogin": "الذهاب لتسجيل الدخول",
+
+    "memberSince": "عضو منذ",
+
+    "contactInfo": "معلومات الاتصال",
+    "phone": "رقم الهاتف",
+    "wilaya": "الولاية",
+    "address": "العنوان",
+    "notProvided": "غير متوفر",
+
+    "quickActions": "إجراءات سريعة",
+    "viewOrders": "عرض طلباتي",
+
+    "accountDetails": "تفاصيل الحساب",
+    "totalOrders": "إجمالي الطلبات",
+    "joined": "تاريخ الانضمام",
+    "lastUpdated": "آخر تحديث",
+
+    "needHelp": "تحتاج مساعدة؟",
+    "helpText": "تواصل مع فريق الدعم للحصول على المساعدة",
+    "contactSupport": "اتصل بالدعم",
+    "signOut": "تسجيل الخروج"
+  },
+  "orderDetails": {
+    "notFound": "الطلب غير موجود",
+
+    "back": "رجوع",
+    "order": "طلب",
+    "orderProgress": "حالة الطلب",
+
+    "customer": "الزبون",
+    "delivery": "التوصيل",
+    "wilaya": "الولاية",
+    "commune": "البلدية",
+    "company": "شركة",
+    "address": "العنوان",
+
+    "products": "المنتجات",
+    "subtotal": "المجموع الفرعي",
+    "discount": "الخصم",
+    "shipping": "التوصيل",
+    "total": "الإجمالي",
+
+    "orderInfo": "معلومات الطلب",
+
+    "deleteTitle": "حذف الطلب",
+    "deleteConfirm": "هل أنت متأكد أنك تريد حذف هذا الطلب؟",
+    "deleteWarning": "لا يمكن التراجع عن هذا الإجراء.",
+    "cancel": "إلغاء",
+    "confirmDelete": "نعم، حذف",
+
+    "exchange": "استبدال",
+    "exchangeDesc": "طلب استبدال المنتج",
+
+    "return": "إرجاع",
+    "returnDesc": "إرجاع الطلب",
+
+    "edit": "تعديل الطلب",
+    "editDesc": "تغيير المنتجات أو الكميات",
+
+    "delete": "حذف",
+    "deleteDesc": "إلغاء الطلب نهائيًا"
+  },
+   "bottomNav": {
+    "home": "الرئيسية",
+    "favorites": "المفضلة",
+    "cart": "السلة"
+  },
+  "exchange": {
+    "backToOrder": "العودة إلى الطلب",
+
+    "title": "طلب استبدال",
+    "subtitle": "اختر المنتجات المراد إرجاعها وراجع سلة التسوق للمنتجات الجديدة.",
+
+    "itemsToReturn": "المنتجات المراد إرجاعها",
+    "noItems": "لا توجد عناصر",
+
+    "return": "إرجاع",
+    "cancel": "إلغاء",
+
+    "newProducts": "منتجات جديدة",
+    "itemsInCart": "عناصر في السلة",
+    "cartEmpty": "سلة التسوق فارغة",
+    "cartHint": "أضف منتجات إلى السلة لإدراجها في الاستبدال.",
+    "browseProducts": "تصفح المنتجات",
+
+    "cartTotal": "إجمالي السلة",
+
+    "reasonLabel": "سبب الاستبدال",
+    "reasonPlaceholder": "اشرح سبب الاستبدال...",
+
+    "summary": "ملخص الاستبدال",
+    "returnedValue": "قيمة الإرجاع",
+    "newValue": "المنتجات الجديدة",
+    "difference": "الفرق",
+
+    "selectReturnItem": "اختر عنصرًا واحدًا على الأقل للإرجاع",
+    "addProducts": "أضف منتجات إلى السلة",
+    "enterReason": "يرجى إدخال سبب الاستبدال",
+
+    "submitting": "جارٍ الإرسال...",
+    "submit": "إرسال الطلب"
+  },
+  "return": {
+    "backToOrder": "العودة إلى الطلب",
+
+    "title": "طلب إرجاع",
+    "subtitle": "اختر العناصر التي ترغب في إرجاعها وحدد الكمية.",
+
+    "itemsToReturn": "العناصر المراد إرجاعها",
+    "noItems": "لا توجد عناصر",
+
+    "returnQty": "الكمية المراد إرجاعها",
+
+    "reasonTitle": "سبب الإرجاع",
+    "reasonPlaceholder": "أو صف السبب بالتفصيل...",
+
+    "summary": "الملخص",
+    "noneSelected": "لم يتم اختيار أي عنصر",
+    "estimatedRefund": "إجمالي المبلغ المتوقع استرجاعه",
+
+    "selectItem": "يرجى اختيار عنصر واحد على الأقل للإرجاع",
+    "enterReason": "يرجى إدخال سبب الإرجاع",
+
+    "submitting": "جارٍ الإرسال...",
+    "submit": "إرسال طلب الإرجاع",
+
+    "refundNote": "سيتم معالجة الاسترجاع بعد موافقة فريقنا"
+  },
+  "orderSuccess": {
+    "title": "تم تأكيد الطلب",
+    "orderLabel": "الطلب",
+
+    "message": "مرحبًا {{name}}، لقد استلمنا طلبك وسنتواصل معك قريبًا لتأكيده.",
+
+    "nextTitle": "ماذا يحدث بعد ذلك",
+
+    "steps": {
+      "confirm": {
+        "title": "تأكيد الطلب",
+        "desc": "سنتواصل معك قريبًا لتأكيد الطلب."
+      },
+      "prepare": {
+        "title": "التحضير والشحن",
+        "desc": "سيتم تجهيز المنتجات وإرسالها."
+      },
+      "delivery": {
+        "title": "التوصيل والدفع",
+        "desc": "الدفع عند الاستلام أمام باب منزلك."
+      }
+    },
+
+    "track": "تتبع الطلب",
+    "back": "العودة إلى المتجر",
+
+    "footer": "سيتم إرسال رسالة تأكيد بعد الموافقة على الطلب."
+  },
+  "about": {
+    "title": "معلومات عنا",
+    "team": "فريقنا"
+  }
+}
+

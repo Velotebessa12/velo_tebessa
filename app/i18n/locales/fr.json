@@ -1,0 +1,220 @@
+
+
+{
+   "home": {
+    "delivery": "Livraison disponible dans toutes les wilayas",
+    "searchPlaceholder": "Rechercher vélos, pièces, accessoires…",
+    "searchButton": "Rechercher",
+    "allCategories": "Toutes les catégories",
+    "sortBy": "Trier par",
+    "shopByCategory": "Acheter par catégorie",
+    "viewAll": "Voir tout",
+    "clear": "Effacer",
+    "results": "résultats",
+    "noProductsTitle": "Aucun produit trouvé",
+    "noProductsDesc": "Essayez d'autres termes de recherche ou filtres."
+  },
+  "cart": {
+    "title": "Panier",
+    "item": "article",
+    "items": "articles",
+    "emptyTitle": "Votre panier est vide",
+    "continueShopping": "Continuer vos achats",
+    "orderSummary": "Récapitulatif de la commande",
+    "promoCode": "Code promo",
+    "promoPlaceholder": "ENTRER LE CODE",
+    "apply": "Appliquer",
+    "applying": "Application…",
+    "subtotal": "Sous-total",
+    "discount": "Remise",
+    "shipping": "Livraison",
+    "shippingNote": "Calculée à la commande",
+    "total": "Total",
+    "checkout": "Passer à la caisse"
+  },
+  "navbar": {
+    "home": "Accueil",
+    "products": "Produits",
+    "categories": "Catégories",
+    "selectLanguage": "Choisir la langue",
+    "profile": "Mon profil",
+    "orders": "Mes commandes"
+  },
+    "orders": {
+    "title": "Mes commandes",
+    "subtitle": "Suivez et gérez vos commandes",
+    "empty": "Aucune commande récente",
+    "order": "Commande",
+    "delivery": "Livraison",
+    "standard": "Standard",
+    "tracking": "Suivi",
+    "total": "Total",
+    "payLater": "Livraison à régler plus tard avec le livreur",
+    "deliveryFee": "livraison",
+    "view": "Voir"
+  },
+  "profile": {
+    "notLoggedIn": "Non connecté",
+    "loginRequired": "Veuillez vous connecter pour voir votre profil.",
+    "goToLogin": "Aller à la connexion",
+
+    "memberSince": "Membre depuis",
+
+    "contactInfo": "Informations de contact",
+    "phone": "Numéro de téléphone",
+    "wilaya": "Wilaya",
+    "address": "Adresse",
+    "notProvided": "Non renseigné",
+
+    "quickActions": "Actions rapides",
+    "viewOrders": "Voir mes commandes",
+
+    "accountDetails": "Détails du compte",
+    "totalOrders": "Commandes totales",
+    "joined": "Inscrit le",
+    "lastUpdated": "Dernière mise à jour",
+
+    "needHelp": "Besoin d’aide ?",
+    "helpText": "Contactez notre équipe de support pour assistance",
+    "contactSupport": "Contacter le support",
+    "signOut": "Se déconnecter"
+  },
+  "orderDetails": {
+    "notFound": "Commande introuvable",
+
+    "back": "Retour",
+    "order": "Commande",
+    "orderProgress": "Avancement de la commande",
+
+    "customer": "Client",
+    "delivery": "Livraison",
+    "wilaya": "Wilaya",
+    "commune": "Commune",
+    "company": "Société",
+    "address": "Adresse",
+
+    "products": "Produits",
+    "subtotal": "Sous-total",
+    "discount": "Remise",
+    "shipping": "Livraison",
+    "total": "Total",
+
+    "orderInfo": "Informations de la commande",
+
+    "deleteTitle": "Supprimer la commande",
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cette commande ?",
+    "deleteWarning": "Cette action est irréversible.",
+    "cancel": "Annuler",
+    "confirmDelete": "Oui, supprimer",
+
+    "exchange": "Échanger",
+    "exchangeDesc": "Demander un échange de produit",
+
+    "return": "Retour",
+    "returnDesc": "Retourner la commande",
+
+    "edit": "Modifier la commande",
+    "editDesc": "Changer les produits ou quantités",
+
+    "delete": "Supprimer",
+    "deleteDesc": "Annuler définitivement la commande"
+  },
+  "bottomNav": {
+    "home": "Accueil",
+    "favorites": "Favoris",
+    "cart": "Panier"
+  },
+  "exchange": {
+    "backToOrder": "Retour à la commande",
+
+    "title": "Demande d'échange",
+    "subtitle": "Sélectionnez les articles à retourner et vérifiez votre panier pour les nouveaux produits.",
+
+    "itemsToReturn": "Produits à retourner",
+    "noItems": "Aucun article trouvé",
+
+    "return": "Retourner",
+    "cancel": "Annuler",
+
+    "newProducts": "Nouveaux produits",
+    "itemsInCart": "articles dans le panier",
+    "cartEmpty": "Votre panier est vide",
+    "cartHint": "Ajoutez des produits au panier pour les inclure dans l'échange.",
+    "browseProducts": "Parcourir les produits",
+
+    "cartTotal": "Total panier",
+
+    "reasonLabel": "Raison de l'échange",
+    "reasonPlaceholder": "Expliquez la raison de l'échange...",
+
+    "summary": "Résumé de l'échange",
+    "returnedValue": "Valeur retournée",
+    "newValue": "Nouveaux produits",
+    "difference": "Différence",
+
+    "selectReturnItem": "Sélectionnez au moins un article à retourner",
+    "addProducts": "Ajoutez des produits au panier",
+    "enterReason": "Veuillez renseigner la raison de l'échange",
+
+    "submitting": "Soumission...",
+    "submit": "Soumettre la demande"
+  },
+  "return": {
+    "backToOrder": "Retour à la commande",
+
+    "title": "Demande de retour",
+    "subtitle": "Sélectionnez les articles que vous souhaitez retourner et indiquez la quantité.",
+
+    "itemsToReturn": "Articles à retourner",
+    "noItems": "Aucun article trouvé",
+
+    "returnQty": "Quantité à retourner",
+
+    "reasonTitle": "Raison du retour",
+    "reasonPlaceholder": "Ou décrivez la raison en détail...",
+
+    "summary": "Récapitulatif",
+    "noneSelected": "Aucun article sélectionné",
+    "estimatedRefund": "Total remboursable estimé",
+
+    "selectItem": "Sélectionnez au moins un article à retourner",
+    "enterReason": "Veuillez indiquer la raison du retour",
+
+    "submitting": "Soumission...",
+    "submit": "Soumettre la demande de retour",
+
+    "refundNote": "Le remboursement sera traité après validation par notre équipe"
+  },
+  "orderSuccess": {
+    "title": "Commande confirmée",
+    "orderLabel": "Commande",
+
+    "message": "Bonjour {{name}}, nous avons bien reçu votre commande et vous contacterons prochainement pour la confirmer.",
+
+    "nextTitle": "Étapes suivantes",
+
+    "steps": {
+      "confirm": {
+        "title": "Confirmation de la commande",
+        "desc": "Nous vous contacterons prochainement pour confirmer votre commande."
+      },
+      "prepare": {
+        "title": "Préparation & expédition",
+        "desc": "Vos articles seront préparés et expédiés."
+      },
+      "delivery": {
+        "title": "Livraison & paiement",
+        "desc": "Paiement à la livraison à votre domicile."
+      }
+    },
+
+    "track": "Suivre la commande",
+    "back": "Retour à la boutique",
+
+    "footer": "Un message de confirmation sera envoyé une fois votre commande validée."
+  },
+  "about": {
+    "title": "À propos",
+    "team": "Notre équipe"
+  }
+}

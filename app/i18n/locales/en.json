@@ -1,0 +1,219 @@
+
+{
+  "home": {
+    "delivery": "Delivery available in all wilayas",
+    "searchPlaceholder": "Search bikes, parts, accessories…",
+    "searchButton": "Search",
+    "allCategories": "All Categories",
+    "sortBy": "Sort by",
+    "shopByCategory": "Shop by Category",
+    "viewAll": "View all",
+    "clear": "Clear",
+    "results": "results",
+    "noProductsTitle": "No products found",
+    "noProductsDesc": "Try different search terms or filters."
+  },
+   "cart": {
+    "title": "Shopping Cart",
+    "item": "item",
+    "items": "items",
+    "emptyTitle": "Your cart is empty",
+    "continueShopping": "Continue Shopping",
+    "orderSummary": "Order Summary",
+    "promoCode": "Promo code",
+    "promoPlaceholder": "ENTER CODE",
+    "apply": "Apply",
+    "applying": "Applying…",
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "shipping": "Shipping",
+    "shippingNote": "Calculated at checkout",
+    "total": "Total",
+    "checkout": "Proceed to Checkout"
+  },
+  "navbar": {
+    "home": "Home",
+    "products": "Products",
+    "categories": "Categories",
+    "selectLanguage": "Select Language",
+    "profile": "My Profile",
+    "orders": "My Orders"
+  },
+  "orders": {
+    "title": "My orders",
+    "subtitle": "Track and manage your orders",
+    "empty": "No recent orders",
+    "order": "Order",
+    "delivery": "Delivery",
+    "standard": "Standard",
+    "tracking": "Tracking",
+    "total": "Total",
+    "payLater": "Delivery to be paid later with the courier",
+    "deliveryFee": "delivery",
+    "view": "View"
+  },
+  "profile": {
+    "notLoggedIn": "Not logged in",
+    "loginRequired": "Please login to view your profile.",
+    "goToLogin": "Go to Login",
+
+    "memberSince": "Member since",
+
+    "contactInfo": "Contact Information",
+    "phone": "Phone Number",
+    "wilaya": "Wilaya",
+    "address": "Address",
+    "notProvided": "Not provided",
+
+    "quickActions": "Quick Actions",
+    "viewOrders": "View My Orders",
+
+    "accountDetails": "Account Details",
+    "totalOrders": "Total Orders",
+    "joined": "Joined",
+    "lastUpdated": "Last Updated",
+
+    "needHelp": "Need Help?",
+    "helpText": "Contact our support team for assistance",
+    "contactSupport": "Contact Support",
+    "signOut": "Sign out"
+  },
+  "orderDetails": {
+    "notFound": "Order not found",
+
+    "back": "Back",
+    "order": "Order",
+    "orderProgress": "Order Progress",
+
+    "customer": "Customer",
+    "delivery": "Delivery",
+    "wilaya": "Wilaya",
+    "commune": "Commune",
+    "company": "Company",
+    "address": "Address",
+
+    "products": "Products",
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "shipping": "Shipping",
+    "total": "Total",
+
+    "orderInfo": "Order Information",
+
+    "deleteTitle": "Delete Order",
+    "deleteConfirm": "Are you sure you want to delete this order?",
+    "deleteWarning": "This action cannot be undone.",
+    "cancel": "Cancel",
+    "confirmDelete": "Yes, Delete",
+
+    "exchange": "Exchange",
+    "exchangeDesc": "Request a product exchange",
+
+    "return": "Return",
+    "returnDesc": "Return this order",
+
+    "edit": "Edit order",
+    "editDesc": "Change products or quantities",
+
+    "delete": "Delete",
+    "deleteDesc": "Permanently cancel this order"
+  },
+  "bottomNav": {
+    "home": "Home",
+    "favorites": "Favorites",
+    "cart": "Cart"
+  },
+  "exchange": {
+    "backToOrder": "Back to order",
+
+    "title": "Exchange request",
+    "subtitle": "Select items to return and review your cart for new products.",
+
+    "itemsToReturn": "Items to return",
+    "noItems": "No items found",
+
+    "return": "Return",
+    "cancel": "Cancel",
+
+    "newProducts": "New products",
+    "itemsInCart": "items in cart",
+    "cartEmpty": "Your cart is empty",
+    "cartHint": "Add products to the cart to include them in the exchange.",
+    "browseProducts": "Browse products",
+
+    "cartTotal": "Cart total",
+
+    "reasonLabel": "Reason for exchange",
+    "reasonPlaceholder": "Explain the reason for the exchange...",
+
+    "summary": "Exchange summary",
+    "returnedValue": "Returned value",
+    "newValue": "New products",
+    "difference": "Difference",
+
+    "selectReturnItem": "Select at least one item to return",
+    "addProducts": "Add products to the cart",
+    "enterReason": "Please provide a reason for the exchange",
+
+    "submitting": "Submitting...",
+    "submit": "Submit request"
+  },
+   "return": {
+    "backToOrder": "Back to order",
+
+    "title": "Return request",
+    "subtitle": "Select the items you want to return and specify the quantity.",
+
+    "itemsToReturn": "Items to return",
+    "noItems": "No items found",
+
+    "returnQty": "Quantity to return",
+
+    "reasonTitle": "Return reason",
+    "reasonPlaceholder": "Or describe the reason in detail...",
+
+    "summary": "Summary",
+    "noneSelected": "No items selected",
+    "estimatedRefund": "Estimated refundable total",
+
+    "selectItem": "Select at least one item to return",
+    "enterReason": "Please provide a return reason",
+
+    "submitting": "Submitting...",
+    "submit": "Submit return request",
+
+    "refundNote": "The refund will be processed after approval by our team"
+  },
+  "orderSuccess": {
+    "title": "Order Confirmed",
+    "orderLabel": "Order",
+
+    "message": "Hi {{name}}, we’ve received your order and will contact you shortly to confirm it.",
+
+    "nextTitle": "What Happens Next",
+
+    "steps": {
+      "confirm": {
+        "title": "Order Confirmation",
+        "desc": "We’ll contact you shortly to confirm your order."
+      },
+      "prepare": {
+        "title": "Preparation & Shipping",
+        "desc": "Your items will be prepared and dispatched."
+      },
+      "delivery": {
+        "title": "Delivery & Payment",
+        "desc": "Pay upon delivery at your doorstep."
+      }
+    },
+
+    "track": "Track Order",
+    "back": "Back to Store",
+
+    "footer": "A confirmation message will be sent once your order is approved."
+  },
+  "about": {
+    "title": "About Us",
+    "team": "Our Team"
+  }
+}

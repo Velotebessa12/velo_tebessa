@@ -1,0 +1,603 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  // output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String?
+  password  String
+  phoneNumber String? @unique
+  name      String?
+  wilaya String?
+  wilayaId String?
+  adress String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  role Role @default(USER)
+
+  customerOrders  Order[] @relation("CustomerOrders")
+  deliveryOrders  Order[] @relation("DeliveryOrders")
+
+  isActive Boolean @default(true)
+  isUnique Boolean @default(false)
+
+
+  pendingBalance Float @default(0)
+  
+  permissions String[]
+  exchanges    Exchange[]
+  coupons CouponUsage[]
+}
+
+// add orders 
+// add how many orders have been done on a product
+// add salary or money to give to DeliveryPerson and when you give him itwill get 0
+
+
+
+enum Role {
+  USER 
+  ADMIN
+  MANAGER 
+  WORKER
+  DELIVERY
+}
+
+model Wilaya {
+  name String
+  wilaya_id Int @id
+  /// Official Wilaya ID (matches NOEST wilaya_id)
+  /// Example: 16 = Alger, 9 = Blida
+
+  delivery_tarif Int
+  /// Home delivery price (DZD)
+  /// Used when delivery type = "home"
+  /// Seller → Customer doorstep
+
+  delivery_stopdesk Int
+  /// StopDesk / relay point delivery price (DZD)
+  /// Used when delivery type = "stopdesk"
+  /// Customer picks up package from agency
+
+  return_tarif Int
+  /// Return shipping price (DZD)
+  /// Charged to seller if customer refuses the order
+  /// Door-to-agency return
+
+  return_stopdesk Int
+  /// Return price for StopDesk delivery (DZD)
+  /// Used if a StopDesk order is returned
+
+  shippingCompany String
+
+  createdAt DateTime @default(now())
+  /// Record creation timestamp
+
+  updatedAt DateTime @updatedAt
+  /// Automatically updated on every change
+}
+
+model Product {
+  id           String   @id @default(uuid())
+
+  // ONLY used when product has NO variants
+  buyingPrice Float?
+  regularPrice        Float?
+  promoPrice Float?
+  regularPriceText    String?
+  promoPriceText String?
+  stock        Int?
+  minimumStock Int?
+
+  images       String[]
+
+  categoryId   String?
+  category     Category? @relation(fields: [categoryId], references: [id])
+
+  type         Type
+  isActive     Boolean @default(true)
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  translations ProductTranslation[]
+
+  addonsAsMain  ProductAddon[] @relation("MainProduct")
+  addonsAsAddon ProductAddon[] @relation("AddonProduct")
+
+
+  similarProducts String[]
+
+  youtubeVideoUrls String[]
+
+  exchangeItems ExchangeItem[]
+  operations Operation[]
+  orderItems   OrderItem[]
+  variants     ProductVariant[]
+  discounts    DiscountProduct[]
+  invoiceItems InvoiceItem[]
+}
+
+
+model ProductVariant {
+  id           String   @id @default(uuid())
+  productId    String
+  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  color        String?
+  attribute String?
+
+  buyingPrice Float?
+  regularPrice        Float?
+  promoPrice Float?
+  priceText    String?
+
+  stock        Int      @default(0)
+  minimumStock Int      @default(3)
+
+  imageUrl String?
+
+
+  isActive     Boolean  @default(true)
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+
+
+model ProductTranslation {
+  id          String @id @default(uuid())
+
+  productId   String
+  product     Product @relation(fields: [productId], references: [id])
+
+  language    String   // "ar" | "fr" | "en"
+
+  name        String
+  description String?
+
+  @@unique([productId, language])
+}
+
+model ProductAddon {
+  id String @id @default(uuid())
+
+  mainProductId String
+  mainProduct   Product @relation("MainProduct", fields: [mainProductId], references: [id])
+
+  addonProductId String
+  addonProduct   Product @relation("AddonProduct", fields: [addonProductId], references: [id])
+
+  // Optional settings
+  required Boolean @default(false)
+}
+
+
+enum Type {
+  PRODUCT 
+  ADDITION
+}
+
+
+model Category {
+  id        String   @id @default(uuid())
+  slug      String   @unique
+  imageUrl  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  translations CategoryTranslation[]
+  products Product[]
+  discounts   DiscountCategory[]
+}
+
+model CategoryTranslation {
+  id          String @id @default(uuid())
+
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
+
+  language    String   // "ar" | "fr" | "en"
+
+  name        String
+  description String?
+
+  @@unique([categoryId, language])
+}
+
+
+model Coupon {
+  id        String   @id @default(uuid())
+
+  code      String   @unique
+
+  type      CouponType
+
+  value     Float    // either percentage or fixed amount
+
+  maxDiscount Float?   // max reduction (optional)
+  minAmount   Float?   // minimum cart amount required
+
+  expiresAt  DateTime?
+
+  isActive   Boolean  @default(true)
+
+  // Scope
+  scope      CouponScope @default(ALL)
+
+  usageLimit   Int?    // null = unlimited
+  usedCount    Int     @default(0)
+  usages CouponUsage[]
+
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model CouponUsage {
+  id        String   @id @default(uuid())
+
+  // relations
+  couponId  String
+  coupon    Coupon   @relation(fields: [couponId], references: [id])
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  orderId   String   @unique
+  order     Order    @relation(fields: [orderId], references: [id])
+
+  // SNAPSHOT (this is the key change)
+  code            String
+  discountType    CouponType
+  discountValue   Float
+  discountAmount  Float
+
+  appliedAt DateTime @default(now())
+}
+
+enum CouponType {
+  PERCENTAGE
+  FIXED
+}
+
+enum CouponScope {
+  ALL
+  PRODUCTS
+  CATEGORIES
+}
+
+
+
+
+
+model Order {
+  id        String   @id @default(uuid())
+
+  customerId String?
+  customer   User?    @relation("CustomerOrders", fields: [customerId], references: [id])
+
+  subtotal        Float
+  shippingPrice Float @default(0)
+  discountTotal   Float @default(0)
+  total     Float
+
+
+  status    OrderStatus  @default(PENDING)
+
+  deliveryMethod String?
+  // ---- Delivery Information ----
+  shippingCompany String?
+
+  detailedAddress String?
+
+  deliveryNote String?
+
+  deliveryPersonId String?
+  deliveryPerson   User?   @relation("DeliveryOrders", fields: [deliveryPersonId], references: [id])
+  deliveredAt DateTime?
+
+  wilaya   String
+  commune  String
+
+  phoneNumber String
+  fullName    String
+
+  createdAt DateTime @default(now())
+
+  station_code String?
+  trackingId String?
+
+  couponUsage CouponUsage?
+  items OrderItem[]
+  exchanges    Exchange[]
+  invoices Invoice[]
+}
+
+
+// productId  → "T-Shirt"
+// variantId  → "Size L / Red"
+
+model OrderItem {
+  id         String  @id @default(uuid())
+
+  orderId    String
+  order      Order   @relation(fields: [orderId], references: [id])
+
+  productId  String
+  product    Product @relation(fields: [productId], references: [id])
+
+  // 🔥 Variant snapshot
+  variantId   String?
+  variantName String?
+  /// Example: "Size L / Red" or "256GB / Black"
+
+
+  quantity   Int
+
+  unitPrice  Float   // product base price SNAPSHOT
+  total      Float   // (unitPrice + addOns) * quantity
+
+  addOns     OrderItemAddOn[]
+}
+
+model OrderItemAddOn {
+  id          String @id @default(uuid())
+
+  orderItemId String
+  orderItem   OrderItem @relation(fields: [orderItemId], references: [id])
+
+  addOnId     String
+  name        String
+  unitPrice  Float
+  quantity   Int
+  total      Float
+}
+
+
+enum OrderStatus {
+  PENDING
+  PREPARING
+  SHIPPED
+  IN_TRANSIT
+  AT_OFFICE
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELED
+  RETURNED
+}
+
+
+model Invoice {
+  id            String        @id @default(uuid())
+
+  orderId       String?
+  order         Order?        @relation(fields: [orderId], references: [id])
+
+  supplierName  String        // Nom du fournisseur *
+  contact       String?       // Contact
+  invoiceNumber String?       // N° Facture (optional)
+
+  status        InvoiceStatus // PENDING | RECEIVED | CANCELLED
+  notes         String?       // Notes
+
+  totalAmount   Float         // Calculated from items
+
+  items         InvoiceItem[] // Produits
+
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+
+model InvoiceItem {
+  id         String   @id @default(uuid())
+
+  invoiceId String
+  invoice   Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+
+  quantity        Int      // Quantity
+  unitPrice Float    // Unit price
+
+  createdAt DateTime @default(now())
+}
+
+enum InvoiceStatus {
+  PENDING
+  RECEIVED
+  CANCELLED
+}
+
+
+model Operation {
+  id        String   @id @default(uuid())
+  
+
+  productId String
+  quantity  Int
+  price     Float
+  type      OperationType
+  stock Int
+  reason    String?
+
+  createdAt      DateTime @default(now())
+  product   Product  @relation(fields: [productId], references: [id])
+}
+
+
+enum OperationType {
+  IN
+  OUT
+}
+
+
+
+
+model Transaction {
+  id          String   @id @default(uuid())
+
+  description String
+
+  amount      Float
+  
+  type TransactionType
+  direction   TransactionDirection
+
+  createdAt   DateTime @default(now())
+}
+
+
+enum TransactionType {
+SALE
+RETURN
+EXPENSE
+DELIVERY_PAYMENT
+RETURN_LOSS
+}
+
+enum TransactionDirection {
+  IN
+  OUT
+}
+
+
+model Exchange {
+  id             String   @id @default(uuid())
+  exchangeNumber String   @unique
+  status         ExchangeStatus @default(PENDING)
+
+  orderId        String
+  order          Order    @relation(fields: [orderId], references: [id])
+
+  customerId     String
+  customer       User     @relation(fields: [customerId], references: [id])
+
+  items          ExchangeItem[]
+
+  returnedTotal  Float
+  newTotal       Float
+  difference     Float
+
+  reason String?
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+
+model ExchangeItem {
+  id          String   @id @default(uuid())
+
+  exchangeId  String
+  exchange    Exchange @relation(fields: [exchangeId], references: [id], onDelete: Cascade)
+
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id])
+
+  type        ExchangeItemType
+
+  name        String        // snapshot of product name
+  variant     String?       // size / color snapshot
+  price       Float         // price at time of exchange
+  quantity    Int
+  total       Float
+
+  createdAt   DateTime @default(now())
+}
+
+
+enum ExchangeStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  COMPLETED
+}
+
+enum ExchangeItemType {
+  RETURNED
+  NEW
+}
+
+
+model Discount {
+  id          String   @id @default(uuid())
+
+  name        String
+  description String?
+
+  type        DiscountType
+  value       Float
+
+  startsAt    DateTime?
+  endsAt      DateTime?
+
+  isActive    Boolean @default(true)
+  priority    Int     @default(0)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // RELATIONS
+  products    DiscountProduct[]
+  categories  DiscountCategory[]
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED
+}
+
+
+model DiscountProduct {
+  id          String   @id @default(uuid())
+
+  discountId  String
+  discount    Discount @relation(fields: [discountId], references: [id], onDelete: Cascade)
+
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([discountId, productId])
+}
+
+
+
+model DiscountCategory {
+  id          String   @id @default(uuid())
+
+  discountId  String
+  discount    Discount @relation(fields: [discountId], references: [id], onDelete: Cascade)
+
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([discountId, categoryId])
+}
+
+model Image {
+  id        String   @id @default(uuid())
+ 
+  url  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
