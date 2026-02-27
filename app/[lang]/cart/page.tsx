@@ -107,12 +107,12 @@ function getItemPrice(item: CartItem): number {
   return getItemBasePrice(item) + getAddonsPrice(item);
 }
 
-function getItemStock(item: CartItem): number {
+function getItemStock(item: any): number {
   if (item.variantId && item.variant) return item.variant.stock ?? 0;
   return item.stock ?? 0;
 }
 
-function computeSubtotal(cart: CartItem[]): number {
+function computeSubtotal(cart: any[]): number {
   return cart.reduce(
     (sum, item) => sum + getItemPrice(item) * item.quantity,
     0,
@@ -127,7 +127,7 @@ function AddonRow({
   updateAddonQuantity,
   lang,
 }: {
-  addon: CartAddon;
+  addon: any;
   itemId: string;
   updateAddonQuantity: (itemId: string, addonId: string, qty: number) => void;
   lang: string;
@@ -182,7 +182,7 @@ function CartItemCard({
   updateQuantity,
   updateAddonQuantity,
 }: {
-  item: CartItem;
+  item: any;
   lang: string;
   removeFromCart: (id: string) => void;
   updateQuantity: (id: string, qty: number) => void;
@@ -325,7 +325,7 @@ function CartItemCard({
       {/* Addons */}
       {item.addons && item.addons.length > 0 && (
         <div className="border-t border-gray-100 divide-y divide-gray-50">
-          {item.addons.map((addon) => (
+          {item.addons.map((addon : any) => (
             <AddonRow
               key={addon.id}
               addon={addon}
@@ -359,7 +359,7 @@ export default function CartPage() {
   const router = useRouter();
   const {lang , dict} = useLang();
   const [hasExchange, setHasExchange] = useState(false);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<any | null>(null);
 
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
@@ -371,6 +371,7 @@ export default function CartPage() {
 
   useEffect(() => {
     const checkHasExchange = async () => {
+      if(!user?.id) return
       try {
         const res = await fetch(
           `/api/exchanges/check-has-exchange?userId=${user?.id}`,
@@ -381,6 +382,7 @@ export default function CartPage() {
         }
 
         const { hasExchange } = await res.json();
+        console.log(hasExchange)
         setHasExchange(hasExchange);
       } catch (error) {
         toast.error("Error checking exchanges");
@@ -514,7 +516,7 @@ export default function CartPage() {
               </div>
             ) : (
               <div className="space-y-3 sm:space-y-4">
-                {cart.map((item) => (
+                {cart.map((item : any) => (
                   <CartItemCard
                     key={`${item.id}-${item.variantId ?? "no-variant"}`}
                     item={item}

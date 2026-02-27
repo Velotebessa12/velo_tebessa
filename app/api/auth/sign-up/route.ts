@@ -12,11 +12,11 @@ export async function POST(req: Request) {
       phoneNumber,
       name,
       wilaya,
-      adress,
+      address,
     } = body;
 
 
-    console.log(password , phoneNumber , name , wilaya , adress)
+    console.log(password , phoneNumber , name , wilaya , address)
 
     // Basic validation
     if (!phoneNumber || !password) {
@@ -48,7 +48,7 @@ export async function POST(req: Request) {
         password: hashedPassword,
         name,
         wilaya,
-        adress,
+        address,
       },
       select: {
         id: true,

@@ -15,6 +15,9 @@ export async function POST(req: NextRequest) {
             password,
             role : "DELIVERY",
             permissions
+        },
+        include : {
+          deliveryOrders : true
         }
         });
 

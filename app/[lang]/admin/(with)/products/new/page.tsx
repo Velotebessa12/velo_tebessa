@@ -113,7 +113,7 @@ const CreateProductPage = () => {
     const fetchProduct = async () => {
       setIsFetching(true);
       try {
-        const res = await fetch(`/api/products/${updateId}`);
+        const res = await fetch(`/api/products/get-product?productId=${updateId}`);
         if (!res.ok) throw new Error();
         const { product } = await res.json();
 
@@ -262,7 +262,7 @@ const CreateProductPage = () => {
       ? `/api/products/${updateId}`
       : `/api/products/create-product`;
 
-    const method = isUpdateMode ? "PUT" : "POST";
+    const method = isUpdateMode ? "PATCH" : "POST";
 
     const res = await fetch(url, {
       method,
@@ -381,7 +381,7 @@ const CreateProductPage = () => {
   };
 
   return (
-    <div className="p-4 max-w-3xl mx-auto">
+    <div className="p-4 mx-auto">
       {/* Page header */}
       <div className="mb-6 flex items-center gap-3">
         <button

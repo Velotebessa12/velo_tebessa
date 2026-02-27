@@ -35,7 +35,8 @@ export default function OrderDetailsPage() {
   const [selectedStatus, setSelectedStatus] = useState("PENDING");
   const [note, setNote] = useState("");
   const { lang } = useLang();
-
+  const [isEditingShipping, setIsEditingShipping] = useState(false)
+  const [shippingPrice, setShippingPrice] = useState(0)
   const statusLabels: Record<string, string> = {
     PENDING: "Pending",
     PREPARING: "Preparing",
@@ -127,6 +128,30 @@ export default function OrderDetailsPage() {
 
     fetchOrder();
   }, [orderId]);
+
+  const saveShippingPrice = async () => {
+  try {
+    const res = await fetch(`/api/orders/${order.id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        shippingPrice: Number(shippingPrice),
+      }),
+    })
+
+    if (!res.ok) {
+      throw new Error("Failed to update shipping price")
+    }
+
+    toast.success("Delivery price updated")
+    setIsEditingShipping(false)
+  } catch (error) {
+    toast.error("Error updating delivery price")
+    console.error(error)
+  }
+}
 
   console.log(order);
 
@@ -443,7 +468,7 @@ export default function OrderDetailsPage() {
                       <h3 className="font-medium group-hover:underline text-gray-900">
                         {getTranslations(
                           item.product?.translations,
-                          { lang },
+                           lang ,
                           "name",
                         ) || "Product"}
                       </h3>
@@ -458,7 +483,7 @@ export default function OrderDetailsPage() {
                       <p className="text-xs text-gray-400 line-clamp-2 leading-relaxed">
                         {getTranslations(
                           item.product?.translations,
-                          { lang },
+                           lang ,
                           "description",
                         )}
                       </p>
@@ -466,7 +491,7 @@ export default function OrderDetailsPage() {
                       {/* Add-ons */}
                       {item.addOns?.length > 0 && (
                         <div className="mt-1 space-y-1">
-                          {item.addOns.map((addOn) => (
+                          {item.addOns.map((addOn : any) => (
                             <p key={addOn.id} className="text-sm text-gray-500">
                               + {addOn.name} × {addOn.quantity} (
                               {addOn.unitPrice.toLocaleString()} DA)
@@ -512,19 +537,51 @@ export default function OrderDetailsPage() {
                   </span>
                 </div>
 
-                {order.shippingPrice && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">
-                      Shipping / Delivery cost
-                    </span>
-                    <span className="font-medium">
-                      + {order.shippingPrice.toLocaleString()} DA
-                    </span>
-                  </div>
-                )}
+              <div className="flex justify-between items-center text-sm">
+  <span className="text-gray-600">
+    Shipping / Delivery cost
+  </span>
+
+  {!isEditingShipping ? (
+    <span
+      className="font-medium cursor-pointer underline"
+      onClick={() => setIsEditingShipping(true)}
+      title="Click to edit"
+    >
+      + {Number(order.shippingPrice ?? 0).toLocaleString()} DA
+    </span>
+  ) : (
+    <div className="flex items-center gap-2">
+      <input
+        type="number"
+        className="w-24 border rounded px-2 py-1 text-sm"
+        value={shippingPrice}
+        onChange={(e) => setShippingPrice(Number(e.target.value))}
+        min={0}
+      />
+
+      <button
+        onClick={saveShippingPrice}
+        className="text-green-600 text-xs font-medium"
+      >
+        Save
+      </button>
+
+      <button
+        onClick={() => {
+          setShippingPrice(Number(order.shippingPrice ?? 0))
+          setIsEditingShipping(false)
+        }}
+        className="text-gray-500 text-xs"
+      >
+        Cancel
+      </button>
+    </div>
+  )}
+</div>
                 <div className="flex justify-between text-lg font-semibold pt-2 border-t border-gray-200">
                   <span>Total</span>
-                  <span>{order.total.toLocaleString()} DA</span>
+                  <span>{(Number(order.total) + (Number(order.shippingPrice))).toLocaleString()} DA</span>
                 </div>
               </div>
             </div>

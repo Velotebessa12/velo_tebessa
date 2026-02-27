@@ -63,12 +63,12 @@ export default function DiscountsPage() {
     },
   ]);
 
-  function openEditPopup(discount) {
+  function openEditPopup(discount : any) {
     setSelectedDiscount(discount);
     setIsEditingOpen(true);
   }
 
-  function openDeletePopup(discount) {
+  function openDeletePopup(discount : any) {
     setSelectedDiscount(discount);
     setIsDeleteOpen(true);
   }
@@ -279,7 +279,7 @@ export default function DiscountsPage() {
                           Aucun produit disponible
                         </p>
                       ) : (
-                        products.map((product) => (
+                        products.map((product : any) => (
                           <label
                             key={product.id}
                             className="flex items-start gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded-md"
@@ -300,24 +300,24 @@ export default function DiscountsPage() {
                               <span className="text-sm font-medium text-gray-800">
                                 {getTranslations(
                                   product.translations,
-                                  { lang },
+                                   lang ,
                                   "name",
                                 )}
                               </span>
 
-                              <span className="text-xs text-gray-500">
+                              {/* <span className="text-xs text-gray-500">
                                 {product.sku || "—"} • {product.price} DA
-                              </span>
+                              </span> */}
                             </div>
                           </label>
                         ))
                       )}
                     </div>
 
-                    <p className="text-xs text-gray-500 mt-3">
+                    {/* <p className="text-xs text-gray-500 mt-3">
                       {products.filter((p) => p.excluded).length} produit(s)
                       exclu(s)
-                    </p>
+                    </p> */}
                   </div>
                 </div>
 
@@ -334,7 +334,7 @@ export default function DiscountsPage() {
                           Aucune catégorie disponible
                         </p>
                       ) : (
-                        categories.map((category) => (
+                        categories.map((category : any) => (
                           <label
                             key={category.id}
                             className="flex items-start gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded-md"
@@ -355,7 +355,7 @@ export default function DiscountsPage() {
                               <span className="text-sm font-medium text-gray-800">
                                 {getTranslations(
                                   category.translations,
-                                  { lang },
+                                   lang ,
                                   "name",
                                 )}
                               </span>

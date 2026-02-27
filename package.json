@@ -14,6 +14,7 @@
     "class-variance-authority": "^0.7.1",
     "cloudinary": "^2.9.0",
     "clsx": "^2.1.1",
+    "csv-parse": "^6.1.0",
     "i18next": "^25.8.4",
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^0.563.0",
@@ -25,6 +26,7 @@
     "react-dom": "19.2.3",
     "react-hot-toast": "^2.6.0",
     "react-i18next": "^16.5.4",
+    "react-icons": "^5.5.0",
     "tailwind-merge": "^3.4.0",
     "zustand": "^5.0.11"
   },

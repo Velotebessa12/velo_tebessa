@@ -264,7 +264,7 @@ const Page = () => {
                     {(order.wilaya === "Tebessa" ||
                       order.commune === "Tebessa") &&
                     order.shippingPrice === 0 ? (
-                      <span className="text-xs text-orange-600 ml-2">
+                      <span className="text-xs text-orange-600 mx-2">
                         ({dict.orders.payLater})
                       </span>
                     ) : order.shippingPrice > 0 ? (

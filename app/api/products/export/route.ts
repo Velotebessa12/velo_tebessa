@@ -17,33 +17,26 @@ export async function GET() {
     const headers = [
       "ID",
       "Type",
-      "Parent",
-
+      "Parent ID",
       "Name (ar)",
       "Description (ar)",
       "Name (fr)",
       "Description (fr)",
       "Name (en)",
       "Description (en)",
-
+      "Buying price",
       "Regular price",
-      "Sale price",
+      "Promo price",
       "Regular price text",
       "Promo price text",
-      "Buying price",
-
       "Stock",
-      "Low stock amount",
-      "Stock status",
-
-      "Categories",
+      "Minimum stock",
       "Images",
-
+      "Category ID",
       "Is active",
-      "YouTube video",
-
+      "YouTube URLs",
+      "Similar Product IDs",
       "Created at",
-      "Updated at",
     ];
 
     const rows: string[] = [];
@@ -53,125 +46,67 @@ export async function GET() {
       const fr = t(product.translations, "fr");
       const en = t(product.translations, "en");
 
-      const category =
-        t(product.category?.translations ?? [], "fr")?.name ?? "";
-
       const images = product.images.join("|");
+      const youtubeUrls = product.youtubeVideoUrls.join("|");
+      const similarIds = product.similarProducts.join("|");
+
+      const hasVariants = product.variants.length > 0;
+      const wcType = hasVariants ? "variable" : "simple";
 
       /* ============================
-         SIMPLE PRODUCT
+         SIMPLE / VARIABLE (parent)
       ============================ */
-      if (product.variants.length === 0) {
-        rows.push(
-          [
-            product.id,
-            "simple",
-            "",
-
-            q(ar?.name ?? ""),
-            q(ar?.description ?? ""),
-            q(fr?.name ?? ""),
-            q(fr?.description ?? ""),
-            q(en?.name ?? ""),
-            q(en?.description ?? ""),
-
-            product.regularPrice ?? "",
-            product.promoPrice ?? "",
-            q(product.regularPriceText ?? ""),
-            q(product.promoPriceText ?? ""),
-            product.buyingPrice ?? "",
-
-            product.stock ?? "",
-            product.minimumStock ?? "",
-            product.stock && product.stock > 0 ? "instock" : "outofstock",
-
-            q(category),
-            q(images),
-
-            product.isActive ? "1" : "0",
-            q(product.youtubeVideoUrl ?? ""),
-
-            product.createdAt.toISOString(),
-            product.updatedAt.toISOString(),
-          ].join(","),
-        );
-      } else {
+      rows.push(
+        [
+          product.id,
+          wcType,
+          "",                               // no parent
+          q(ar?.name ?? ""),
+          q(ar?.description ?? ""),
+          q(fr?.name ?? ""),
+          q(fr?.description ?? ""),
+          q(en?.name ?? ""),
+          q(en?.description ?? ""),
+          hasVariants ? "" : (product.buyingPrice ?? ""),
+          hasVariants ? "" : (product.regularPrice ?? ""),
+          hasVariants ? "" : (product.promoPrice ?? ""),
+          hasVariants ? "" : q(product.regularPriceText ?? ""),
+          hasVariants ? "" : q(product.promoPriceText ?? ""),
+          hasVariants ? "" : (product.stock ?? ""),
+          hasVariants ? "" : (product.minimumStock ?? ""),
+          q(images),
+          product.categoryId ?? "",
+          product.isActive,
+          q(youtubeUrls),
+          q(similarIds),
+          product.createdAt.toISOString(),
+        ].join(","),
+      );
 
       /* ============================
-         VARIABLE PRODUCT (PARENT)
+         VARIATIONS
       ============================ */
+      for (const v of product.variants) {
         rows.push(
           [
-            product.id,
-            "variable",
-            "",
-
-            q(ar?.name ?? ""),
-            q(ar?.description ?? ""),
-            q(fr?.name ?? ""),
-            q(fr?.description ?? ""),
-            q(en?.name ?? ""),
-            q(en?.description ?? ""),
-
-            "",
-            "",
-            "",
-            "",
-            "",
-
-            "",
-            "",
-            "",
-
-            q(category),
-            q(images),
-
-            product.isActive ? "1" : "0",
-            q(product.youtubeVideoUrl ?? ""),
-
-            product.createdAt.toISOString(),
-            product.updatedAt.toISOString(),
+            v.id,
+            "variation",
+            product.id,                     // parent
+            "", "", "", "", "", "",          // no translations on variants
+            v.buyingPrice ?? "",
+            v.regularPrice ?? "",
+            v.promoPrice ?? "",
+            "",                             // no regularPriceText on variants
+            q(v.priceText ?? ""),
+            v.stock ?? "",
+            v.minimumStock ?? "",
+            q(v.imageUrl ?? ""),
+            product.categoryId ?? "",       // inherit from parent
+            v.isActive,
+            "", "",                         // no youtube/similar on variants
+            v.createdAt.toISOString(),
           ].join(","),
         );
-
-        /* ============================
-           VARIATIONS
-        ============================ */
-        for (const v of product.variants) {
-          rows.push(
-            [
-              v.id,
-              "variation",
-              product.id,
-
-              "",
-              "",
-              "",
-              "",
-              "",
-              "",
-
-              v.regularPrice ?? "",
-              v.promoPrice ?? "",
-              "",
-              q(v.priceText ?? ""),
-              v.buyingPrice ?? "",
-
-              v.stock ?? "",
-              v.minimumStock ?? "",
-              v.stock > 0 ? "instock" : "outofstock",
-
-              q(category),
-              q(v.imageUrl ?? ""),
-
-              v.isActive ? "1" : "0",
-              "",
-
-              v.createdAt.toISOString(),
-              v.updatedAt.toISOString(),
-            ].join(","),
-          );
-        }
       }
     }
 
@@ -180,7 +115,7 @@ export async function GET() {
     return new NextResponse(csv, {
       headers: {
         "Content-Type": "text/csv; charset=utf-8",
-        "Content-Disposition": `attachment; filename="products-full-export.csv"`,
+        "Content-Disposition": `attachment; filename="products-export.csv"`,
       },
     });
   } catch (e) {
@@ -189,13 +124,11 @@ export async function GET() {
   }
 }
 
-/* ============================
-   HELPERS
-============================ */
-function t(translations: any[], { lang }: string) {
-  return translations?.find((x) => x.language === { lang });
+function t(translations: { language: string; name: string; description?: string | null }[], lang: string) {
+  return translations.find(x => x.language === lang);
 }
 
-function q(v: string) {
+function q(v: string | null | undefined): string {
+  if (!v) return '""';
   return `"${v.replace(/"/g, '""')}"`;
 }

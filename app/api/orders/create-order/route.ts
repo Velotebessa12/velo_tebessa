@@ -53,6 +53,7 @@ export async function POST(request: Request) {
       discountAmount,    // ✅ optional (final applied amount)
     } = body;
 
+      console.log(body)
     if (!total || !wilaya || !phoneNumber || !fullName) {
       return NextResponse.json(
         { error: "Missing required fields" },

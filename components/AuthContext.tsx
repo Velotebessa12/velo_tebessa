@@ -12,12 +12,7 @@ export type User = {
   name?: string;
 };
 
-export type Admin = {
-  id: string;
-  email: string;
-  name?: string;
-  permissions?: string[];
-};
+export type Admin = any
 
 type AuthContextType = {
   user: User | null;

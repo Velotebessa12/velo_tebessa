@@ -213,6 +213,30 @@
 
     "footer": "سيتم إرسال رسالة تأكيد بعد الموافقة على الطلب."
   },
+  "adminSidebar": {
+    "dashboard": "لوحة التحكم",
+    "orders": "الطلبات",
+    "products": "المنتجات",
+    "categories": "الفئات",
+    "customers": "العملاء",
+    "discounts": "التخفيضات",
+    "coupons": "الكوبونات",
+    "inventory": "المخزون",
+    "invoices": "الفواتير",
+    "cashRegister": "الصندوق",
+    "finances": "المالية",
+    "delivery": "التوصيل",
+    "deliveryPersons": "الموصلون",
+    "employees": "الموظفون",
+    "deliveryPrices": "أسعار التوصيل",
+    "myDeliveries": "توصيلاتي",
+    "exchangesReturns": "الاستبدال والإرجاع",
+    "uploadImages": "رفع الصور",
+    "logout": "تسجيل الخروج",
+    "backToStore": "العودة إلى المتجر",
+    "active": "نشط",
+    "admin": "مشرف"
+  },
   "about": {
     "title": "معلومات عنا",
     "team": "فريقنا"

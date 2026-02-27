@@ -168,9 +168,28 @@ export default function OrderDetailsMobilePage() {
 
   function openDeletePopup(order: any) {
     setIsDeleteOpen(true);
-    toast.success("Order deleted successuflly !");
-    router.push(`/${ lang }/`);
     // setSelectedOrder(order);
+  }
+
+
+  const deleteOrder = async (id: string) => {
+    try {
+      const res = await fetch(`/api/orders/${id}`, {
+        method: "DELETE",
+      })
+  
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.error || "Error deleting order")
+      }
+  
+
+      router.push(`/${ lang }/`);
+      toast.success("Order deleted successfully")
+    } catch (error: any) {
+      toast.error(error.message || "Error deleting order")
+      console.error(error)
+    }
   }
 
   if (isLoading) return <Loader />;
@@ -228,7 +247,7 @@ export default function OrderDetailsMobilePage() {
                 </button>
 {/* handleDeleteOrder() */}
                 <button
-                  onClick={() => {}}
+                  onClick={() => deleteOrder(order.id)}
                   className="px-4 py-2 text-sm rounded-md bg-red-500 text-white hover:bg-red-600"
                 >
                   {dict.orderDetails.confirmDelete}
@@ -463,14 +482,16 @@ export default function OrderDetailsMobilePage() {
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">{dict.orderDetails.shipping}</span>
                   <span className="font-medium">
-                    {order.shippingPrice.toLocaleString()} DA
+                   + {order.shippingPrice.toLocaleString()} DA
                   </span>
                 </div>
               )}
 
               <div className="flex justify-between text-lg font-semibold pt-2 border-t border-gray-200">
                 <span>{dict.orderDetails.total}</span>
-                <span>{order.total.toLocaleString()} DA</span>
+               <span>
+  {(Number(order.total) + Number(order.shippingPrice)).toLocaleString()} DA
+</span>
               </div>
             </div>
           </div>

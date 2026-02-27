@@ -9,7 +9,7 @@ export default function AveragePricePopUp({
   onToggle,
   onConfirm,
   disabled = false,
-}) {
+}: any) {
   const handleToggle = () => {
     const price = Number(currentPrice);
 

@@ -212,6 +212,30 @@
 
     "footer": "A confirmation message will be sent once your order is approved."
   },
+  "adminSidebar": {
+    "dashboard": "Dashboard",
+    "orders": "Orders",
+    "products": "Products",
+    "categories": "Categories",
+    "customers": "Customers",
+    "discounts": "Discounts",
+    "coupons": "Coupons",
+    "inventory": "Inventory",
+    "invoices": "Invoices",
+    "cashRegister": "Cash Register",
+    "finances": "Finances",
+    "delivery": "Delivery",
+    "deliveryPersons": "Delivery Persons",
+    "employees": "Employees",
+    "deliveryPrices": "Delivery Prices",
+    "myDeliveries": "My Deliveries",
+    "exchangesReturns": "Exchanges & Returns",
+    "uploadImages": "Upload Images",
+    "logout": "Logout",
+    "backToStore": "Back to Store",
+    "active": "Active",
+    "admin": "Admin"
+  },
   "about": {
     "title": "About Us",
     "team": "Our Team"

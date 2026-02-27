@@ -226,26 +226,26 @@ const Page = () => {
         </div>
         <div className="bg-white border border-gray-200 rounded-2xl p-3 sm:p-4 md:p-5 hover:shadow-md transition-shadow">
           <p className="text-[10px] sm:text-xs md:text-sm font-medium text-gray-600 mb-1">
-            En attente
+            Active
           </p>
           <p className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
-            0
+           {products.filter((product) => product.isActive === true).length }
           </p>
         </div>
         <div className="bg-white border border-gray-200 rounded-2xl p-3 sm:p-4 md:p-5 hover:shadow-md transition-shadow">
           <p className="text-[10px] sm:text-xs md:text-sm font-medium text-gray-600 mb-1">
-            Approuvés
+            Low stock
           </p>
           <p className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
-            3
+          {products.filter((product) => product.stock < product.minimumStock).length }
           </p>
         </div>
         <div className="bg-white border border-gray-200 rounded-2xl p-3 sm:p-4 md:p-5 hover:shadow-md transition-shadow">
           <p className="text-[10px] sm:text-xs md:text-sm font-medium text-gray-600 mb-1">
-            Rejetés
+            Out of stock
           </p>
           <p className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
-            1
+          {products.filter((product) => product.stock === 0).length }
           </p>
         </div>
       </div>

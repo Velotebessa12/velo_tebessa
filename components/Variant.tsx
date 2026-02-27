@@ -10,14 +10,10 @@ const Variant = ({variants , setVariants , handleAddVariant}: {
   handleAddVariant : () => void
 }) => {
 
-  // Calculate profit whenever prices change
-  const calculateProfit = (regular, purchase) => {
-    const profit = (regular || 0) - (purchase || 0)
-    return `${profit} DA`
-  }
+
 
   // Calculate stock status
-  const calculateStatus = (stock, preorder) => {
+  const calculateStatus = (stock : any, preorder : any) => {
     if (stock > 0) return 'En stock'
     if (preorder === 'allowed') return 'Précommande'
     return 'Rupture de stock'
@@ -25,17 +21,17 @@ const Variant = ({variants , setVariants , handleAddVariant}: {
 
  
 
-  const handleDeleteVariant = (id) => {
+  const handleDeleteVariant = (id : any) => {
     setVariants(variants.filter(v => v.id !== id))
   }
 
-  const toggleVariant = (id) => {
+  const toggleVariant = (id : any) => {
     setVariants(variants.map(v => 
       v.id === id ? { ...v, expanded: !v.expanded } : v
     ))
   }
 
-const updateVariant = (id, field, value) => {
+const updateVariant = (id : any, field : any, value : any) => {
   setVariants((prev) =>
     prev.map((v) => {
       if (v.id !== id) return v;
@@ -66,7 +62,7 @@ const updateVariant = (id, field, value) => {
 };
 
 
-  const handleImageUpload = (id, e) => {
+  const handleImageUpload = (id : any, e : any) => {
     const file = e.target.files?.[0]
     if (file) {
       const reader = new FileReader()
@@ -77,7 +73,7 @@ const updateVariant = (id, field, value) => {
     }
   }
 
-  const getStatusColor = (status) => {
+  const getStatusColor = (status : any) => {
     switch (status) {
       case 'En stock': return 'bg-emerald-100 text-emerald-800'
       case 'Précommande': return 'bg-blue-100 text-blue-800'

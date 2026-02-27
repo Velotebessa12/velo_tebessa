@@ -328,7 +328,7 @@ export default function CheckoutPage() {
           phoneNumber: formData.phoneNumber,
           name: formData.fullName,
           wilaya: formData.wilaya,
-          adress: formData.detailedAddress,
+          address: formData.detailedAddress,
           password: formData.password,
         }),
       });

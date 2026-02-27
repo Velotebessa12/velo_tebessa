@@ -22,7 +22,7 @@ export default function FinancialManagementPage() {
   const [activeTab, setActiveTab] = useState('overview');
   const [isOpen , setIsOpen ] = useState(false)
   const [isLoading , setIsLoading ] = useState(true)
-  const [stats , setStats ] = useState()
+  const [stats , setStats ] = useState<any | null>(null)
 
   // const stats = {
   //   revenue: '26 994 DA',

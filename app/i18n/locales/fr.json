@@ -213,6 +213,30 @@
 
     "footer": "Un message de confirmation sera envoyé une fois votre commande validée."
   },
+  "adminSidebar": {
+    "dashboard": "Tableau de bord",
+    "orders": "Commandes",
+    "products": "Produits",
+    "categories": "Catégories",
+    "customers": "Clients",
+    "discounts": "Réductions",
+    "coupons": "Coupons",
+    "inventory": "Inventaire",
+    "invoices": "Factures",
+    "cashRegister": "Caisse",
+    "finances": "Finances",
+    "delivery": "Livraison",
+    "deliveryPersons": "Livreurs",
+    "employees": "Employés",
+    "deliveryPrices": "Prix de livraison",
+    "myDeliveries": "Mes livraisons",
+    "exchangesReturns": "Échanges & Retours",
+    "uploadImages": "Télécharger des images",
+    "logout": "Déconnexion",
+    "backToStore": "Retour à la boutique",
+    "active": "Actif",
+    "admin": "Administrateur"
+  },
   "about": {
     "title": "À propos",
     "team": "Notre équipe"

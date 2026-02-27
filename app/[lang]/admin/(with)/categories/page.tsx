@@ -34,7 +34,7 @@ const Page = () => {
   const [isEditingOpen, setIsEditingOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const router = useRouter();
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState<any | null>(null);
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -118,7 +118,7 @@ const Page = () => {
     } = normalizeLanguages();
 
     try {
-      if (images.length !== 0) return;
+      if (images.length === 0) return;
       const formData = new FormData();
       formData.append("image", images[0]);
       formData.append("slug", newCategorySlug);
@@ -172,6 +172,63 @@ const Page = () => {
       console.error("Error creating category");
     }
   };
+
+  const editCategory = async (
+  id: string,
+  data: {
+    slug?: string;
+    imageUrl?: string | null;
+  }
+) => {
+  try {
+    const res = await fetch(`/api/categories/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      throw new Error("Error updating category");
+    }
+
+    const updatedCategory = await res.json();
+
+    setCategories((prev) =>
+      prev.map((c) => (c.id === id ? updatedCategory : c))
+    );
+
+    toast.success("Category updated successfully");
+  } catch (error) {
+    toast.error("Error updating category");
+    console.error(error);
+  }
+};
+
+
+const deleteCategory = async (id: string) => {
+  try {
+    const res = await fetch(`/api/categories/${id}`, {
+      method: "DELETE",
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || "Error deleting category");
+    }
+
+    setCategories((prev) =>
+      prev.filter((c) => c.id !== id)
+    );
+    setIsDeleteOpen(false)
+    toast.success("Category deleted successfully");
+  } catch (error: any) {
+    toast.error(error.message || "Error deleting category");
+    console.error(error);
+  }
+};
+
 
   function openEditPopup(category: any) {
     // Names
@@ -376,10 +433,7 @@ const Page = () => {
                 </button>
 
                 <button
-                  onClick={() => {
-                    console.log("Order deleted");
-                    setIsDeleteOpen(false);
-                  }}
+                  onClick={() => deleteCategory(selectedCategory?.id)}
                   className="px-4 py-2 text-sm rounded-md bg-red-500 text-white hover:bg-red-600"
                 >
                   Yes, Delete

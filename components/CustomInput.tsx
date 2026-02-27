@@ -1,7 +1,7 @@
 import React from "react";
 import { Search, X } from "lucide-react";
 
-const CustomInput = ({ value, onChange }) => {
+const CustomInput = ({ value, onChange }: any) => {
   return (
     <div className="w-full max-w-xl mt-1 flex items-center bg-white border-2 border-gray-200 rounded-2xl overflow-hidden shadow-sm focus-within:border-teal-500 focus-within:ring-4 focus-within:ring-teal-50 transition-all">
       <div className="relative flex flex-1 items-center">

@@ -25,6 +25,19 @@ const [selectedCoupon , setSelectedCoupon ] = useState<any | null>(null)
   const [isEditingOpen , setIsEditingOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
+  const [couponData, setCouponData] = useState({
+  type: "PERCENTAGE" as "PERCENTAGE" | "FIXED",
+  code: "",
+  value: "" as number | "",
+  usageLimit: "" as number | "",
+  minAmount: "" as number | "",
+  expiresAt: "",
+  isActive: true,
+});
+
+const updateCoupon = (key: string, value: any) => {
+  setCouponData((prev) => ({ ...prev, [key]: value }));
+};
 
  useEffect(() => {
   const fetchCoupons = async () => {
@@ -52,7 +65,56 @@ const [selectedCoupon , setSelectedCoupon ] = useState<any | null>(null)
   fetchCoupons();
 }, []);
 
- 
+ const editCoupon = async (id: string, data: Record<string, any>) => {
+  try {
+    const res = await fetch(`/api/coupons/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      throw new Error("Error updating coupon");
+    }
+
+    const updatedCoupon = await res.json();
+
+    setCoupons((prev) =>
+      prev.map((c) => (c.id === id ? updatedCoupon : c))
+    );
+    setIsEditingOpen(false)
+    toast.success("Coupon updated successfully");
+  } catch (error) {
+    toast.error("Error updating coupon");
+    console.error(error);
+  }
+};
+
+const deactivateCoupon = async (id: string) => {
+  try {
+    const res = await fetch(`/api/coupons/${id}`, {
+      method: "DELETE",
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || "Error deactivating coupon");
+    }
+
+    setCoupons((prev) =>
+      prev.map((c) =>
+        c.id === id ? { ...c, isActive: false } : c
+      )
+    );
+    setIsDeleteOpen(false)
+    toast.success("Coupon deactivated successfully");
+  } catch (error: any) {
+    toast.error(error.message || "Error deactivating coupon");
+    console.error(error);
+  }
+};
 
   const generateCode = () => {
     const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -78,16 +140,7 @@ const [selectedCoupon , setSelectedCoupon ] = useState<any | null>(null)
     // You can add a toast notification here
   };
 
-  const handleEdit = (id: string) => {
-    console.log('Edit coupon:', id);
-    // Add your edit logic here
-  };
-
-  const handleDelete = (id: string) => {
-    if (confirm('Are you sure you want to delete this coupon?')) {
-      setCoupons(coupons.filter(coupon => coupon.id !== id));
-    }
-  };
+  
 
  const handleNewCoupon = async () => {
   setError("");
@@ -155,6 +208,17 @@ const [selectedCoupon , setSelectedCoupon ] = useState<any | null>(null)
 };
 
     function openEditPopup(coupon : any) {
+      setCouponData({
+         type: coupon.type || "PERCENTAGE",
+      code: coupon.code || "",
+      value: coupon.value ?? "",
+      usageLimit: coupon.usageLimit ?? "",
+      minAmount: coupon.minAmount ?? "",
+      expiresAt: coupon.expiresAt
+      ? new Date(coupon.expiresAt).toISOString().split("T")[0]
+      : "",
+      isActive: coupon.isActive ?? true,
+      })
   setSelectedCoupon(coupon);
   setIsEditingOpen(true);
 }
@@ -179,7 +243,7 @@ function openDeletePopup(coupon : any) {
       onClose={() => setIsDeleteOpen(false)}
       children={
         <div className="w-full flex flex-col items-center justify-center p-6 text-center">
-          <h2 className="text-lg font-semibold text-gray-900">Delete Coupon</h2>
+          <h2 className="text-lg font-semibold text-gray-900">Deactivate "Coupon"</h2>
           <p className="mt-3 text-sm text-gray-600">
             Are you sure you want to delete this coupon?
             <br />
@@ -193,7 +257,9 @@ function openDeletePopup(coupon : any) {
               Cancel
             </button>
             <button
-              onClick={() => { console.log("Order deleted"); setIsDeleteOpen(false); }}
+              onClick={() => {
+                deactivateCoupon(selectedCoupon.id)
+              }}
               className="px-4 py-2 text-sm rounded-md bg-red-500 text-white hover:bg-red-600"
             >
               Yes, Delete
@@ -207,148 +273,147 @@ function openDeletePopup(coupon : any) {
   {/* ── Edit Popup ───────────────────────────────────────────────────────── */}
   {isEditingOpen && (
     <PopUp isOpen={isEditingOpen} onClose={() => setIsEditingOpen(false)} children={
-      <div className="p-4 sm:p-6">
-        <div className="flex items-center gap-3 mb-5">
-          <div className="p-2 bg-teal-100 rounded-lg flex-shrink-0">
-            <Tag className="w-5 h-5 text-teal-600" />
-          </div>
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Edit coupon</h2>
-        </div>
+     <div className="p-4 sm:p-6">
+  <div className="flex items-center gap-3 mb-5">
+    <div className="p-2 bg-teal-100 rounded-lg flex-shrink-0">
+      <Tag className="w-5 h-5 text-teal-600" />
+    </div>
+    <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Edit coupon</h2>
+  </div>
 
-        {/* Code */}
-        <div className="mb-5">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Code du coupon *
-          </label>
-          <div className="flex gap-2">
-            <input
-              value={selectedCoupon.code}
-              onChange={(e) => updateCoupon("code", e.target.value.toUpperCase())}
-              type="text"
-              placeholder="SAVE20"
-              className="flex-1 min-w-0 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition text-sm"
-            />
-            <button
-              onClick={() => updateCoupon("code", Math.random().toString(36).substring(2, 8).toUpperCase())}
-              type="button"
-              className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition text-xs sm:text-sm whitespace-nowrap flex-shrink-0"
-            >
-              <span className="hidden xs:inline">Generate new</span>
-              <span className="xs:hidden">Gen.</span>
-            </button>
-          </div>
-        </div>
+  {/* Code */}
+  <div className="mb-5">
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Code du coupon *
+    </label>
+    <div className="flex gap-2">
+      <input
+        value={couponData.code}
+        onChange={(e) => updateCoupon("code", e.target.value.toUpperCase())}
+        type="text"
+        placeholder="SAVE20"
+        className="flex-1 min-w-0 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition text-sm"
+      />
+      <button
+        onClick={() => updateCoupon("code", Math.random().toString(36).substring(2, 8).toUpperCase())}
+        type="button"
+        className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition text-xs sm:text-sm whitespace-nowrap flex-shrink-0"
+      >
+        <span className="hidden xs:inline">Generate new</span>
+        <span className="xs:hidden">Gen.</span>
+      </button>
+    </div>
+  </div>
 
-        {/* Type & Value */}
-        <div className="grid grid-cols-1 xs:grid-cols-2 gap-4 mb-5">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
-            <select
-              value={selectedCoupon.type}
-              onChange={(e) => updateCoupon("type", e.target.value as "PERCENTAGE" | "FIXED")}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none transition text-sm"
-            >
-              <option value="PERCENTAGE">Pourcentage (%)</option>
-              <option value="FIXED">Montant fixe (DA)</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Valeur</label>
-            <div className="relative">
-              <input
-                type="number"
-                value={selectedCoupon.value}
-                onChange={(e) => updateCoupon("value", e.target.value === "" ? "" : Number(e.target.value))}
-                placeholder={selectedCoupon.type === "PERCENTAGE" ? "10" : "500"}
-                className="w-full px-3 py-2 pr-8 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none transition text-sm"
-              />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs">
-                {selectedCoupon.type === "PERCENTAGE" ? "%" : "DA"}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Usage Limit & Min Amount */}
-        <div className="grid grid-cols-1 xs:grid-cols-2 gap-4 mb-5">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Limite d'utilisateurs
-            </label>
-            <input
-              type="number"
-              value={selectedCoupon.usageLimit}
-              onChange={(e) => updateCoupon("usageLimit", e.target.value === "" ? "" : Number(e.target.value))}
-              placeholder="0"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none transition text-sm"
-            />
-            <p className="text-xs text-gray-500 mt-1">0 = illimité</p>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Montant minimum
-            </label>
-            <input
-              type="number"
-              value={selectedCoupon.minAmount}
-              onChange={(e) => updateCoupon("minAmount", e.target.value === "" ? "" : Number(e.target.value))}
-              placeholder="1000"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none transition text-sm"
-            />
-          </div>
-        </div>
-
-        {/* Expiry */}
-        <div className="mb-5">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Date d'expiration
-          </label>
-          <div className="relative">
-            <input
-              type="date"
-              value={selectedCoupon.expirationDate}
-              onChange={(e) => updateCoupon("expirationDate", e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none transition text-sm"
-            />
-            <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-          </div>
-          <p className="text-xs text-gray-500 mt-1">Laisser vide pour pas d'expiration</p>
-        </div>
-
-        {/* Active */}
-        <div className="mb-5">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={selectedCoupon.isActive}
-              onChange={(e) => updateCoupon("isActive", e.target.checked)}
-              className="w-4 h-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500 cursor-pointer"
-            />
-            <span className="text-sm font-medium text-gray-700">Actif</span>
-          </label>
-        </div>
-
-        {error && (
-          <div className="mb-4 text-sm text-red-600 bg-red-50 p-3 rounded-lg">{error}</div>
-        )}
-
-        <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
-          <button
-            type="button"
-            className="px-4 sm:px-5 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition text-sm"
-          >
-            Annuler
-          </button>
-          <button
-            onClick={handleNewCoupon}
-            disabled={loading}
-            className="px-4 sm:px-5 py-2 bg-teal-500 text-white rounded-lg font-medium hover:bg-teal-600 transition flex items-center gap-2 disabled:opacity-50 text-sm"
-          >
-            <Check className="w-4 h-4" />
-            {loading ? "Enregistrement..." : "Enregistrer"}
-          </button>
-        </div>
+  {/* Type & Value */}
+  <div className="grid grid-cols-1 xs:grid-cols-2 gap-4 mb-5">
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
+      <select
+        value={couponData.type}
+        onChange={(e) => updateCoupon("type", e.target.value as "PERCENTAGE" | "FIXED")}
+        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none transition text-sm"
+      >
+        <option value="PERCENTAGE">Pourcentage (%)</option>
+        <option value="FIXED">Montant fixe (DA)</option>
+      </select>
+    </div>
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-2">Valeur</label>
+      <div className="relative">
+        <input
+          type="number"
+          value={couponData.value}
+          onChange={(e) => updateCoupon("value", e.target.value === "" ? "" : Number(e.target.value))}
+          placeholder={couponData.type === "PERCENTAGE" ? "10" : "500"}
+          className="w-full px-3 py-2 pr-8 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none transition text-sm"
+        />
+        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs">
+          {couponData.type === "PERCENTAGE" ? "%" : "DA"}
+        </span>
       </div>
+    </div>
+  </div>
+
+  {/* Usage Limit & Min Amount */}
+  <div className="grid grid-cols-1 xs:grid-cols-2 gap-4 mb-5">
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-2">
+        Limite d'utilisateurs
+      </label>
+      <input
+        type="number"
+        value={couponData.usageLimit}
+        onChange={(e) => updateCoupon("usageLimit", e.target.value === "" ? "" : Number(e.target.value))}
+        placeholder="0"
+        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none transition text-sm"
+      />
+      <p className="text-xs text-gray-500 mt-1">0 = illimité</p>
+    </div>
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-2">
+        Montant minimum
+      </label>
+      <input
+        type="number"
+        value={couponData.minAmount}
+        onChange={(e) => updateCoupon("minAmount", e.target.value === "" ? "" : Number(e.target.value))}
+        placeholder="1000"
+        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none transition text-sm"
+      />
+    </div>
+  </div>
+
+  {/* Expiry */}
+  <div className="mb-5">
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Date d'expiration
+    </label>
+    <div className="relative">
+      <input
+        type="date"
+        value={couponData.expiresAt}
+        onChange={(e) => updateCoupon("expiresAt", e.target.value)}
+        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 outline-none transition text-sm"
+      />
+      <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+    </div>
+    <p className="text-xs text-gray-500 mt-1">Laisser vide pour pas d'expiration</p>
+  </div>
+
+  {/* Active */}
+  <div className="mb-5">
+    <label className="flex items-center gap-2 cursor-pointer">
+      <input
+        type="checkbox"
+        checked={couponData.isActive}
+        onChange={(e) => updateCoupon("isActive", e.target.checked)}
+        className="w-4 h-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500 cursor-pointer"
+      />
+      <span className="text-sm font-medium text-gray-700">Actif</span>
+    </label>
+  </div>
+
+
+
+  <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+    <button
+      type="button"
+      onClick={() => setIsEditingOpen(false)}
+      className="px-4 sm:px-5 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition text-sm"
+    >
+      Annuler
+    </button>
+    <button
+      onClick={() => editCoupon(selectedCoupon.id , couponData)}
+      disabled={loading}
+      className="px-4 sm:px-5 py-2 bg-teal-500 text-white rounded-lg font-medium hover:bg-teal-600 transition flex items-center gap-2 disabled:opacity-50 text-sm"
+    >
+      <Check className="w-4 h-4" />
+      {loading ? "Enregistrement..." : "Enregistrer"}
+    </button>
+  </div>
+</div>
     } />
   )}
 

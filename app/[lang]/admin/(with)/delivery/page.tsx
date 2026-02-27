@@ -1,4 +1,5 @@
 "use client";
+import { useLang } from "@/components/LanguageContext";
 import PopUp from "@/components/PopUp";
 import {
   Edit,
@@ -9,16 +10,19 @@ import {
   Truck,
   User,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 const page = () => {
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isEditingOpen, setIsEditingOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [shippingCompany, setShippingCompany] = useState("noest-express");
+  const {lang } = useLang()
+  const router = useRouter()
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -46,12 +50,12 @@ const page = () => {
     fetchOrders();
   }, [shippingCompany]);
 
-  function openEditPopup(order) {
+  function openEditPopup(order : any) {
     setSelectedOrder(order);
     setIsEditingOpen(true);
   }
 
-  function openDeletePopup(order) {
+  function openDeletePopup(order : any) {
     setSelectedOrder(order);
     setIsDeleteOpen(true);
   }
@@ -183,7 +187,7 @@ const page = () => {
                     colSpan={8}
                     className="text-center py-10 text-sm text-gray-500"
                   >
-                    Aucune commande récente
+                    Aucune commande récente avec shippingCompanies
                   </td>
                 </tr>
               )}
@@ -246,7 +250,7 @@ const page = () => {
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() =>
-                          router.push(`/${{ lang }}/admin/orders/${order.id}`)
+                          router.push(`/${ lang }/admin/orders/${order.id}`)
                         }
                         className="p-1.5 hover:bg-gray-100 rounded transition"
                       >
@@ -361,7 +365,7 @@ const page = () => {
                 <div className="flex items-center gap-0.5 flex-shrink-0">
                   <button
                     onClick={() =>
-                      router.push(`/${{ lang }}/admin/orders/${order.id}`)
+                      router.push(`/${ lang }/admin/orders/${order.id}`)
                     }
                     className="p-1.5 hover:bg-gray-100 rounded-lg transition"
                   >

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { Upload, Download, Info, FileSpreadsheet, ArrowLeft } from 'lucide-react'
+import toast from 'react-hot-toast'
 
 const Page = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
@@ -43,15 +44,23 @@ const Page = () => {
 };
 
    const upload = async () => {
-    const formData = new FormData();
+try {
+      const formData = new FormData();
     formData.append("file", selectedFile as File);
 
-    await fetch("/api/products/import", {
+    const res = await fetch("/api/products/import", {
       method: "POST",
       body: formData,
     });
 
-    alert("Import finished");
+    if(!res.ok) throw new Error("Error occured")
+
+      toast.success("Products imported successfully !")
+
+} catch (error) {
+  toast.error("Error")
+ console.log("Error occured : try again later !") 
+}
   };
 
   return (

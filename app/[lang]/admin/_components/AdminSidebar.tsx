@@ -39,7 +39,7 @@ const AdminSidebar = () => {
   const [isCollapsed, setIsCollapsed] = React.useState(false);
   const { lang } = useLang();
   const router = useRouter();
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<any | null>(null);
 
   useEffect(() => {
     const savedUser = localStorage.getItem("admin");
@@ -77,12 +77,6 @@ const AdminSidebar = () => {
         PERMISSIONS.CONFIRM_ORDERS,
         PERMISSIONS.UPDATE_ORDER_STATUS,
       ],
-    },
-    {
-      label: "Exchanges & Returns",
-      icon: <ArrowLeftRight size={20} />,
-      href: "/admin/exchanges-returns",
-      requiredPermissions: [PERMISSIONS.MANAGE_ORDERS],
     },
     {
       label: "Produits",
@@ -168,6 +162,12 @@ const AdminSidebar = () => {
       href: "/admin/dashboard/delivery-person",
       // requiredPermissions: [PERMISSIONS.MANAGE_EMPLOYEES],
     },
+     {
+      label: "Exchanges & Returns",
+      icon: <ArrowLeftRight size={20} />,
+      href: "/admin/exchanges-returns",
+      requiredPermissions: [PERMISSIONS.MANAGE_ORDERS],
+    },
     {
       label: "Upload images",
       icon: <PictureInPicture2 size={20} />,
@@ -177,8 +177,8 @@ const AdminSidebar = () => {
   ];
 
   const hasPermission = (
-    userPermissions: Permission[] = [],
-    required?: Permission[],
+    userPermissions: any[] = [],
+    required?: any[],
   ) => {
     if (!required || required.length === 0) return true;
     return required.some((p) => userPermissions.includes(p));
@@ -214,7 +214,7 @@ const AdminSidebar = () => {
               {user?.name
                 ? user.name
                     .split(" ")
-                    .map((word) => word[0])
+                    .map((word : any) => word[0])
                     .slice(0, 2)
                     .join("")
                     .toUpperCase()

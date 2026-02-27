@@ -6,6 +6,7 @@ import {
   Eye,
   ChevronDown,
   ChevronDownCircleIcon,
+  Plus,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import PopUp from "@/components/PopUp";
@@ -97,6 +98,26 @@ export default function ExchangeManagementPage() {
             </p>
           </div>
         </div>
+
+            <div className="flex items-center gap-2">
+               <button
+        type="button"
+        onClick={() => {}}
+        className="px-4 py-2.5 mb-2 rounded-2xl text-yellow-700 border bg-yellow-50 border-yellow-200 hover:bg-yellow-100 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+      >
+        <RefreshCw className="w-4 h-4" />
+        <span className="hidden sm:inline">New Exchange</span>
+      </button>
+
+      <button
+        type="button"
+        onClick={() => {}}
+        className="px-4 py-2.5 mb-2 bg-teal-500 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+      >
+        <Plus className="w-4 h-4" />
+        <span className="hidden sm:inline">New Return</span>
+      </button>
+            </div>
 
         <div className="flex gap-2 mb-6">
           <button

@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     let newStock =
       type === "IN"
         ? product.stock + quantity
-        : product.stock - quantity;
+        : product.stock! - quantity;
 
     if (newStock < 0) {
       return NextResponse.json(

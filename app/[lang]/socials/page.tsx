@@ -1,35 +1,42 @@
 "use client";
 
-import { Instagram, Facebook, Phone, Mail, MapPin, Globe } from "lucide-react";
-
+import { Instagram, Facebook, Phone, Mail, MapPin, Globe, Youtube } from "lucide-react";
+import { FaTiktok } from "react-icons/fa";
 export default function SocialsPage() {
   const socials = [
-    {
-      name: "Instagram",
-      value: "@velotebessa",
-      link: "https://instagram.com/velotebessa",
-      icon: Instagram,
-      color: "text-pink-500",
-      bg: "bg-pink-50",
-    },
-    {
-      name: "Facebook",
-      value: "Velo Tebessa",
-      link: "https://facebook.com/velotebessa",
-      icon: Facebook,
-      color: "text-blue-500",
-      bg: "bg-blue-50",
-    },
-    {
-      name: "Website",
-      value: "velotebessa.com",
-      link: "https://velotebessa.com",
-      icon: Globe,
-      color: "text-teal-600",
-      bg: "bg-teal-50",
-    },
-  ];
-
+  {
+    name: "Instagram",
+    value: "@velotebessa",
+    link: "https://instagram.com/velotebessa",
+    icon: Instagram,
+    color: "text-pink-500",
+    bg: "bg-pink-50",
+  },
+  {
+    name: "Facebook",
+    value: "Velo Tebessa",
+    link: "https://facebook.com/velotebessa",
+    icon: Facebook,
+    color: "text-blue-500",
+    bg: "bg-blue-50",
+  },
+  {
+    name: "TikTok",
+    value: "@velotebessa",
+    link: "https://www.tiktok.com/@velotebessa",
+    icon: FaTiktok,
+    color: "text-black",
+    bg: "bg-gray-100",
+  },
+  {
+    name: "YouTube",
+    value: "Velo Tebessa",
+    link: "https://www.youtube.com/@velotebessa",
+    icon: Youtube,
+    color: "text-red-500",
+    bg: "bg-red-50",
+  },
+];
   const contacts = [
     { name: "Phone", value: "+213 000 000 000", icon: Phone },
     { name: "Email", value: "contact@velotebessa.com", icon: Mail },

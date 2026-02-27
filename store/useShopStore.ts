@@ -55,9 +55,9 @@ export interface Coupon {
 
 interface CheckoutSnapshot {
   subtotal: number;
-  discount: number;
-  total: number;
-  coupon: Coupon | null;
+  discount?: number;
+  total?: number;
+  coupon?: Coupon | null; // 👈 add the ?
 }
 
 /* ───────────────── STORE STATE ───────────────── */
@@ -71,13 +71,14 @@ interface ShopState {
   checkoutSnapshot: CheckoutSnapshot | null;
 
   /* cart actions */
-  addToCart: (product: Omit<CartItem, "quantity">) => void;
+  addToCart: (product: Omit<CartItem, "quantity"> & { quantity?: number }) => void;
   removeFromCart: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
+  updateAddonQuantity: (productId: string, addonId: string, quantity: number) => void; // 👈 added
   clearCart: () => void;
 
   /* coupon / checkout */
-  setCheckoutSnapshot: (snapshot: CheckoutSnapshot) => void;
+  setCheckoutSnapshot: (snapshot: CheckoutSnapshot | null) => void;
   clearCheckoutSnapshot: () => void;
 
   /* favorites */
@@ -92,7 +93,7 @@ interface ShopState {
 
 /* ───────────────── STORE ───────────────── */
 
-const sameAddons = (a = [], b = []) => {
+const sameAddons = (a: CartAddon[] = [], b: CartAddon[] = []) => {
   if (a.length !== b.length) return false;
 
   return a
@@ -233,11 +234,11 @@ updateAddonQuantity: (
     return sum + itemTotal;
   }, 0),
 
-      total: () => {
-        const snapshot = get().checkoutSnapshot;
-        if (snapshot) return snapshot.total;
-        return get().subtotal();
-      },
+     total: () => {
+  const snapshot = get().checkoutSnapshot;
+  if (snapshot) return snapshot.total ?? snapshot.subtotal;
+  return get().subtotal();
+},
 
       itemsCount: () =>
         get().cart.reduce((sum, item) => sum + item.quantity, 0),

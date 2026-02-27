@@ -117,6 +117,8 @@ export const PERMISSIONS = {
   MANAGE_DISCOUNTS: 'manage_discounts',
   CONFIRM_ORDERS: 'confirm_orders',
   UPDATE_ORDER_STATUS: 'update_order_status',
+  // for now
+  MANAGE_DELIVERIES: 'manage_deliveries',
 } as const;
 
 export const PERMISSION_OPTIONS = Object.values(PERMISSIONS).map(value => ({

@@ -22,7 +22,8 @@ model User {
   name      String?
   wilaya String?
   wilayaId String?
-  adress String?
+  address String?
+  commune String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

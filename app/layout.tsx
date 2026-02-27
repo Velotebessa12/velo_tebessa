@@ -87,17 +87,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({
-  children,
-  params,
-}: Readonly<{
+export default async function RootLayout({ children }: Readonly<{
   children: React.ReactNode;
-  params: Promise<{ lang: string }>;
-}>) {
-  const { lang } = await params;
+ }>) {
+
 
   return (
-    <html lang={lang} dir={lang === "ar" ? "rtl" : "ltr"}>
+    <html>
       <body>
         <main>
           <AuthProvider>{children}</AuthProvider>

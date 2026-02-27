@@ -1,20 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { parse } from "csv-parse/sync";
+
 
 function parseCSV(text: string): string[][] {
-  return text
-    .split("\n")
-    .map(r =>
-      r
-        .split(",")
-        .map(c => c.replace(/^"|"$/g, "").replace(/""/g, '"').trim()),
-    )
-    .filter(r => r.length > 1);
+  return parse(text, {
+    skip_empty_lines: true,
+    relax_quotes: true,
+    relax_column_count: true,
+    trim: true,
+  });
 }
 
 function num(v?: string) {
   const n = Number(v);
-  return isNaN(n) ? null : n;
+  return isNaN(n) || v === "" ? null : n;
 }
 
 export async function POST(req: NextRequest) {
@@ -27,70 +27,44 @@ export async function POST(req: NextRequest) {
     const rows = parseCSV(text);
     rows.shift(); // remove header
 
-    const productMap = new Map<string, string>();
+    const productMap = new Map<string, string>(); // csvId → real db id
 
     /* ============================
-       PASS 1 — PRODUCTS
+       PASS 1 — PRODUCTS (simple + variable)
     ============================ */
     for (const row of rows) {
       const [
-        csvId,
-        type,
-
-        ,
-        nameAr,
-        descAr,
-        nameFr,
-        descFr,
-        nameEn,
-        descEn,
-
-        regularPrice,
-        promoPrice,
-        regularPriceText,
-        promoPriceText,
-        buyingPrice,
-
-        stock,
-        lowStock,
-
-        ,
-        categoryName,
-        images,
-
-        isActive,
-        youtubeUrl,
+        csvId,        // 0  ID
+        type,         // 1  Type
+        ,             // 2  Parent ID (ignored in pass 1)
+        nameAr,       // 3  Name (ar)
+        descAr,       // 4  Description (ar)
+        nameFr,       // 5  Name (fr)
+        descFr,       // 6  Description (fr)
+        nameEn,       // 7  Name (en)
+        descEn,       // 8  Description (en)
+        buyingPrice,  // 9  Buying price
+        regularPrice, // 10 Regular price
+        promoPrice,   // 11 Promo price
+        regularPriceText, // 12 Regular price text
+        promoPriceText,   // 13 Promo price text
+        stock,        // 14 Stock
+        minimumStock, // 15 Minimum stock
+        images,       // 16 Images
+        categoryId,   // 17 Category ID
+        isActive,     // 18 Is active
+        youtubeUrls,  // 19 YouTube URLs
+        similarIds,   // 20 Similar Product IDs
+        createdAt,    // 21 Created at
       ] = row;
 
       if (type === "variation") continue;
 
-      let categoryId: string | undefined;
-
-      if (categoryName) {
-        const slug = categoryName.toLowerCase().replace(/\s+/g, "-");
-
-        const category = await prisma.category.upsert({
-          where: { slug },
-          update: {},
-          create: {
-            slug,
-            translations: {
-              create: [
-                { language: "ar", name: categoryName },
-                { language: "fr", name: categoryName },
-                { language: "en", name: categoryName },
-              ],
-            },
-          },
-        });
-
-        categoryId = category.id;
-      }
-
       const product = await prisma.product.create({
         data: {
+          // ...(csvId ? { id: csvId } : {}),
           type: "PRODUCT",
-          isActive: isActive === "1",
+          isActive: isActive === "true",
 
           buyingPrice: num(buyingPrice),
           regularPrice: num(regularPrice),
@@ -99,65 +73,64 @@ export async function POST(req: NextRequest) {
           promoPriceText: promoPriceText || null,
 
           stock: num(stock),
-          minimumStock: num(lowStock),
+          minimumStock: num(minimumStock),
 
-          images: images ? images.split("|") : [],
-          youtubeVideoUrl: youtubeUrl || null,
+          images: images ? images.split("|").filter(Boolean) : [],
+          youtubeVideoUrls: youtubeUrls ? youtubeUrls.split("|").filter(Boolean) : [],
+          similarProducts: similarIds ? similarIds.split("|").filter(Boolean) : [],
 
-          categoryId,
+          categoryId: categoryId || null,
+
+          ...(createdAt ? { createdAt: new Date(createdAt) } : {}),
 
           translations: {
             create: [
-              nameAr && { language: "ar", name: nameAr, description: descAr },
-              nameFr && { language: "fr", name: nameFr, description: descFr },
-              nameEn && { language: "en", name: nameEn, description: descEn },
+              nameAr ? { language: "ar", name: nameAr, description: descAr || null } : null,
+              nameFr ? { language: "fr", name: nameFr, description: descFr || null } : null,
+              nameEn ? { language: "en", name: nameEn, description: descEn || null } : null,
             ].filter(Boolean) as any,
           },
         },
       });
 
-      productMap.set(csvId, product.id);
+      if (csvId) productMap.set(csvId, product.id);
     }
 
     /* ============================
-       PASS 2 — VARIANTS
+       PASS 2 — VARIANTS (variation rows)
     ============================ */
     for (const row of rows) {
       const [
-        ,
-        type,
-        parent,
-
-        ,
-        ,
-        ,
-        ,
-        ,
-        ,
-
-        regularPrice,
-        promoPrice,
-        ,
-        priceText,
-        buyingPrice,
-
-        stock,
-        lowStock,
-
-        ,
-        ,
-        imageUrl,
-        isActive,
+        ,             // 0  ID
+        type,         // 1  Type
+        parentId,     // 2  Parent ID
+        ,             // 3  Name (ar)
+        ,             // 4  Description (ar)
+        ,             // 5  Name (fr)
+        ,             // 6  Description (fr)
+        ,             // 7  Name (en)
+        ,             // 8  Description (en)
+        buyingPrice,  // 9  Buying price
+        regularPrice, // 10 Regular price
+        promoPrice,   // 11 Promo price
+        ,             // 12 Regular price text
+        priceText,    // 13 Promo price text (mapped to variant's priceText)
+        stock,        // 14 Stock
+        minimumStock, // 15 Minimum stock
+        imageUrl,     // 16 Images (single for variant)
+        ,             // 17 Category ID (inherited, not stored on variant)
+        isActive,     // 18 Is active
       ] = row;
 
       if (type !== "variation") continue;
 
-      const parentId = productMap.get(parent);
-      if (!parentId) continue;
+      // resolve parent — could be a real UUID already in DB or a csvId we mapped
+      const resolvedParentId = productMap.get(parentId) ?? parentId;
+      if (!resolvedParentId) continue;
 
       await prisma.productVariant.create({
         data: {
-          productId: parentId,
+          productId: resolvedParentId,
 
           buyingPrice: num(buyingPrice),
           regularPrice: num(regularPrice),
@@ -165,10 +138,10 @@ export async function POST(req: NextRequest) {
           priceText: priceText || null,
 
           stock: num(stock) ?? 0,
-          minimumStock: num(lowStock) ?? 3,
+          minimumStock: num(minimumStock) ?? 3,
 
           imageUrl: imageUrl || null,
-          isActive: isActive === "1",
+          isActive: isActive === "true",
         },
       });
     }

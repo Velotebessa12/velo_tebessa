@@ -43,7 +43,7 @@ export async function POST(req: Request) {
 
     for (const order of orders) {
       const agencyStatus = await getAgencyStatus(order.trackingId!);
-      const mappedStatus = mapNoestStatusToOrderStatus(agencyStatus);
+      const mappedStatus = mapNoestStatusToOrderStatus(agencyStatus as any);
 
       // Ignore invalid or unchanged status
       if (!mappedStatus || mappedStatus === order.status) continue;

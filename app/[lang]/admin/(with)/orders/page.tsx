@@ -111,6 +111,56 @@ const Page = () => {
     fetchOrders();
   }, []);
 
+  const editOrder = async (id: string, data: Record<string, any>) => {
+  try {
+    const res = await fetch(`/api/orders/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+
+    if (!res.ok) {
+      throw new Error("Error updating order")
+    }
+
+    const updatedOrder = await res.json()
+
+    // Optional: update state locally
+    setOrders((prev) =>
+      prev.map((o) => (o.id === id ? updatedOrder : o))
+    )
+
+    toast.success("Order updated successfully")
+  } catch (error) {
+    toast.error("Error updating order")
+    console.error(error)
+  }
+}
+
+
+  const deleteOrder = async (id: string) => {
+  try {
+    const res = await fetch(`/api/orders/${id}`, {
+      method: "DELETE",
+    })
+
+    if (!res.ok) {
+      const err = await res.json()
+      throw new Error(err.error || "Error deleting order")
+    }
+
+    // Optional: remove from UI
+    setOrders((prev) => prev.filter((o) => o.id !== id))
+    setIsDeleteOpen(false)
+    toast.success("Order deleted successfully")
+  } catch (error: any) {
+    toast.error(error.message || "Error deleting order")
+    console.error(error)
+  }
+}
+
   async function handleSendViaNoest() {
     if (!selectedOrder) {
       return toast.error("No order selected");
@@ -257,10 +307,7 @@ const Page = () => {
                   Cancel
                 </button>
                 <button
-                  onClick={() => {
-                    console.log("Order deleted");
-                    setIsDeleteOpen(false);
-                  }}
+                  onClick={() => deleteOrder(selectedOrder.id)}
                   className="px-4 py-2 text-sm rounded-md bg-red-500 text-white hover:bg-red-600"
                 >
                   Yes, Delete
@@ -299,7 +346,7 @@ const Page = () => {
                   <div className="text-sm font-medium text-gray-900 truncate">
                     {getTranslations(
                       selectedOrder?.items?.[0]?.product?.translations,
-                      { lang },
+                       lang ,
                       "name",
                     ) || "Undefined"}
                   </div>

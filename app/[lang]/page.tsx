@@ -79,6 +79,8 @@ export default function Home() {
     fetchData();
   }, []);
 
+  
+
   const isFiltering =
     searchQuery.length > 0 || selectedCategory !== "" || selectedSort !== "";
 

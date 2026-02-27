@@ -113,7 +113,7 @@ export default function PurchaseInvoicesPage() {
           .includes(q),
       ),
     );
-  }, [searchQuery, products, { lang }]);
+  }, [searchQuery, products, lang ]);
 
   const filteredInvoices = invoices.filter((invoice) => {
     const search = searchTerm.toLowerCase();
@@ -210,7 +210,8 @@ export default function PurchaseInvoicesPage() {
       prev.map((r) => {
         if (r.id !== id) return r;
         if (field === "productId") {
-          const found = productOptions.find((p) => String(p.id) === value);
+          let productOptions
+          const found = (productOptions as any).find((p : any) => String(p.id) === value);
           return {
             ...r,
             productId: String(value),
@@ -255,7 +256,7 @@ export default function PurchaseInvoicesPage() {
       // onCreate?.(data);
     } catch (error) {
       console.error(error);
-      toast.error(error.message || "Something went wrong");
+      toast.error("Something went wrong");
     }
   };
 

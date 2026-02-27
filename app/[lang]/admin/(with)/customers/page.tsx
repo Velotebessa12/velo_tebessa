@@ -13,9 +13,23 @@ const Page = () => {
   const [customerFilter, setCustomerFilter] = useState('All Customers');
   const [isEditingOpen, setIsEditingOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [selectedCustomer , setSelectedCustomer ] = useState(null)
+  const [selectedCustomer , setSelectedCustomer ] = useState<any | null>(null)
   const [isUnique , setIsUnique ] = useState(false)
   const [showPassword, setShowPassword] = useState(false);
+  const [customerData, setCustomerData] = useState({
+  name: "",
+  phoneNumber: "",
+  wilaya: "",
+  commune: "",
+  address: "",
+  isUnique: false,
+});
+
+const handleChange = (e : React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const { name, value } = e.target;
+  setCustomerData((prev) => ({ ...prev, [name]: value }));
+};
+
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
@@ -63,20 +77,82 @@ const Page = () => {
     return matchesSearch && matchesFilter;
   });
 
-  const handleView = (id) => {
+  const handleView = (id : any) => {
     console.log('View customer:', id);
   };
 
 
-   function openEditPopup(customer) {
+   function openEditPopup(customer : any) {
+    setCustomerData({
+      name: customer.name || "",
+      phoneNumber: customer.phoneNumber || "",
+      wilaya: customer.wilaya || "",
+      commune: customer.commune || "",
+      address: customer.address || "",
+      isUnique: customer.isUnique || false,
+    })
     setSelectedCustomer(customer);
     setIsEditingOpen(true);
   }
 
-  function openDeletePopup(customer) {
+  function openDeletePopup(customer : any) {
     setSelectedCustomer(customer);
     setIsDeleteOpen(true);
   }
+
+  const editCustomer = async (id: string, data: Record<string, any>) => {
+  try {
+    const res = await fetch(`/api/customers/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      throw new Error("Error updating customer");
+    }
+
+    const updatedCustomer = await res.json();
+
+    // Optional: update state locally
+    setCustomers((prev) =>
+      prev.map((c) => (c.id === id ? updatedCustomer : c))
+    );
+    setIsEditingOpen(false)
+    toast.success("Customer updated successfully");
+  } catch (error) {
+    toast.error("Error updating customer");
+    console.error(error);
+  }
+};
+
+const deactivateCustomer = async (id: string) => {
+  try {
+    const res = await fetch(`/api/customers/${id}`, {
+      method: "DELETE",
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || "Error deactivating customer");
+    }
+
+    // Optional: remove or mark inactive in UI
+    setCustomers((prev) =>
+      prev.map((c) =>
+        c.id === id ? { ...c, isActive: false } : c
+      )
+    );
+
+    toast.success("Customer deactivated successfully");
+  } catch (error: any) {
+    toast.error(error.message || "Error deactivating customer");
+    console.error(error);
+  }
+};
+
 
   if(isLoading){
     return <Loader/>
@@ -110,7 +186,9 @@ const Page = () => {
               Cancel
             </button>
             <button
-              onClick={() => { handleDeactivateProduct(); setIsDeleteOpen(false); }}
+              onClick={() => { 
+                deactivateCustomer(selectedCustomer.id)
+                 setIsDeleteOpen(false); }}
               className="px-4 py-2 text-sm rounded-md bg-red-500 text-white hover:bg-red-600"
             >
               Yes, Sure
@@ -126,120 +204,133 @@ const Page = () => {
       isOpen={isEditingOpen}
       onClose={() => setIsEditingOpen(false)}
       children={
-        <div className="w-full font-sans">
+       <div className="w-full font-sans">
 
-          {/* Name + Phone */}
-          <div className="grid grid-cols-1 xs:grid-cols-2 gap-4 mb-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Nom <span className="text-red-500">*</span>
-              </label>
-              <input
-                value={selectedCustomer.name}
-                type="text"
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-gray-400"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Téléphone <span className="text-red-500">*</span>
-              </label>
-              <input
-                value={selectedCustomer.phoneNumber}
-                type="text"
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-gray-400"
-              />
-            </div>
-          </div>
+  {/* Name + Phone */}
+  <div className="grid grid-cols-1 xs:grid-cols-2 gap-4 mb-4">
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        Nom <span className="text-red-500">*</span>
+      </label>
+      <input
+        name="name"
+        value={customerData.name}
+        onChange={handleChange}
+        type="text"
+        className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-gray-400"
+      />
+    </div>
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        Téléphone <span className="text-red-500">*</span>
+      </label>
+      <input
+        name="phoneNumber"
+        value={customerData.phoneNumber}
+        onChange={handleChange}
+        type="text"
+        className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-gray-400"
+      />
+    </div>
+  </div>
 
-          {/* Wilaya + Commune */}
-          <div className="grid grid-cols-1 xs:grid-cols-2 gap-4 mb-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Wilaya <span className="text-red-500">*</span>
-              </label>
-              <input
-                value={selectedCustomer.wilaya}
-                type="text"
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-gray-400"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Commune <span className="text-red-500">*</span>
-              </label>
-              <input
-                value={selectedCustomer.commune}
-                type="text"
-                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-gray-400"
-              />
-            </div>
-          </div>
+  {/* Wilaya + Commune */}
+  <div className="grid grid-cols-1 xs:grid-cols-2 gap-4 mb-4">
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        Wilaya <span className="text-red-500">*</span>
+      </label>
+      <input
+        name="wilaya"
+        value={customerData.wilaya}
+        onChange={handleChange}
+        type="text"
+        className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-gray-400"
+      />
+    </div>
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        Commune <span className="text-red-500">*</span>
+      </label>
+      <input
+        name="commune"
+        value={customerData.commune}
+        onChange={handleChange}
+        type="text"
+        className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-gray-400"
+      />
+    </div>
+  </div>
 
-          {/* Address */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Adresse <span className="text-red-500">*</span>
-            </label>
-            <textarea
-              value={selectedCustomer.commune}
-              rows={3}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-800 resize-none focus:outline-none focus:border-gray-400"
-            />
-          </div>
+  {/* Address */}
+  <div className="mb-4">
+    <label className="block text-sm font-medium text-gray-700 mb-1">
+      Adresse <span className="text-red-500">*</span>
+    </label>
+    <textarea
+      name="address"
+      value={customerData.address}
+      onChange={handleChange}
+      rows={3}
+      className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-800 resize-none focus:outline-none focus:border-gray-400"
+    />
+  </div>
 
-          {/* Password */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Password
-            </label>
-            <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                value={selectedCustomer?.password || ""}
-                disabled
-                className="w-full border border-gray-300 rounded-md px-3 py-2 pr-10 text-sm text-gray-800 bg-gray-100 cursor-not-allowed focus:outline-none"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
-              >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
-            </div>
-          </div>
+  {/* Password */}
+  <div className="mb-4">
+    <label className="block text-sm font-medium text-gray-700 mb-1">
+      Password
+    </label>
+    <div className="relative">
+      <input
+        type={showPassword ? "text" : "password"}
+        value={selectedCustomer?.password || ""}
+        disabled
+        className="w-full border border-gray-300 rounded-md px-3 py-2 pr-10 text-sm text-gray-800 bg-gray-100 cursor-not-allowed focus:outline-none"
+      />
+      <button
+        type="button"
+        onClick={() => setShowPassword(!showPassword)}
+        className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+      >
+        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+      </button>
+    </div>
+  </div>
 
-          {/* Classification */}
-          <div className="mb-4">
-            <h3 className="text-sm font-semibold text-gray-800 mb-3">Classification Client</h3>
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-sm font-medium text-gray-800">Client unique</p>
-                <p className="text-xs text-gray-500 mt-0.5">
-                  Les clients uniques reçoivent des réductions spéciales
-                </p>
-              </div>
-              <button
-                onClick={() => setIsUnique((v) => !v)}
-                className={`relative shrink-0 w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none ${isUnique ? "bg-teal-500" : "bg-gray-300"}`}
-              >
-                <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${isUnique ? "translate-x-5" : "translate-x-0"}`} />
-              </button>
-            </div>
-          </div>
+  {/* Classification */}
+  <div className="mb-4">
+    <h3 className="text-sm font-semibold text-gray-800 mb-3">Classification Client</h3>
+    <div className="flex items-start justify-between gap-4">
+      <div>
+        <p className="text-sm font-medium text-gray-800">Client unique</p>
+        <p className="text-xs text-gray-500 mt-0.5">
+          Les clients uniques reçoivent des réductions spéciales
+        </p>
+      </div>
+      <button
+        onClick={() => setCustomerData((prev) => ({ ...prev, isUnique: !prev.isUnique }))}
+        className={`relative shrink-0 w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none ${customerData.isUnique ? "bg-teal-500" : "bg-gray-300"}`}
+      >
+        <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${customerData.isUnique ? "translate-x-5" : "translate-x-0"}`} />
+      </button>
+    </div>
+  </div>
 
-          <div className="border-t border-gray-100 my-5" />
+  <div className="border-t border-gray-100 my-5" />
 
-          <div className="flex items-center justify-end gap-3">
-            <button className="px-4 sm:px-5 py-2 rounded-md text-sm font-medium text-gray-600 border border-gray-200 hover:bg-gray-50 transition-colors">
-              Annuler
-            </button>
-            <button className="px-4 sm:px-5 py-2 rounded-md text-sm font-semibold bg-teal-500 hover:bg-teal-600 text-white transition-colors">
-              Enregistrer
-            </button>
-          </div>
-        </div>
+  <div className="flex items-center justify-end gap-3">
+    <button className="px-4 sm:px-5 py-2 rounded-md text-sm font-medium text-gray-600 border border-gray-200 hover:bg-gray-50 transition-colors">
+      Annuler
+    </button>
+    <button
+      onClick={() => editCustomer(selectedCustomer.id, customerData)}
+      className="px-4 sm:px-5 py-2 rounded-md text-sm font-semibold bg-teal-500 hover:bg-teal-600 text-white transition-colors"
+    >
+      Enregistrer
+    </button>
+  </div>
+</div>
       }
     />
   )}
@@ -327,7 +418,7 @@ const Page = () => {
                     {customer.wilaya}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                    {customer.commune || customer.adress}
+                    {customer.commune || customer.address}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {customer.customerOrders.length || 0}
@@ -460,7 +551,7 @@ const Page = () => {
               {/* Row 3: address + actions */}
               <div className="flex items-center justify-between gap-2">
                 <span className="text-[11px] text-gray-400 truncate">
-                  {customer.commune || customer.adress || "—"}
+                  {customer.commune || customer.address || "—"}
                 </span>
                 <div className="flex items-center gap-0.5 flex-shrink-0">
                   <button

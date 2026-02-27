@@ -40,16 +40,20 @@ const page = () => {
   fetchDeliveryPrices();
 }, [shippingCompany]);
 
- function openEditPopup(wilaya) {
+ function openEditPopup(wilaya : any) {
     setSelectedWilaya(wilaya);
     setIsEditingOpen(true);
   }
 
-  function openDeletePopup(wilaya) {
+  function openDeletePopup(wilaya : any) {
     setSelectedWilaya(wilaya);
     setIsDeleteOpen(true);
   }
 
+
+  function viewWilaya (id : string) {
+    
+  }
 
   return (
     <div className="p-3 sm:p-4">
@@ -75,7 +79,7 @@ const page = () => {
         <span className="hidden sm:inline">Noest Express 0 / 58</span>
         <span className="sm:hidden">Noest 0/58</span>
       </p>
-      <p className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">0</p>
+      <p className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">{wilayas?.filter((w : any) => w.shippingCompany === "noest-express").length || 0}</p>
     </div>
 
     <div className="bg-white border border-gray-200 rounded-lg p-3 sm:p-4 md:p-5 hover:shadow-md transition-shadow">

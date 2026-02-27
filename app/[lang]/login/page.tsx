@@ -147,7 +147,7 @@ export default function AuthPage() {
           phoneNumber: signupPhone,
           name: signupFullName,
           wilaya: signupWilaya,
-          adress: signupAddress,
+          address: signupAddress,
           password: signupPassword,
         }),
       });

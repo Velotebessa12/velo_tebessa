@@ -40,7 +40,7 @@ export default function InventoryManagementPage() {
   const [reason, setReason] = useState("");
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedOperation, setSelectedOperation] = useState(null);
+  const [selectedOperation, setSelectedOperation] = useState<any | null>(null);
   const [isEditingOpen, setIsEditingOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [overridePrice, setOverridePrice] = useState("");
@@ -264,7 +264,117 @@ export default function InventoryManagementPage() {
         <PopUp
           isOpen={isEditingOpen}
           onClose={() => setIsEditingOpen(false)}
-          children={<>Operation info</>}
+          children={<>
+           <div className="flex flex-col gap-4 sm:gap-5">
+
+             <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-gray-700">
+                  Type
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    min={0}
+                    value={selectedOperation.type}
+                    onChange={(e) => (e.target.value as any)}
+                    placeholder="0"
+                    className="flex-1 min-w-0 border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-400/30 focus:border-teal-400 transition"
+                  />
+                  </div>
+                  </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-gray-700">
+                  Sélectionner un produit
+                </label>
+                <select
+                  value={selectedProductId}
+                  onChange={(e) => setSelectedProductId(e.target.value)}
+                  className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-400/30 focus:border-teal-400 transition"
+                >
+                  <option value="" disabled>
+                    -- Choisir un produit --
+                  </option>
+                  {products.map((p : any) => (
+                    <option key={p.id} value={p.id}>
+                      {getTranslations(p.translations,  lang , "name")} -
+                      Stock: {p.stock} - UnitPrice: {p.buyingPrice} Da
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-gray-700">
+                  Prix d'achat (unitaire)
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    min={0}
+                    value={purchasePrice}
+                    onChange={(e) => setPurchasePrice(e.target.value as any as any)}
+                    placeholder="0"
+                    className="flex-1 min-w-0 border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-400/30 focus:border-teal-400 transition"
+                  />
+                  <AveragePricePopUp
+                    currentPrice={Number(purchasePrice) || 0}
+                    newPrice={overridePrice}
+                    setNewPrice={setOverridePrice}
+                    isOpen={isOverrideOpen}
+                    onToggle={() => setIsOverrideOpen((v) => !v)}
+                    onConfirm={(price : any) => {
+                      setPurchasePrice(price);
+                      setIsOverrideOpen(false);
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-gray-700">
+                  Quantité
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  value={quantity}
+                  onChange={(e) => setQuantity(e.target.value as any as any)}
+                  placeholder="0"
+                  className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-400/30 focus:border-teal-400 transition"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-gray-700">
+                  Raison (optionnel)
+                </label>
+                <textarea
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+                  placeholder="Ex. Nouvel achat, retour client"
+                  rows={3}
+                  className="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-800 resize-none focus:outline-none focus:ring-2 focus:ring-teal-400/30 focus:border-teal-400 transition"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-1">
+                <button
+                  onClick={() => {}}
+                  className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition"
+                >
+                  Annuler
+                </button>
+                <button
+                  onClick={handleStockIn}
+                  disabled={!selectedProductId || !quantity || loading}
+                  className="flex-1 py-2.5 rounded-xl bg-teal-500 hover:bg-teal-600 text-white text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition"
+                >
+                  Enregistrer
+                </button>
+              </div>
+            </div>
+          </>}
         />
       )}
 

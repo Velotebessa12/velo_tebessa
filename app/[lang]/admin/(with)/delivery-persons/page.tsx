@@ -11,12 +11,16 @@ import {
   User,
   Eye,
   MotorbikeIcon,
+  Package,
+  Info,
 } from "lucide-react";
 import PopUp from "@/components/PopUp";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useLang } from "@/components/LanguageContext";
 import Loader from "@/components/Loader";
+
+  type DeliveryAction = "CONFIRM" | "RETURN"
 
 export default function DeliveryPersonsPage() {
   const [showModal, setShowModal] = useState(false);
@@ -33,15 +37,15 @@ export default function DeliveryPersonsPage() {
   // ]);
   const [isEditingOpen, setIsEditingOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [pendingDeliveries, setPendingDeliveries] = useState([]);
-  const [deliveryPersons, setDeliveryPersons] = useState([]);
+  const [pendingDeliveries, setPendingDeliveries] = useState<any[]>([]);
+  const [deliveryPersons, setDeliveryPersons] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [name, setName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isDeliveriesOpen, setIsDeliveriesOpen] = useState(false);
-  const [selectedDeliveryPerson, setSelectedDeliveryPerson] = useState(null);
+  const [selectedDeliveryPerson, setSelectedDeliveryPerson] = useState<any | null>(null);
   const [deliveries, setDeliveries] = useState([]);
   const router = useRouter();
   const { lang } = useLang();
@@ -96,7 +100,7 @@ export default function DeliveryPersonsPage() {
     }
   };
 
-  function openEditPopup(deliveryPerson) {
+  function openEditPopup(deliveryPerson : any) {
     setName(deliveryPerson.name);
     setPhoneNumber(deliveryPerson.phoneNumber);
     setEmail(deliveryPerson.email);
@@ -105,12 +109,12 @@ export default function DeliveryPersonsPage() {
     setIsEditingOpen(true);
   }
 
-  function openDeletePopup(deliveryPerson) {
+  function openDeletePopup(deliveryPerson : any) {
     setSelectedDeliveryPerson(deliveryPerson);
     setIsDeleteOpen(true);
   }
 
-  function openDeliveriesPopup(deliveryPerson) {
+  function openDeliveriesPopup(deliveryPerson : any) {
     setIsDeliveriesLoading(true);
     setIsDeliveriesOpen(true);
     setSelectedDeliveryPerson(deliveryPerson);
@@ -143,12 +147,12 @@ export default function DeliveryPersonsPage() {
         throw new Error(data.message || "Failed to create employee");
       }
 
-      console.log("Employee created:", data);
+      setDeliveryPersons(prev => [data.deliveryPerson , ...prev])
       setIsOpen(false);
       toast.success("Employee created successfully");
     } catch (error) {
       console.error("Error:", error);
-      toast.error(error.message || "Something went wrong");
+      toast.error("Something went wrong");
     }
   }
 
@@ -170,12 +174,12 @@ export default function DeliveryPersonsPage() {
         throw new Error(data.message || "Failed to create employee");
       }
 
-      setSelectedDeliveryPerson((prev) => ({ ...prev, pendingBalance: 0 }));
+      setSelectedDeliveryPerson((prev : any) => ({ ...prev, pendingBalance: 0 }));
 
       toast.success("Withraw created successfully , addded to caiss !");
     } catch (error) {
       console.error("Error:", error);
-      toast.error(error.message || "Something went wrong");
+      toast.error("Something went wrong");
     }
   }
 
@@ -199,6 +203,47 @@ export default function DeliveryPersonsPage() {
       setIsDeliveriesLoading(false);
     }
   };
+
+
+
+const handleDeliveryAction = async (
+  orderId: string,
+  action: DeliveryAction
+) => {
+  try {
+    const endpoint =
+      action === "CONFIRM"
+        ? "/api/delivery/persons/confirm-delivery"
+        : "/api/orders/return-order"
+
+    const res = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        orderId,
+        deliveryPersonId: selectedDeliveryPerson.id, // assuming logged-in delivery user
+      }),
+    })
+
+    if (!res.ok) {
+      const err = await res.json()
+      throw new Error(err.error || "Action failed")
+    }
+
+    toast.success(
+      action === "CONFIRM"
+        ? "Delivery confirmed successfully"
+        : "Order returned successfully"
+    )
+
+   
+  } catch (error: any) {
+    toast.error(error.message || "Something went wrong")
+    console.error(error)
+  }
+}
 
   if (isLoading) {
     return <Loader />;
@@ -387,128 +432,65 @@ export default function DeliveryPersonsPage() {
             <div className="space-y-3">
               {isDeliveriesngLoading ? (
                 <Loader />
+              ) : deliveries.length === 0 ? (
+<div className="flex flex-col items-center justify-center py-16 text-center">
+  <div className="p-4 bg-gray-100 rounded-full mb-4">
+    <Package className="w-8 h-8 text-gray-400" />
+  </div>
+  <p className="text-sm font-medium text-gray-600">No deliveries found</p>
+  <p className="text-xs text-gray-400 mt-1">Orders will appear here once created</p>
+</div>
               ) : (
-                deliveries.map((delivery) => (
-                  <div
-                    key={delivery.id}
-                    className="bg-white border rounded-lg p-3 sm:p-4 shadow-sm hover:shadow-md transition"
-                  >
-                    {/* Header */}
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="min-w-0 flex-1 mr-2">
-                        <p className="text-xs text-gray-500">Order ID</p>
-                        <p className="text-sm font-semibold text-gray-800 truncate">
-                          {delivery.id}
-                        </p>
-                      </div>
-                      <span
-                        className={`flex-shrink-0 px-2.5 py-1 text-[10px] font-medium rounded-full ${
-                          delivery.status === "DELIVERED"
-                            ? "bg-green-100 text-green-700"
-                            : delivery.status === "CANCELLED"
-                              ? "bg-red-100 text-red-700"
-                              : "bg-yellow-100 text-yellow-700"
-                        }`}
-                      >
-                        {delivery.status}
-                      </span>
-                    </div>
+                deliveries.map((delivery : any) => (
+             <div
+  key={delivery.id}
+  className="bg-white border border-gray-200 rounded-md px-4 py-4 shadow-sm hover:shadow-md transition flex items-center gap-4 w-full"
+>
+  {/* Customer */}
+  <div className="flex-1 min-w-0">
+    <p className="text-sm font-semibold text-gray-800 truncate">{delivery.fullName}</p>
+    <p className="text-xs text-gray-400 truncate">{delivery.phoneNumber}</p>
+  </div>
 
-                    {/* Customer */}
-                    <div className="mb-3">
-                      <p className="text-sm font-medium text-gray-800">
-                        {delivery.fullName}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {delivery.phoneNumber}
-                      </p>
-                    </div>
+  {/* Location */}
+  <div className="hidden sm:block shrink-0">
+    <p className="text-sm font-medium text-gray-700">{delivery.wilaya}</p>
+    <p className="text-xs text-gray-400">{delivery.commune}</p>
+  </div>
 
-                    {/* Address */}
-                    <div className="grid grid-cols-2 gap-2 text-sm mb-3">
-                      <div>
-                        <p className="text-xs text-gray-500">Wilaya</p>
-                        <p className="text-sm font-medium">{delivery.wilaya}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-500">Commune</p>
-                        <p className="text-sm font-medium">
-                          {delivery.commune}
-                        </p>
-                      </div>
-                      {delivery.detailedAddress && (
-                        <div className="col-span-2">
-                          <p className="text-xs text-gray-500">Address</p>
-                          <p className="text-sm font-medium">
-                            {delivery.detailedAddress}
-                          </p>
-                        </div>
-                      )}
-                    </div>
+  {/* Total */}
+  <div className="shrink-0 text-right">
+    <p className="text-sm font-bold text-gray-800">{delivery.total} Da</p>
+    <p className="text-xs text-gray-400">+{delivery.shippingPrice || 0} ship</p>
+  </div>
 
-                    {/* Delivery Info */}
-                    <div className="grid grid-cols-2 gap-2 text-sm mb-3">
-                      <div>
-                        <p className="text-xs text-gray-500">Method</p>
-                        <p className="text-sm font-medium">
-                          {delivery.deliveryMethod || "—"}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-500">Company</p>
-                        <p className="text-sm font-medium">
-                          {delivery.shippingCompany || "—"}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-500">Tracking ID</p>
-                        <p className="text-sm font-medium">
-                          {delivery.trackingId || "—"}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-500">Station</p>
-                        <p className="text-sm font-medium">
-                          {delivery.station_code || "—"}
-                        </p>
-                      </div>
-                    </div>
+  {/* Status or Actions */}
+  {delivery.status === "DELIVERED" ? (
+    <div className="flex flex-col items-center gap-2 shrink-0">
+     <button
+  onClick={() => handleDeliveryAction(delivery.id, "CONFIRM")}
+  className="px-3 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700 hover:bg-green-200 transition"
+>
+  Confirm
+</button>
 
-                    {/* Pricing */}
-                    <div className="flex justify-between items-center border-t pt-3 text-sm">
-                      <div>
-                        <p className="text-xs text-gray-500">Total</p>
-                        <p className="font-semibold">{delivery.total} Da</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-xs text-gray-500">Shipping</p>
-                        <p className="font-semibold">
-                          {delivery.shippingPrice || 0} Da
-                        </p>
-                      </div>
-                    </div>
-
-                    {delivery.deliveryNote && (
-                      <div className="mt-3 bg-gray-50 p-2 rounded text-sm">
-                        <p className="text-xs text-gray-500">Delivery Note</p>
-                        <p className="text-sm text-gray-700">
-                          {delivery.deliveryNote}
-                        </p>
-                      </div>
-                    )}
-
-                    <div className="flex justify-between items-center mt-3 text-[10px] sm:text-xs text-gray-400">
-                      <p>
-                        Created: {new Date(delivery.createdAt).toLocaleString()}
-                      </p>
-                      {delivery.deliveredAt && (
-                        <p>
-                          Delivered:{" "}
-                          {new Date(delivery.deliveredAt).toLocaleString()}
-                        </p>
-                      )}
-                    </div>
-                  </div>
+<button
+  onClick={() => handleDeliveryAction(delivery.id, "RETURN")}
+  className="px-3 py-1 text-xs font-medium rounded-full bg-red-100 text-red-700 hover:bg-red-200 transition"
+>
+  Return
+</button>
+    </div>
+  ) : (
+    <span className={`shrink-0 px-3 py-1 text-xs font-medium rounded-full ${
+      delivery.status === "CANCELLED"
+        ? "bg-red-100 text-red-700"
+        : "bg-yellow-100 text-yellow-700"
+    }`}>
+      {delivery.status}
+    </span>
+  )}
+</div>
                 ))
               )}
             </div>
@@ -660,7 +642,7 @@ export default function DeliveryPersonsPage() {
                     Pending Deliveries
                   </span>
                   <span className="text-xs sm:text-sm font-semibold text-gray-900">
-                    {person.deliveryOrders.filter((o) => o.status === "PENDING")
+                    {person.deliveryOrders.filter((o : any) => o.status === "PENDING")
                       ?.length || 0}
                   </span>
                 </div>
@@ -686,7 +668,7 @@ export default function DeliveryPersonsPage() {
                   onClick={() => openEditPopup(person)}
                   className="px-2.5 sm:px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  <Edit
+                  <Info
                     size={16}
                     className="text-gray-600 sm:w-[18px] sm:h-[18px]"
                   />
@@ -804,7 +786,7 @@ export default function DeliveryPersonsPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap" />
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-1">
+                        {/* <div className="flex items-center gap-1">
                           <button
                             onClick={() =>
                               router.push(
@@ -841,7 +823,7 @@ export default function DeliveryPersonsPage() {
                           >
                             <Trash2 className="w-4 h-4 text-red-600" />
                           </button>
-                        </div>
+                        </div> */}
                       </td>
                     </tr>
                   ))
@@ -911,7 +893,7 @@ export default function DeliveryPersonsPage() {
                     </div>
 
                     {/* Actions */}
-                    <div className="flex items-center gap-0.5 flex-shrink-0">
+                    {/* <div className="flex items-center gap-0.5 flex-shrink-0">
                       <button
                         onClick={() =>
                           router.push(
@@ -948,7 +930,7 @@ export default function DeliveryPersonsPage() {
                       >
                         <Trash2 className="w-4 h-4 text-red-600" />
                       </button>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               ))

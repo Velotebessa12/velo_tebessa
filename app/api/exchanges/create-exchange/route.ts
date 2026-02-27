@@ -120,7 +120,7 @@ export async function POST(req: NextRequest) {
         },
 
         customer: {
-          connect: { id: order.customerId },
+          connect: { id : order.customerId! },
         },
 
         returnedTotal,

@@ -86,6 +86,63 @@ export default function CashRegisterPage() {
     }
   };
 
+  const editTransaction = async (
+  id: string,
+  data: {
+    description?: string;
+    amount?: number;
+    type?: string;
+    direction?: string;
+  }
+) => {
+  try {
+    const res = await fetch(`/api/cash-register/transactions/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      throw new Error("Error updating transaction");
+    }
+
+    const updatedTransaction = await res.json();
+
+    setTransactions((prev) =>
+      prev.map((t) => (t.id === id ? updatedTransaction : t))
+    );
+    setIsEditingOpen(false)
+    toast.success("Transaction updated successfully");
+  } catch (error) {
+    toast.error("Error updating transaction");
+    console.error(error);
+  }
+};
+
+const deleteTransaction = async (id: string) => {
+  try {
+    const res = await fetch(`/api/cash-register/transactions/${id}`, {
+      method: "DELETE",
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || "Error deleting transaction");
+    }
+
+    setTransactions((prev) =>
+      prev.filter((t) => t.id !== id)
+    );
+    setIsDeleteOpen(false)
+    toast.success("Transaction deleted successfully");
+  } catch (error: any) {
+    toast.error(error.message || "Error deleting transaction");
+    console.error(error);
+  }
+};
+
   const handleAddTransaction = async () => {
     try {
       const response = await fetch("/api/cash-register/create-transaction", {
@@ -122,6 +179,10 @@ export default function CashRegisterPage() {
   };
 
   function openEditPopup(transaction : any) {
+    setAmout(transaction.amount)
+    setType(transaction.type)
+    setDescription(transaction.description)
+    setDirection(transaction.direction)
     setSelectedTransaction(transaction);
     setIsEditingOpen(true);
   }
@@ -162,10 +223,7 @@ export default function CashRegisterPage() {
                   Cancel
                 </button>
                 <button
-                  onClick={() => {
-                    console.log("deleted");
-                    setIsDeleteOpen(false);
-                  }}
+                  onClick={() => deleteTransaction(selectedTransaction.id)}
                   className="px-4 py-2 text-sm rounded-md bg-red-500 text-white hover:bg-red-600"
                 >
                   Yes, Delete
@@ -257,7 +315,12 @@ export default function CashRegisterPage() {
                   Annuler
                 </button>
                 <button
-                  onClick={handleAddTransaction}
+                  onClick={() => editTransaction(selectedTransaction.id , {
+                    amount,
+                    description,
+                    direction, 
+                    type
+                  })}
                   className="flex-1 px-4 py-2.5 bg-teal-500 hover:bg-teal-600 text-white rounded-lg font-medium transition text-sm"
                 >
                   Update

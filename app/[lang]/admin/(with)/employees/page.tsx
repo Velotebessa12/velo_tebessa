@@ -210,6 +210,8 @@ export default function EmployeesPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Failed to create employee');
+
+      setEmployees(prev => [data.employee , ...prev])
       toast.success('Employee created successfully');
       setIsOpen(false);
     } catch (error: any) {
