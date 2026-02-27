@@ -271,50 +271,56 @@ setSimilarProducts(products);
                 {getTranslations(product.translations, lang, "name")}
               </h1>
 
-              {/* Price */}
-              <div className="flex items-end gap-3 mb-6">
-                <div className="flex items-end gap-3">
-                  {/* Show original price if promo exists */}
-                  {((selectedVariant?.promoPrice &&
-                    selectedVariant.promoPrice > 0) ||
-                    (!selectedVariant &&
-                      product.promoPrice &&
-                      product.promoPrice > 0)) && (
-                    <span className="text-lg sm:text-xl text-gray-400 line-through">
-                      {(
-                        selectedVariant?.regularPrice || product.regularPrice
-                      )?.toLocaleString()}{" "}
-                      DA
-                    </span>
-                  )}
+           {/* Price */}
+<div className="mb-4 flex flex-col gap-1">
+  {/* Prices row */}
+  <div className="flex items-end gap-3 flex-wrap">
+    {/* Old price (promo) */}
+    {((selectedVariant?.promoPrice &&
+      selectedVariant.promoPrice > 0) ||
+      (!selectedVariant &&
+        product.promoPrice &&
+        product.promoPrice > 0)) && (
+      <span className="text-base sm:text-lg text-gray-400 line-through">
+        {(
+          selectedVariant?.regularPrice ??
+          product.regularPrice ??
+          0
+        ).toLocaleString()}{" "}
+        DA
+      </span>
+    )}
 
-                  {/* Current price */}
-                  <span className="text-3xl sm:text-4xl font-extrabold text-teal-600">
-                    {basePrice.toLocaleString()} DA
-                  </span>
-                </div>
+    {/* Current price */}
+    <span className="text-2xl sm:text-3xl font-bold text-teal-600 leading-tight">
+      {basePrice.toLocaleString()}{" "}
+      <span className="text-base sm:text-lg font-medium">DA</span>
+    </span>
+  </div>
 
-                {((selectedVariant?.promoPrice &&
-                selectedVariant?.promoPrice > 0
-                  ? selectedVariant?.promoPriceText
-                  : selectedVariant?.regularPriceText) ||
-                  (product?.promoPrice && product?.promoPrice > 0
-                    ? product?.promoPriceText
-                    : product?.regularPriceText)) && (
-                  <span
-                    dir="rtl"
-                    className="text-base sm:text-lg text-gray-500 font-medium pb-1"
-                  >
-                    {selectedVariant?.promoPrice &&
-                    selectedVariant?.promoPrice > 0
-                      ? selectedVariant?.promoPriceText
-                      : selectedVariant?.regularPriceText ||
-                        (product?.promoPrice && product?.promoPrice > 0
-                          ? product?.promoPriceText
-                          : product?.regularPriceText)}
-                  </span>
-                )}
-              </div>
+  {/* Price text (slightly smaller, under price) */}
+  {(
+    selectedVariant?.promoPrice && selectedVariant?.promoPrice > 0
+      ? selectedVariant?.promoPriceText
+      : selectedVariant?.regularPriceText ||
+        (product?.promoPrice && product?.promoPrice > 0
+          ? product?.promoPriceText
+          : product?.regularPriceText)
+  ) && (
+    <span
+      dir="rtl"
+      className="text-sm sm:text-base text-gray-500 leading-snug"
+    >
+      {selectedVariant?.promoPrice &&
+      selectedVariant?.promoPrice > 0
+        ? selectedVariant?.promoPriceText
+        : selectedVariant?.regularPriceText ||
+          (product?.promoPrice && product?.promoPrice > 0
+            ? product?.promoPriceText
+            : product?.regularPriceText)}
+    </span>
+  )}
+</div>
             </div>
 
             {/* Purchase section */}
