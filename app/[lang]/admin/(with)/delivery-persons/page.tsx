@@ -214,7 +214,7 @@ const handleDeliveryAction = async (
     const endpoint =
       action === "CONFIRM"
         ? "/api/delivery/persons/confirm-delivery"
-        : "/api/orders/return-order"
+        : "/api/delivery/persons/return-delivery"
 
     const res = await fetch(endpoint, {
       method: "POST",
@@ -297,36 +297,8 @@ const handleDeliveryAction = async (
           onClose={() => setIsEditingOpen(false)}
           children={
             <>
-              <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 sm:p-6">
-                {/* Tabs */}
-                <div className="flex gap-2 mb-6">
-                  <button
-                    onClick={() => setTab("info")}
-                    className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition
-            ${
-              tab === "info"
-                ? "bg-teal-500 text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            }`}
-                  >
-                    Info
-                  </button>
-
-                  <button
-                    onClick={() => setTab("balance")}
-                    className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition
-            ${
-              tab === "balance"
-                ? "bg-teal-500 text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            }`}
-                  >
-                    Pending balance
-                  </button>
-                </div>
-
-                {/* CONTENT */}
-                {tab === "info" && (
+              <div className=" p-4 sm:p-6">
+          
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 xs:grid-cols-2 gap-3 sm:gap-4">
                       <div>
@@ -392,30 +364,9 @@ const handleDeliveryAction = async (
                       </button>
                     </div>
                   </div>
-                )}
+             
 
-                {tab === "balance" && (
-                  <div className="flex flex-col items-center justify-center py-12 gap-6">
-                    <div className="text-center">
-                      <p className="text-sm text-gray-500 mb-2">
-                        Pending balance
-                      </p>
-                      <p className="text-4xl font-bold text-orange-600">
-                        {(
-                          selectedDeliveryPerson?.pendingBalance || 0
-                        ).toLocaleString()}{" "}
-                        DZD
-                      </p>
-                    </div>
-
-                    <button
-                      onClick={handleWithdraw}
-                      className="px-8 py-3 bg-teal-500 hover:bg-teal-600 text-white rounded-lg font-medium transition"
-                    >
-                      Get
-                    </button>
-                  </div>
-                )}
+               
               </div>
             </>
           }
@@ -634,7 +585,14 @@ const handleDeliveryAction = async (
                     Pending Balance
                   </span>
                   <span className="text-xs sm:text-sm font-semibold text-orange-600">
-                    {person.pendingBalance} Da
+                     {person.deliveryOrders
+    .filter((order : any) => order.status !== "DELIVERED")
+    .reduce(
+      (acc : number, order : any ) => acc + Number(order.shippingPrice || 0),
+      0
+    )
+    .toLocaleString()}{" "}
+  DA
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
@@ -642,7 +600,7 @@ const handleDeliveryAction = async (
                     Pending Deliveries
                   </span>
                   <span className="text-xs sm:text-sm font-semibold text-gray-900">
-                    {person.deliveryOrders.filter((o : any) => o.status === "PENDING")
+                    {person.deliveryOrders.filter((o : any) => o.status !== "DELIVERED")
                       ?.length || 0}
                   </span>
                 </div>
@@ -713,7 +671,7 @@ const handleDeliveryAction = async (
                     "Date",
                     "Amount",
                     "",
-                    "Actions",
+                    // "Actions",
                   ].map((h) => (
                     <th
                       key={h}

@@ -337,9 +337,11 @@ const Page = () => {
             </div>
 
             {/* Price — hidden on very small screens */}
-            <div className="hidden xs:block flex-shrink-0 text-xs sm:text-sm font-semibold text-gray-900 tabular-nums">
-              {product.regularPrice.toLocaleString()} DA
-            </div>
+           <div className=" flex-shrink-0 text-xs sm:text-sm font-semibold text-gray-900 tabular-nums">
+  {product.regularPrice !== null
+    ? `${product.regularPrice.toLocaleString()} DA`
+    : "—"}
+</div>
 
             {/* Stock badge — hidden below sm */}
             <div

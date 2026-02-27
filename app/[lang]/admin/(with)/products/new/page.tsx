@@ -912,7 +912,7 @@ const CreateProductPage = () => {
           isOpen={showCategoryModal}
           onClose={() => setShowCategoryModal(false)}
         >
-          <CreateCategory categories={categories} setCategories={setCategories} />
+          <CreateCategory categories={categories} setCategories={setCategories} setShowCategoryModal={setShowCategoryModal}/>
         </PopUp>
       )}
     </div>

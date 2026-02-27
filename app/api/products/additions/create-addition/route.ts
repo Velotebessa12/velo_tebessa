@@ -1,82 +1,75 @@
-import { prisma } from "@/lib/prisma";
-import { NextRequest, NextResponse } from "next/server";
-import { uploadToCloudinary } from "@/lib/uploadToCloudinary";
+import { prisma } from "@/lib/prisma"
+import { NextRequest, NextResponse } from "next/server"
 
 export async function POST(req: NextRequest) {
   try {
-    const formData = await req.formData();
+    const payload = await req.json()
 
-    // 🔥 Pricing (same logic as product)
-    const buyingPrice = Number(formData.get("buyingPrice"));
-    const regularPrice = Number(formData.get("regularPrice"));
+    const {
+      prices,
+      stock,
+      images,
+      translations,
+      addons = [],
+    } = payload
 
-    const promoRaw = formData.get("promoPrice");
-    const promoPrice =
-      promoRaw !== null && promoRaw !== "null"
-        ? Number(promoRaw)
-        : null;
-
-    const stock = Number(formData.get("stock"));
-    const priceText = formData.get("priceText") as string | null;
-
-    const translationsRaw = formData.get("translations") as string;
-    const addonsRaw = formData.get("addons") as string;
-    const images = formData.getAll("images") as File[];
-
-    // ✅ Validation
+    /* ───────── VALIDATION ───────── */
     if (
-      Number.isNaN(regularPrice) ||
-      Number.isNaN(stock) ||
+      !prices ||
+      prices.regularPrice === undefined ||
+      !stock ||
+      stock.stock === undefined ||
+      !Array.isArray(images) ||
       images.length === 0
     ) {
       return NextResponse.json(
         { error: "Missing or invalid required fields" },
         { status: 400 }
-      );
+      )
     }
 
-    // Upload images
-    const uploadedUrls = await Promise.all(
-      images.map((img) => uploadToCloudinary(img))
-    );
-
-    let translations: any[] = [];
-    let addons: any[] = [];
-
-    try {
-      translations = translationsRaw ? JSON.parse(translationsRaw) : [];
-      addons = addonsRaw ? JSON.parse(addonsRaw) : [];
-    } catch {
-      return NextResponse.json(
-        { error: "Invalid JSON format" },
-        { status: 400 }
-      );
-    }
-
-    translations = translations.filter(
+    const cleanTranslations = (translations || []).filter(
       (t: any) => t.name && t.name.trim() !== ""
-    );
+    )
 
-    if (!translations.length) {
+    if (!cleanTranslations.length) {
       return NextResponse.json(
         { error: "At least one translation is required" },
         { status: 400 }
-      );
+      )
     }
 
-    // ✅ Create ADDITION product
+    /* ───────── CREATE ADDITION PRODUCT ───────── */
     const product = await prisma.product.create({
       data: {
-        buyingPrice,
-        regularPrice,
-        promoPrice,
-        regularPriceText : priceText || undefined,
-        stock,
+        // prices
+        buyingPrice:
+          prices.buyingPrice !== undefined
+            ? Number(prices.buyingPrice)
+            : null,
+
+        regularPrice: Number(prices.regularPrice),
+
+        promoPrice:
+          prices.promoPrice !== null && prices.promoPrice !== undefined
+            ? Number(prices.promoPrice)
+            : null,
+
+        regularPriceText: prices.regularPriceText ?? null,
+        promoPriceText: prices.promoPriceText ?? null,
+
+        // stock
+        stock: Number(stock.stock),
+        minimumStock:
+          stock.minimumStock !== undefined
+            ? Number(stock.minimumStock)
+            : null,
+
+        images,
         type: "ADDITION",
-        images: uploadedUrls,
 
         translations: {
-          create: translations.map((t: any) => ({
+          create: cleanTranslations.map((t: any) => ({
             language: t.language,
             name: t.name,
           })),
@@ -85,7 +78,7 @@ export async function POST(req: NextRequest) {
         addonsAsMain: {
           create: addons.map((a: any) => ({
             addonProductId: a.addonProductId,
-            required: a.required || false,
+            required: a.required ?? false,
           })),
         },
       },
@@ -94,15 +87,14 @@ export async function POST(req: NextRequest) {
         translations: true,
         addonsAsMain: true,
       },
-    });
+    })
 
-    return NextResponse.json({ product });
-
+    return NextResponse.json({ product })
   } catch (error) {
-    console.error(error);
+    console.error(error)
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }
-    );
+    )
   }
 }

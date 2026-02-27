@@ -5,10 +5,12 @@ import toast from "react-hot-toast";
 
 const CreateCategory = ({
     categories ,
-    setCategories
+    setCategories,
+    setShowCategoryModal
 }: {
     categories : any[],
-    setCategories : React.Dispatch<React.SetStateAction<any[]>>
+    setCategories : React.Dispatch<React.SetStateAction<any[]>>,
+    setShowCategoryModal : React.Dispatch<React.SetStateAction<boolean>>
 }) => {
   const [images, setImages] = useState([]);
 
@@ -61,7 +63,7 @@ const normalizeLanguages = () => {
     } = normalizeLanguages();
 
     try {
-      if (images.length !== 0) return;
+      if (images.length === 0) return;
       const formData = new FormData();
       formData.append("image", images[0]);
       formData.append("slug", newCategorySlug);
@@ -85,7 +87,7 @@ const normalizeLanguages = () => {
       ];
 
       formData.append("translations", JSON.stringify(translations));
-
+    
       // Create category
       const res = await fetch("/api/categories/create-category", {
         method: "POST",
@@ -96,6 +98,7 @@ const normalizeLanguages = () => {
       toast.success("Category created successfully !");
       const data = await res.json();
 
+      setShowCategoryModal(false)
       setCategories([ data.category , ...categories]);
     //   setCategoryId(data.category.id);
 

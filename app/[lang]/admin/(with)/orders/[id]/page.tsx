@@ -117,6 +117,7 @@ export default function OrderDetailsPage() {
 
         const { order } = await res.json();
         setOrder(order);
+        setShippingPrice(order.shippingPrice)
         setSelectedStatus(order.status);
       } catch (error) {
         toast.error("Error fetching Order");
@@ -146,6 +147,7 @@ export default function OrderDetailsPage() {
     }
 
     toast.success("Delivery price updated")
+    setOrder((prev : any)=> ({...prev , shippingPrice : shippingPrice}))
     setIsEditingShipping(false)
   } catch (error) {
     toast.error("Error updating delivery price")

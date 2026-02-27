@@ -51,7 +51,15 @@ export async function GET() {
       const similarIds = product.similarProducts.join("|");
 
       const hasVariants = product.variants.length > 0;
-      const wcType = hasVariants ? "variable" : "simple";
+      let wcType: string;
+
+if (product.type === "ADDITION") {
+  wcType = "addition";
+} else if (product.variants.length > 0) {
+  wcType = "variable";
+} else {
+  wcType = "simple";
+}
 
       /* ============================
          SIMPLE / VARIABLE (parent)

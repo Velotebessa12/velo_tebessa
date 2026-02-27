@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { parse } from "csv-parse/sync";
 
+/* =========================
+   Helpers
+========================= */
 
 function parseCSV(text: string): string[][] {
   return parse(text, {
@@ -14,58 +17,74 @@ function parseCSV(text: string): string[][] {
 
 function num(v?: string) {
   const n = Number(v);
-  return isNaN(n) || v === "" ? null : n;
+  return v === "" || v === undefined || Number.isNaN(n) ? null : n;
 }
+
+/* =========================
+   POST /api/products/import
+========================= */
 
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
     const file = formData.get("file") as File;
-    if (!file) return new NextResponse("CSV file required", { status: 400 });
+
+    if (!file) {
+      return new NextResponse("CSV file required", { status: 400 });
+    }
 
     const text = await file.text();
     const rows = parseCSV(text);
-    rows.shift(); // remove header
 
-    const productMap = new Map<string, string>(); // csvId → real db id
+    // remove header
+    rows.shift();
 
-    /* ============================
-       PASS 1 — PRODUCTS (simple + variable)
-    ============================ */
+    // csvId -> real productId
+    const productMap = new Map<string, string>();
+
+    /* =========================
+       PASS 1 — PRODUCTS
+       (simple | variable | addition)
+    ========================= */
+
     for (const row of rows) {
       const [
-        csvId,        // 0  ID
-        type,         // 1  Type
-        ,             // 2  Parent ID (ignored in pass 1)
-        nameAr,       // 3  Name (ar)
-        descAr,       // 4  Description (ar)
-        nameFr,       // 5  Name (fr)
-        descFr,       // 6  Description (fr)
-        nameEn,       // 7  Name (en)
-        descEn,       // 8  Description (en)
-        buyingPrice,  // 9  Buying price
-        regularPrice, // 10 Regular price
-        promoPrice,   // 11 Promo price
-        regularPriceText, // 12 Regular price text
-        promoPriceText,   // 13 Promo price text
-        stock,        // 14 Stock
-        minimumStock, // 15 Minimum stock
-        images,       // 16 Images
-        categoryId,   // 17 Category ID
-        isActive,     // 18 Is active
-        youtubeUrls,  // 19 YouTube URLs
-        similarIds,   // 20 Similar Product IDs
-        createdAt,    // 21 Created at
+        csvId,               // 0
+        type,                // 1
+        ,                    // 2 parentId (ignored here)
+        nameAr,              // 3
+        descAr,              // 4
+        nameFr,              // 5
+        descFr,              // 6
+        nameEn,              // 7
+        descEn,              // 8
+        buyingPrice,         // 9
+        regularPrice,        // 10
+        promoPrice,          // 11
+        regularPriceText,    // 12
+        promoPriceText,      // 13
+        stock,               // 14
+        minimumStock,        // 15
+        images,              // 16
+        categoryId,          // 17
+        isActive,            // 18
+        youtubeUrls,         // 19
+        similarIds,          // 20
+        createdAt,           // 21
       ] = row;
 
+      // variations are handled in pass 2
       if (type === "variation") continue;
+
+      const productType =
+        type === "addition" ? "ADDITION" : "PRODUCT";
 
       const product = await prisma.product.create({
         data: {
-          // ...(csvId ? { id: csvId } : {}),
-          type: "PRODUCT",
+          type: productType,
           isActive: isActive === "true",
 
+          // ✅ Product keeps prices & stock ALWAYS
           buyingPrice: num(buyingPrice),
           regularPrice: num(regularPrice),
           promoPrice: num(promoPrice),
@@ -76,57 +95,79 @@ export async function POST(req: NextRequest) {
           minimumStock: num(minimumStock),
 
           images: images ? images.split("|").filter(Boolean) : [],
-          youtubeVideoUrls: youtubeUrls ? youtubeUrls.split("|").filter(Boolean) : [],
-          similarProducts: similarIds ? similarIds.split("|").filter(Boolean) : [],
+          youtubeVideoUrls: youtubeUrls
+            ? youtubeUrls.split("|").filter(Boolean)
+            : [],
+          similarProducts: similarIds
+            ? similarIds.split("|").filter(Boolean)
+            : [],
 
           categoryId: categoryId || null,
 
-          ...(createdAt ? { createdAt: new Date(createdAt) } : {}),
+          ...(createdAt
+            ? { createdAt: new Date(createdAt) }
+            : {}),
 
           translations: {
             create: [
-              nameAr ? { language: "ar", name: nameAr, description: descAr || null } : null,
-              nameFr ? { language: "fr", name: nameFr, description: descFr || null } : null,
-              nameEn ? { language: "en", name: nameEn, description: descEn || null } : null,
+              nameAr
+                ? { language: "ar", name: nameAr, description: descAr || null }
+                : null,
+              nameFr
+                ? { language: "fr", name: nameFr, description: descFr || null }
+                : null,
+              nameEn
+                ? { language: "en", name: nameEn, description: descEn || null }
+                : null,
             ].filter(Boolean) as any,
           },
         },
       });
 
-      if (csvId) productMap.set(csvId, product.id);
+      if (csvId) {
+        productMap.set(csvId, product.id);
+      }
     }
 
-    /* ============================
-       PASS 2 — VARIANTS (variation rows)
-    ============================ */
+    /* =========================
+       PASS 2 — VARIANTS
+       (variation only)
+    ========================= */
+
     for (const row of rows) {
       const [
-        ,             // 0  ID
-        type,         // 1  Type
-        parentId,     // 2  Parent ID
-        ,             // 3  Name (ar)
-        ,             // 4  Description (ar)
-        ,             // 5  Name (fr)
-        ,             // 6  Description (fr)
-        ,             // 7  Name (en)
-        ,             // 8  Description (en)
-        buyingPrice,  // 9  Buying price
-        regularPrice, // 10 Regular price
-        promoPrice,   // 11 Promo price
-        ,             // 12 Regular price text
-        priceText,    // 13 Promo price text (mapped to variant's priceText)
-        stock,        // 14 Stock
-        minimumStock, // 15 Minimum stock
-        imageUrl,     // 16 Images (single for variant)
-        ,             // 17 Category ID (inherited, not stored on variant)
-        isActive,     // 18 Is active
+        ,              // 0
+        type,           // 1
+        parentId,       // 2
+        , , , , , ,     // 3–8 translations (ignored)
+        buyingPrice,    // 9
+        regularPrice,   // 10
+        promoPrice,     // 11
+        ,               // 12
+        priceText,      // 13
+        stock,           // 14 (ignored logically)
+        minimumStock,   // 15
+        imageUrl,       // 16
+        ,               // 17
+        isActive,       // 18
       ] = row;
 
       if (type !== "variation") continue;
 
-      // resolve parent — could be a real UUID already in DB or a csvId we mapped
-      const resolvedParentId = productMap.get(parentId) ?? parentId;
+      const resolvedParentId =
+        productMap.get(parentId) ?? parentId;
+
       if (!resolvedParentId) continue;
+
+     
+      const parentProduct = await prisma.product.findUnique({
+        where: { id: resolvedParentId },
+        select: { type: true },
+      });
+
+      if (!parentProduct || parentProduct.type !== "PRODUCT") {
+        continue;
+      }
 
       await prisma.productVariant.create({
         data: {
@@ -137,8 +178,9 @@ export async function POST(req: NextRequest) {
           promoPrice: num(promoPrice),
           priceText: priceText || null,
 
+          // ⚠️ Variant stock is NOT the source of truth
           stock: num(stock) ?? 0,
-          minimumStock: num(minimumStock) ?? 3,
+          minimumStock: num(minimumStock) ?? 0,
 
           imageUrl: imageUrl || null,
           isActive: isActive === "true",
@@ -147,8 +189,8 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error(error);
     return new NextResponse("Import failed", { status: 500 });
   }
 }
