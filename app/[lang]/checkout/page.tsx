@@ -268,6 +268,9 @@ export default function CheckoutPage() {
     e: React.ChangeEvent<HTMLSelectElement>,
   ) => {
     const wilayaName = e.target.value;
+    if(wilayaName === "Tébessa") {
+      setFormData(prev => ({...prev , deliveryMethod : "home"}))
+    }
     const wilayaObj = ALGERIAN_WILAYAS.find((w) => w.name === wilayaName);
 
     // Reset dependent fields
@@ -559,36 +562,51 @@ export default function CheckoutPage() {
                       </div>
                     </button>
 
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          deliveryMethod: "stopdesk",
-                        }))
-                      }
-                      className={`flex items-start gap-3 p-4 border-2 rounded-xl text-left transition-all ${
-                        formData.deliveryMethod === "stopdesk"
-                          ? "border-teal-500 bg-teal-50"
-                          : "border-gray-200 hover:border-teal-300"
-                      }`}
-                    >
-                      <Building2
-                        className={`w-5 h-5 mt-0.5 flex-shrink-0 ${
-                          formData.deliveryMethod === "stopdesk"
-                            ? "text-teal-500"
-                            : "text-gray-400"
-                        }`}
-                      />
-                      <div>
-                        <div className="font-medium text-gray-900 text-sm">
-                          Retrait au bureau
-                        </div>
-                        <div className="text-xs text-gray-500 mt-0.5">
-                          Retrait au bureau de livraison
-                        </div>
-                      </div>
-                    </button>
+                 <button
+  type="button"
+  disabled={formData.wilaya === "Tébessa"}
+  onClick={() => {
+    if (formData.wilaya === "Tébessa") return;
+    setFormData((prev) => ({
+      ...prev,
+      deliveryMethod: "stopdesk",
+    }));
+  }}
+  className={`flex items-start gap-3 p-4 border-2 rounded-xl text-left transition-all
+    ${
+      formData.wilaya === "Tébessa"
+        ? "border-gray-200 bg-gray-100 cursor-not-allowed opacity-60"
+        : formData.deliveryMethod === "stopdesk"
+        ? "border-teal-500 bg-teal-50"
+        : "border-gray-200 hover:border-teal-300"
+    }
+  `}
+>
+  <Building2
+    className={`w-5 h-5 mt-0.5 flex-shrink-0
+      ${
+        formData.wilaya === "Tébessa"
+          ? "text-gray-300"
+          : formData.deliveryMethod === "stopdesk"
+          ? "text-teal-500"
+          : "text-gray-400"
+      }
+    `}
+  />
+  <div>
+    <div className="font-medium text-gray-900 text-sm">
+      Retrait au bureau
+    </div>
+    <div className="text-xs text-gray-500 mt-0.5">
+      Retrait au bureau de livraison
+    </div>
+    {/* {formData.wilaya === "Tébessa" && (
+      <div className="text-xs text-red-500 mt-1">
+        Non disponible pour la wilaya de Tébessa
+      </div>
+    )} */}
+  </div>
+</button>
                   </div>
 
                   {/* Shipping Company (office only) */}
@@ -749,50 +767,47 @@ export default function CheckoutPage() {
                         </p>
                         <div className="mt-3 flex gap-2 flex-wrap gap-2">
                           <div className="flex gap-2">
-                            <div className="flex gap-2">
+                            <div className="flex gap-4">
                               {/* FREE */}
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setShippingOption("FREE");
-                                  setFormData((prev) => ({
-                                    ...prev,
-                                    shippingPrice: 0,
-                                  }));
-                                }}
-                                className={`rounded-md border px-3 py-1.5 text-sm font-medium transition
-      ${
-        shippingOption === null
-          ? "border-gray-300 bg-gray-100 text-gray-500"
-          : shippingOption === "FREE"
-            ? "border-green-700 bg-green-200 text-green-800"
-            : "border-gray-300 bg-gray-100 text-gray-400"
-      }`}
-                              >
-                                Gratuit
-                              </button>
+                           <button
+  type="button"
+  onClick={() => {
+    setShippingOption("FREE");
+    setFormData((prev) => ({
+      ...prev,
+      shippingPrice: 0,
+    }));
+  }}
+  className={`rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200
+    focus:outline-none
+    ${
+      shippingOption === "FREE"
+        ? "bg-green-600 text-white shadow-md ring-2 ring-green-500 ring-offset-2"
+        : "bg-white text-gray-500 shadow-sm hover:shadow-md hover:-translate-y-[1px]"
+    }`}
+>
+  Gratuit
+</button>
 
-                              {/* PAID */}
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setShippingOption("PAID");
-                                  setFormData((prev) => ({
-                                    ...prev,
-                                    shippingPrice: 0,
-                                  }));
-                                }}
-                                className={`rounded-md border px-3 py-1.5 text-sm font-medium transition
-      ${
-        shippingOption === null
-          ? "border-gray-300 bg-gray-100 text-gray-500"
-          : shippingOption === "PAID"
-            ? "border-yellow-700 bg-yellow-300 text-yellow-900"
-            : "border-gray-300 bg-gray-100 text-gray-400"
-      }`}
-                              >
-                                150 – 300 DA
-                              </button>
+<button
+  type="button"
+  onClick={() => {
+    setShippingOption("PAID");
+    setFormData((prev) => ({
+      ...prev,
+      shippingPrice: 0,
+    }));
+  }}
+  className={`rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200
+    focus:outline-none
+    ${
+      shippingOption === "PAID"
+        ? "bg-yellow-500 text-white shadow-md ring-2 ring-yellow-400 ring-offset-2"
+        : "bg-white text-gray-500 shadow-sm hover:shadow-md hover:-translate-y-[1px]"
+    }`}
+>
+  150 – 300 DA
+</button>
                             </div>
                           </div>
                         </div>

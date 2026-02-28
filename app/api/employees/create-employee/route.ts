@@ -8,14 +8,13 @@ export async function POST(req: NextRequest) {
     const { name , phoneNumber , email , password , role , permissions} = await req.json()
   
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
+  
     const employee = await prisma.user.create({
         data : {
             name,
             phoneNumber,
             email,
-            password : hashedPassword,
+            password : password,
             role,
             permissions 
         }

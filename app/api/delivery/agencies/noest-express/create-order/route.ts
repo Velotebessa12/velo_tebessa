@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
     console.log(data)
 
 // not completed yet
-     await prisma.order.update({
+    const order = await prisma.order.update({
       where : {
         id : orderId
       },
@@ -83,6 +83,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       noestResponse: data,
+      order
     });
 
   } catch (error) {

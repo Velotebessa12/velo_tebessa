@@ -27,11 +27,6 @@ export default function PurchaseInvoicesPage() {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const { lang } = useLang();
-  const stats = {
-    totalInvoices: "1",
-    pendingAmount: "0 DA",
-    totalAmount: "2 400 DA",
-  };
   const [rows, setRows] = useState<any[]>([
     { id: Date.now(), productId: "", qty: 1, unitPrice: 0 },
   ]);
@@ -202,26 +197,29 @@ export default function PurchaseInvoicesPage() {
     setRows((prev) => prev.filter((r) => r.id !== id));
 
   const updateRow = (
-    id: number,
-    field: keyof any,
-    value: string | number,
-  ) => {
-    setRows((prev) =>
-      prev.map((r) => {
-        if (r.id !== id) return r;
-        if (field === "productId") {
-          let productOptions
-          const found = (productOptions as any).find((p : any) => String(p.id) === value);
-          return {
-            ...r,
-            productId: String(value),
-            unitPrice: found?.price ?? 0,
-          };
-        }
-        return { ...r, [field]: value };
-      }),
-    );
-  };
+  id: number,
+  field: keyof any,
+  value: string | number,
+) => {
+  setRows((prev) =>
+    prev.map((r) => {
+      if (r.id !== id) return r;
+
+      if (field === "productId") {
+        const found = products.find(
+          (p: any) => String(p.id) === String(value),
+        );
+        return {
+          ...r,
+          productId: String(value),
+          unitPrice: found?.regularPrice ?? found?.price ?? 0,
+        };
+      }
+
+      return { ...r, [field]: value };
+    }),
+  );
+};
 
   const total = rows.reduce((sum, r) => sum + r.qty * r.unitPrice, 0);
 
@@ -545,7 +543,7 @@ export default function PurchaseInvoicesPage() {
               <button
                 onClick={() =>
                   router.push(
-                    `/${{ lang }}/admin/products/new?redirect=invoices`,
+                    `/${ lang }/admin/products/new?redirect=invoices`,
                   )
                 }
                 className="border rounded-lg px-3 py-2 text-xs sm:text-sm hover:bg-gray-50 transition"
@@ -621,7 +619,9 @@ export default function PurchaseInvoicesPage() {
                   <span className="sm:hidden">Pending</span>
                 </p>
                 <p className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 truncate">
-                  {stats.pendingAmount || 0}
+                  {invoices
+                  .filter((invoice) => invoice.status === "PENDING")
+                  .reduce((acc , invoice) => acc + invoice.totalAmount , 0) || 0}
                 </p>
               </div>
               <div className="w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
@@ -638,7 +638,7 @@ export default function PurchaseInvoicesPage() {
                   <span className="sm:hidden">Total</span>
                 </p>
                 <p className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 truncate">
-                  {stats.totalAmount || 0}
+                  {invoices.reduce((acc , invoice) => acc + invoice.totalAmount , 0) || 0}
                 </p>
               </div>
               <div className="w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">

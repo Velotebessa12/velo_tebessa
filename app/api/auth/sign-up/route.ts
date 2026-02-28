@@ -38,14 +38,12 @@ export async function POST(req: Request) {
       );
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
+  
     // Create user
     const user = await prisma.user.create({
       data: {
         phoneNumber,
-        password: hashedPassword,
+        password: password,
         name,
         wilaya,
         address,

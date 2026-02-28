@@ -225,9 +225,17 @@ const Page = () => {
         throw new Error(data.message || "Failed to send order via Noest");
       }
 
+     setOrders((prev) =>
+  prev.map((o) =>
+    o.id === data.order.id
+      ? { ...o, ...data.order }
+      : o
+  )
+);
       toast.success("Order sent successfully via Noest", {
         icon: <Package size={18} />,
       });
+
 
       console.log("Noest API response:", data);
     } catch (error) {
@@ -584,7 +592,8 @@ const Page = () => {
                 </h3>
               </div>
               <div className="divide-y">
-                <div
+                 {selectedOrder.shippingCompany === "noest-express" && (
+                 <div
                   onClick={handleSendViaNoest}
                   className="flex items-center justify-between px-4 py-3 cursor-pointer transition rounded-md hover:bg-blue-50"
                 >
@@ -602,8 +611,10 @@ const Page = () => {
                   <button className="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-md font-medium transition shadow-sm flex-shrink-0 ml-2">
                     Send
                   </button>
-                </div>
-                <div
+                </div> 
+                )}
+                {selectedOrder.shippingCompany === "dhd-express" && (
+                  <div
                   onClick={handleSendViaDhd}
                   className="flex items-center justify-between px-4 py-3 cursor-pointer transition rounded-md hover:bg-orange-50"
                 >
@@ -622,6 +633,7 @@ const Page = () => {
                     Send
                   </button>
                 </div>
+                )}
               </div>
             </div>
           }
@@ -786,7 +798,7 @@ const Page = () => {
                     </td>
                     <td className="px-4 lg:px-6 py-3 whitespace-nowrap">
                       <span className="font-medium text-gray-900">
-                        #{order.id.slice(0, 8)}
+                        #{order.id?.slice(0, 8)}...
                       </span>
                     </td>
                     <td className="px-4 lg:px-6 py-3">
@@ -834,6 +846,8 @@ const Page = () => {
                         >
                           <Edit className="w-4 h-4 text-gray-600" />
                         </button>
+                            {(!["Tebessa", "Tébessa"].includes(order.wilaya) ||
+  !["Tebessa", "Tébessa"].includes(order.commune)) && (
                         <button
                           onClick={() => openDeliveryServicePopup(order)}
                           className="p-1.5 hover:bg-gray-100 rounded transition"
@@ -841,8 +855,9 @@ const Page = () => {
                         >
                           <Truck className="w-4 h-4 text-gray-600" />
                         </button>
+  )}
                         {["Tebessa", "Tébessa"].includes(order.wilaya) &&
-                          order.commune === "Tebessa" && (
+                       ["Tebessa", "Tébessa"].includes(order.commune) && (
                             <button
                               onClick={() => openDeliveryPersonPopup(order)}
                               className="p-1.5 hover:bg-gray-100 rounded transition"
@@ -884,7 +899,7 @@ const Page = () => {
                 <div className="flex items-start justify-between gap-2 mb-2">
                   <div className="flex items-center gap-2 min-w-0">
                     <span className="font-semibold text-gray-900 text-sm tabular-nums">
-                      #{order.id.slice(0, 8)}
+                      #{order.id?.slice(0, 8)}...
                     </span>
                     {/* Status pill */}
                     <span
@@ -949,23 +964,27 @@ const Page = () => {
                     >
                       <Edit className="w-4 h-4 text-gray-600" />
                     </button>
-                    <button
-                      onClick={() => openDeliveryServicePopup(order)}
-                      className="p-1.5 hover:bg-gray-100 rounded-lg transition"
-                      title="Livraison"
-                    >
-                      <Truck className="w-4 h-4 text-gray-600" />
-                    </button>
-                    {["Tebessa", "Tébessa"].includes(order.wilaya) &&
-                      order.commune === "Tebessa" && (
-                        <button
-                          onClick={() => openDeliveryPersonPopup(order)}
-                          className="p-1.5 hover:bg-gray-100 rounded-lg transition"
-                          title="Livreur"
-                        >
-                          <User className="w-4 h-4 text-gray-600" />
-                        </button>
-                      )}
+            {(!["Tebessa", "Tébessa"].includes(order.wilaya) ||
+  !["Tebessa", "Tébessa"].includes(order.commune)) && (
+  <button
+    onClick={() => openDeliveryServicePopup(order)}
+    className="p-1.5 hover:bg-gray-100 rounded-lg transition"
+    title="Livraison"
+  >
+    <Truck className="w-4 h-4 text-gray-600" />
+  </button>
+)}
+
+{["Tebessa", "Tébessa"].includes(order.wilaya) &&
+  ["Tebessa", "Tébessa"].includes(order.commune) && (
+    <button
+      onClick={() => openDeliveryPersonPopup(order)}
+      className="p-1.5 hover:bg-gray-100 rounded-lg transition"
+      title="Livreur"
+    >
+      <User className="w-4 h-4 text-gray-600" />
+    </button>
+  )}
                     <button
                       onClick={() => openDeletePopup(order)}
                       className="p-1.5 hover:bg-red-50 rounded-lg transition"

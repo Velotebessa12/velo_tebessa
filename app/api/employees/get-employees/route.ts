@@ -11,6 +11,9 @@ export async function GET(req: NextRequest) {
             role : {
                 notIn : ["USER" , "DELIVERY"] 
             }
+        },
+        orderBy : {
+          createdAt : "desc"
         }
 });
 

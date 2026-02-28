@@ -366,6 +366,28 @@ export default function OrderDetailsMobilePage() {
             </h2>
 
             <div className="space-y-3 text-sm">
+         <div className="flex items-center gap-2">
+                             <span >
+                              <span className="text-gray-600">
+                               {dict.orders.delivery}:
+                              </span>
+                               <span className="font-medium mx-1">
+           {order.deliveryMethod === "home"
+             ? lang === "fr"
+               ? "À domicile"
+               : lang === "ar"
+               ? "للمنزل"
+               : "Home delivery"
+             : order.deliveryMethod === "stopdesk"
+             ? lang === "fr"
+               ? "Au bureau"
+               : lang === "ar"
+               ? "للمكتب"
+               : "Office pickup"
+             : dict.orders.standard}
+         </span>
+                             </span>
+                           </div>
               <p>
                 <span className="text-gray-600">{dict.orderDetails.wilaya}:</span>{" "}
                 <span className="font-medium">{order.wilaya}</span>

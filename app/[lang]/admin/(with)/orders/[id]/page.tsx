@@ -423,6 +423,17 @@ export default function OrderDetailsPage() {
                   <p className="text-base font-medium">{order.commune}</p>
                 </div>
 
+                {order.orderNote && (
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <p className="text-sm font-semibold text-gray-900 mb-1">
+                      Delivery Note
+                    </p>
+                    <p className="text-sm text-gray-700">
+                      {order.orderNote}
+                    </p>
+                  </div>
+                )}
+
                 {order.deliveryNote && (
                   <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                     <p className="text-sm font-semibold text-gray-900 mb-1">

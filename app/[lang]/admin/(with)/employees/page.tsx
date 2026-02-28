@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Search, Plus, Edit, Trash2, User, UserCog, Users } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, User, UserCog, Users, EyeOff, Eye } from 'lucide-react';
 import toast from 'react-hot-toast';
 import PopUp from '@/components/PopUp';
 import Loader from '@/components/Loader';
@@ -37,6 +37,9 @@ function EmployeeForm({
   onSave: () => void; onCancel: () => void;
   saveLabel?: string;
 }) {
+
+  const [showPassword , setShowPassword] = useState(false)
+
   return (
     <div className="space-y-3 sm:space-y-4">
 
@@ -78,16 +81,34 @@ function EmployeeForm({
 
       {/* Password + Role */}
       <div className="grid grid-cols-1 xs:grid-cols-2 gap-3 sm:gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-          <input
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            type="password"
-            placeholder="••••••••"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-teal-500"
-          />
-        </div>
+       <div>
+  <label className="block text-sm font-medium text-gray-700 mb-1">
+    Password
+  </label>
+
+  <div className="relative">
+    <input
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+      type={showPassword ? "text" : "password"}
+      placeholder="••••••••"
+      className="w-full border border-gray-300 rounded-lg px-3 py-2 pr-10 text-sm outline-none focus:ring-2 focus:ring-teal-500"
+    />
+
+    <button
+      type="button"
+      onClick={() => setShowPassword((prev) => !prev)}
+      className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-gray-700"
+      tabIndex={-1}
+    >
+      {showPassword ? (
+        <EyeOff className="w-4 h-4" />
+      ) : (
+        <Eye className="w-4 h-4" />
+      )}
+    </button>
+  </div>
+</div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
           <select
@@ -219,12 +240,12 @@ export default function EmployeesPage() {
     }
   };
 
-  function handleEdit(employee: Employee) {
+  function handleEdit(employee: any) {
     setSelectedEmployee(employee);
     setName(employee.name);
     setEmail(employee.email);
     setPhoneNumber(employee.phoneNumber);
-    setPassword('');
+    setPassword(employee.password);
     setRole(employee.role);
     setPermissions([]);
     setIsEditingOpen(true);

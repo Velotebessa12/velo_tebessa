@@ -481,6 +481,23 @@ function openDeletePopup(coupon : any) {
           </div>
         </div>
 
+
+        <div className="grid grid-cols-1 xs:grid-cols-2 gap-4 mb-5">
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Type de client
+    </label>
+    <select
+      className="w-full px-3 py-2 border border-gray-300 rounded-lg
+        focus:ring-2 focus:ring-teal-500 outline-none transition text-sm"
+    >
+      <option>Tous les clients</option>
+      <option>Client unique</option>
+    </select>
+  </div>
+
+</div>
+
         {/* Usage Limit & Min Amount */}
         <div className="grid grid-cols-1 xs:grid-cols-2 gap-4 mb-5">
           <div>

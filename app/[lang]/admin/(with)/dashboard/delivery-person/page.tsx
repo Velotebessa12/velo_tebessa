@@ -122,14 +122,14 @@ const Page = () => {
       <div className="p-4">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-slate-900">
-            Deliveries wilaya Tebessa
+            My Deliveries wilaya Tebessa
           </h1>
           <p className="text-slate-600 mt-2">
             All your deliveries Tebessa / Tebessa will be here
           </p>
         </div>
         {/* Statistics Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mb-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
           {/* Stat Box 1 */}
           <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-5 hover:shadow-md transition-shadow">
             <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">
@@ -167,25 +167,6 @@ const Page = () => {
             </p>
             <p className="text-2xl sm:text-3xl font-bold text-gray-900">
               {orders.filter((o) => o.status === "RETURN").length || 0}
-            </p>
-          </div>
-          {/* Stat Box 5 */}
-          <div className="bg-yellow-100 border border-gray-200 rounded-lg p-4 sm:p-5 hover:shadow-md transition-shadow">
-            <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">
-              Pending Money
-            </p>
-            <p className="text-2xl sm:text-3xl font-bold text-gray-900">
-              {admin?.pendingBalance || 0} Da
-            </p>
-          </div>
-
-           {/* Stat Box 6 */}
-          <div className="bg-orange-100 border border-gray-200 rounded-lg p-4 sm:p-5 hover:shadow-md transition-shadow">
-            <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">
-              Money to pay
-            </p>
-            <p className="text-2xl sm:text-3xl font-bold text-gray-900">
-              {admin?.pendingBalance * 4 || 0} Da
             </p>
           </div>
         </div>
