@@ -174,61 +174,57 @@ const Page = () => {
   };
 
   const editCategory = async (
-  id: string,
-  data: {
-    slug?: string;
-    imageUrl?: string | null;
-  }
-) => {
-  try {
-    const res = await fetch(`/api/categories/${id}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
+    id: string,
+    data: {
+      slug?: string;
+      imageUrl?: string | null;
+    },
+  ) => {
+    try {
+      const res = await fetch(`/api/categories/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
 
-    if (!res.ok) {
-      throw new Error("Error updating category");
+      if (!res.ok) {
+        throw new Error("Error updating category");
+      }
+
+      const updatedCategory = await res.json();
+
+      setCategories((prev) =>
+        prev.map((c) => (c.id === id ? updatedCategory : c)),
+      );
+
+      toast.success("Category updated successfully");
+    } catch (error) {
+      toast.error("Error updating category");
+      console.error(error);
     }
+  };
 
-    const updatedCategory = await res.json();
+  const deleteCategory = async (id: string) => {
+    try {
+      const res = await fetch(`/api/categories/${id}`, {
+        method: "DELETE",
+      });
 
-    setCategories((prev) =>
-      prev.map((c) => (c.id === id ? updatedCategory : c))
-    );
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Error deleting category");
+      }
 
-    toast.success("Category updated successfully");
-  } catch (error) {
-    toast.error("Error updating category");
-    console.error(error);
-  }
-};
-
-
-const deleteCategory = async (id: string) => {
-  try {
-    const res = await fetch(`/api/categories/${id}`, {
-      method: "DELETE",
-    });
-
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error || "Error deleting category");
+      setCategories((prev) => prev.filter((c) => c.id !== id));
+      setIsDeleteOpen(false);
+      toast.success("Category deleted successfully");
+    } catch (error: any) {
+      toast.error(error.message || "Error deleting category");
+      console.error(error);
     }
-
-    setCategories((prev) =>
-      prev.filter((c) => c.id !== id)
-    );
-    setIsDeleteOpen(false)
-    toast.success("Category deleted successfully");
-  } catch (error: any) {
-    toast.error(error.message || "Error deleting category");
-    console.error(error);
-  }
-};
-
+  };
 
   function openEditPopup(category: any) {
     // Names
@@ -573,7 +569,7 @@ const deleteCategory = async (id: string) => {
                     Cancel
                   </button>
                   <button
-                    onClick={() => editCategory(selectedCategory.id , {})}
+                    onClick={() => editCategory(selectedCategory.id, {})}
                     disabled={!newCategorySlug}
                     className="w-full sm:w-auto px-4 py-2.5 cursor-pointer bg-teal-500 hover:bg-teal-600 disabled:bg-slate-300 text-white rounded-lg"
                   >
@@ -642,15 +638,11 @@ const deleteCategory = async (id: string) => {
 
                 {/* Title */}
                 <h3 className="text-sm font-bold text-gray-800 text-center truncate">
-                  {getTranslations(category.translations,  lang , "name")}
+                  {getTranslations(category.translations, lang, "name")}
                 </h3>
 
                 <p className="mb-2 text-xs text-gray-400 text-center line-clamp-2 leading-relaxed">
-                  {getTranslations(
-                    category.translations,
-                     lang ,
-                    "description",
-                  )}
+                  {getTranslations(category.translations, lang, "description")}
                 </p>
 
                 {/* Actions */}
