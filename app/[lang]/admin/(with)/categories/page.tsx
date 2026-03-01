@@ -573,7 +573,7 @@ const deleteCategory = async (id: string) => {
                     Cancel
                   </button>
                   <button
-                    onClick={handleCreateCategory}
+                    onClick={() => editCategory(selectedCategory.id , {})}
                     disabled={!newCategorySlug}
                     className="w-full sm:w-auto px-4 py-2.5 cursor-pointer bg-teal-500 hover:bg-teal-600 disabled:bg-slate-300 text-white rounded-lg"
                   >

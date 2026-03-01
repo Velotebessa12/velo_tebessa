@@ -21,6 +21,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    console.log(newCartItems)
+
     if (
       (!Array.isArray(returningItems) || returningItems.length === 0) &&
       (!Array.isArray(newCartItems) || newCartItems.length === 0)
@@ -85,21 +87,19 @@ export async function POST(req: NextRequest) {
       }));
 
     const newItemsData = (newCartItems || [])
-      .filter(
-        (item: any) =>
-          item.productId &&
-          item.price != null &&
-          item.quantity != null
-      )
-      .map((item: any) => ({
-        productId: item.productId,
-        type: "NEW",
-        name: item.name ?? "",
-        variant: item.variant ?? null,
-        price: Number(item.price),
-        quantity: Number(item.quantity),
-        total: Number(item.price) * Number(item.quantity),
-      }));
+  .filter(
+    (item: any) =>
+      item.id && item.price != null && item.quantity != null
+  )
+  .map((item: any) => ({
+    productId: item.id, // ✅ FIX HERE
+    type: "NEW",
+    name: item.name ?? "",
+    variant: item.variant ?? null,
+    price: Number(item.price),
+    quantity: Number(item.quantity),
+    total: Number(item.price) * Number(item.quantity),
+  }));
 
     if (returnedItemsData.length === 0 && newItemsData.length === 0) {
       return NextResponse.json(
@@ -135,6 +135,9 @@ export async function POST(req: NextRequest) {
         items: true,
       },
     });
+
+
+    
 
     return NextResponse.json(exchange, { status: 201 });
   } catch (error: any) {

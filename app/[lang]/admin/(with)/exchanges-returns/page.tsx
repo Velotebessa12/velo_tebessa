@@ -24,50 +24,35 @@ export default function ExchangeManagementPage() {
   const { lang } = useLang();
   const [tab, setTab] = useState<"exchanges" | "returns">("exchanges");
   const [exchanges, setExchanges] = useState([]);
+  const [returns , setReturns ] = useState([])
+  const [isReturnOpen, setIsReturnOpen] = useState<Record<string, boolean>>({});
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const [exRes, retRes] = await Promise.all([
+        fetch("/api/exchanges/get-exchanges"),
+        fetch("/api/returns/get-returns"),
+      ]);
 
-  useEffect(() => {
-    const fetchExchanges = async () => {
-      try {
-        const res = await fetch("/api/exchanges/get-exchanges");
+      if (!exRes.ok) throw new Error("Error fetching exchanges");
+      if (!retRes.ok) throw new Error("Error fetching returns");
 
-        if (!res.ok) {
-          throw new Error("Error fetching exchanges");
-        }
+      const exData = await exRes.json();
+      const retData = await retRes.json();
 
-        const { exchanges } = await res.json();
-        setExchanges(exchanges);
-      } catch (error) {
-        toast.error("Error fetching exchanges");
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchExchanges();
-  }, []);
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Approved":
-        return "bg-green-100 text-green-800";
-      case "Pending":
-        return "bg-orange-100 text-orange-800";
-      case "Rejected":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
+      setExchanges(exData.exchanges);
+      setReturns(retData.returns);
+    } catch (error) {
+      toast.error("Error fetching data");
+      console.error(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleRefresh = () => {
-    console.log("Refreshing...");
-  };
+  fetchData();
+}, []);
 
-  const handleViewOrder = (id: string) => {
-    console.log("View order:", id);
-    setIsOpen(true);
-  };
 
   if (isLoading) {
     return <Loader />;
@@ -99,7 +84,7 @@ export default function ExchangeManagementPage() {
           </div>
         </div>
 
-            <div className="flex items-center gap-2">
+            {/* <div className="flex items-center gap-2">
                <button
         type="button"
         onClick={() => {}}
@@ -112,12 +97,12 @@ export default function ExchangeManagementPage() {
       <button
         type="button"
         onClick={() => {}}
-        className="px-4 py-2.5 mb-2 bg-teal-500 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+        className="px-4 py-2.5 mb-2 text-red-700 border bg-red-50 border-red-200 hover:bg-red-100 text-red-500 rounded-lg font-medium transition-colors flex items-center gap-2"
       >
         <Plus className="w-4 h-4" />
         <span className="hidden sm:inline">New Return</span>
       </button>
-            </div>
+            </div> */}
 
         <div className="flex gap-2 mb-6">
           <button
@@ -368,129 +353,128 @@ export default function ExchangeManagementPage() {
                       </div>
                     </div>
 
-                    {/* Expanded items */}
-                    {isExchangeOpen && (
-                      <div className="mt-4 space-y-3">
-                        {/* Divider */}
-                        <div className="flex items-center gap-2">
-                          <div className="h-px flex-1 bg-gray-100" />
-                          <span className="text-[10px] font-medium text-gray-400 uppercase tracking-widest">
-                            Items
-                          </span>
-                          <div className="h-px flex-1 bg-gray-100" />
-                        </div>
+                  {/* Expanded items */}
+{isExchangeOpen && (
+  <div className="mt-4 space-y-4">
+    {/* Divider */}
+    <div className="flex items-center gap-2">
+      <div className="h-px flex-1 bg-gray-100" />
+      <span className="text-[10px] font-medium text-gray-400 uppercase tracking-widest">
+        Items
+      </span>
+      <div className="h-px flex-1 bg-gray-100" />
+    </div>
 
-                        {/* RETURNED */}
-                        {exchange.items.filter((i : any) => i.type === "RETURNED")
-                          .length > 0 && (
-                          <div className="space-y-2">
-                            <div className="flex items-center gap-2">
-                              <span className="text-[10px] font-semibold text-red-500 uppercase tracking-widest">
-                                ↩ Returned
-                              </span>
-                            </div>
-                            {exchange.items
-                              .filter((i : any) => i.type === "RETURNED")
-                              .map((item : any) => (
-                                <div
-                                  key={item.id}
-                                  className="flex items-center gap-3 p-3 rounded-xl border border-red-50 bg-red-50/40 hover:bg-red-50 transition-colors"
-                                >
-                                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-red-100 flex-shrink-0 flex items-center justify-center">
-                                    <span className="text-xs font-bold text-red-400">
-                                      {item.name.slice(0, 2).toUpperCase()}
-                                      <img
-                                        src={item.product.images?.[0]}
-                                        alt=""
-                                      />
-                                    </span>
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-medium text-gray-800 truncate">
-                                      {item.name}
-                                    </p>
-                                    <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                                      {item.variant && (
-                                        <span className="text-[10px] bg-white border border-gray-200 text-gray-500 px-1.5 py-0.5 rounded-md">
-                                          {item.variant}
-                                        </span>
-                                      )}
-                                      <span className="text-[10px] text-gray-400">
-                                        Qty: {item.quantity}
-                                      </span>
-                                    </div>
-                                  </div>
-                                  <div className="text-right flex-shrink-0">
-                                    <div className="text-sm font-semibold text-gray-800">
-                                      {item.total.toLocaleString()}{" "}
-                                      <span className="text-xs font-normal text-gray-400">
-                                        DA
-                                      </span>
-                                    </div>
-                                    <div className="text-[10px] text-gray-400">
-                                      {item.price.toLocaleString()} ×{" "}
-                                      {item.quantity}
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                          </div>
-                        )}
+    {/* TWO COLUMNS */}
+    <div className="flex flex-col md:flex-row gap-4">
+      
+      {/* LEFT — RETURNED */}
+      <div className="md:w-1/2 space-y-2">
+        {exchange.items.some((i:any) => i.type === "RETURNED") && (
+          <>
+            <span className="text-[10px] font-semibold text-red-500 uppercase tracking-widest">
+              Returned
+            </span>
 
-                        {/* NEW */}
-                        {exchange.items.filter((i : any) => i.type === "NEW").length >
-                          0 && (
-                          <div className="space-y-2">
-                            <div className="flex items-center gap-2">
-                              <span className="text-[10px] font-semibold text-emerald-500 uppercase tracking-widest">
-                                ✦ New
-                              </span>
-                            </div>
-                            {exchange.items
-                              .filter((i : any) => i.type === "NEW")
-                              .map((item : any) => (
-                                <div
-                                  key={item.id}
-                                  className="flex items-center gap-3 p-3 rounded-xl border border-emerald-50 bg-emerald-50/40 hover:bg-emerald-50 transition-colors"
-                                >
-                                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-emerald-100 flex-shrink-0 flex items-center justify-center">
-                                    <span className="text-xs font-bold text-emerald-500">
-                                      {item.name.slice(0, 2).toUpperCase()}
-                                    </span>
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-medium text-gray-800 truncate">
-                                      {item.name}
-                                    </p>
-                                    <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                                      {item.variant && (
-                                        <span className="text-[10px] bg-white border border-gray-200 text-gray-500 px-1.5 py-0.5 rounded-md">
-                                          {item.variant}
-                                        </span>
-                                      )}
-                                      <span className="text-[10px] text-gray-400">
-                                        Qty: {item.quantity}
-                                      </span>
-                                    </div>
-                                  </div>
-                                  <div className="text-right flex-shrink-0">
-                                    <div className="text-sm font-semibold text-gray-800">
-                                      {item.total.toLocaleString()}{" "}
-                                      <span className="text-xs font-normal text-gray-400">
-                                        DA
-                                      </span>
-                                    </div>
-                                    <div className="text-[10px] text-gray-400">
-                                      {item.price.toLocaleString()} ×{" "}
-                                      {item.quantity}
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                          </div>
-                        )}
-                      </div>
+            {exchange.items
+              .filter((i:any) => i.type === "RETURNED")
+              .map((item:any) => (
+                <div
+                  key={item.id}
+                  className="flex items-center gap-3 p-3 rounded-xl border border-red-50 bg-red-50/40 hover:bg-red-50 transition-colors"
+                >
+                  {/* Image */}
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-red-100 flex-shrink-0 overflow-hidden flex items-center justify-center">
+                    {item.product.images?.[0] ? (
+                      <img
+                        src={item.product.images[0]}
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-xs text-red-500">No image</span>
                     )}
+                  </div>
+
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{item.name}</p>
+                    <div className="flex gap-2 text-[10px] text-gray-400">
+                      {item.variant && <span>{item.variant}</span>}
+                      <span>Qty: {item.quantity}</span>
+                    </div>
+                  </div>
+
+                  {/* Price */}
+                  <div className="text-right">
+                    <div className="text-sm font-semibold">
+                      {item.total.toLocaleString()} <span className="text-xs">DA</span>
+                    </div>
+                    <div className="text-[10px] text-gray-400">
+                      {item.price.toLocaleString()} × {item.quantity}
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </>
+        )}
+      </div>
+
+      {/* RIGHT — NEW */}
+      <div className="md:w-1/2 space-y-2">
+        {exchange.items.some((i:any) => i.type === "NEW") && (
+          <>
+            <span className="text-[10px] font-semibold text-emerald-500 uppercase tracking-widest">
+              New
+            </span>
+
+            {exchange.items
+              .filter((i:any) => i.type === "NEW")
+              .map((item:any) => (
+                <div
+                  key={item.id}
+                  className="flex items-center gap-3 p-3 rounded-xl border border-emerald-50 bg-emerald-50/40 hover:bg-emerald-50 transition-colors"
+                >
+                  {/* Image */}
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-emerald-100 flex-shrink-0 overflow-hidden flex items-center justify-center">
+                    {item.product.images?.[0] ? (
+                      <img
+                        src={item.product.images[0]}
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-xs text-emerald-500">No image</span>
+                    )}
+                  </div>
+
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{item.name}</p>
+                    <div className="flex gap-2 text-[10px] text-gray-400">
+                      {item.variant && <span>{item.variant}</span>}
+                      <span>Qty: {item.quantity}</span>
+                    </div>
+                  </div>
+
+                  {/* Price */}
+                  <div className="text-right">
+                    <div className="text-sm font-semibold">
+                      {item.total.toLocaleString()} <span className="text-xs">DA</span>
+                    </div>
+                    <div className="text-[10px] text-gray-400">
+                      {item.price.toLocaleString()} × {item.quantity}
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </>
+        )}
+      </div>
+
+    </div>
+  </div>
+)}
                   </div>
                 </div>
               ))}
@@ -504,7 +488,289 @@ export default function ExchangeManagementPage() {
           </>
         )}
 
-        {tab === "returns" && <div></div>}
+        {tab === "returns" && (
+  <>
+    {/* ── Return Cards ─────────────────────────────────────────────────────── */}
+    <div className="space-y-3 sm:space-y-4">
+      {returns.map((ret: any) => (
+        <div
+          key={ret.id}
+          className="bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
+        >
+          {/* Top accent bar based on status */}
+          <div
+            className={`h-1 w-full ${
+              ret.status === "PENDING"
+                ? "bg-amber-400"
+                : ret.status === "APPROVED"
+                  ? "bg-blue-500"
+                  : ret.status === "REJECTED"
+                    ? "bg-red-400"
+                    : ret.status === "REFUNDED"
+                      ? "bg-violet-500"
+                      : "bg-emerald-500" // COMPLETED
+            }`}
+          />
+
+          <div className="p-4 sm:p-5 md:p-6">
+            {/* Card header */}
+            <div className="flex items-start sm:items-center justify-between gap-3 mb-5">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0">
+                  <svg
+                    className="w-4 h-4 text-gray-500"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="text-sm sm:text-base font-semibold text-gray-900">
+                      #{ret.returnNumber}
+                    </h3>
+                    <span
+                      className={`inline-flex items-center px-2 py-0.5 text-[10px] font-semibold rounded-md tracking-wide uppercase ${
+                        ret.status === "PENDING"
+                          ? "bg-amber-50 text-amber-700 ring-1 ring-amber-200"
+                          : ret.status === "APPROVED"
+                            ? "bg-blue-50 text-blue-700 ring-1 ring-blue-200"
+                            : ret.status === "REJECTED"
+                              ? "bg-red-50 text-red-700 ring-1 ring-red-200"
+                              : ret.status === "REFUNDED"
+                                ? "bg-violet-50 text-violet-700 ring-1 ring-violet-200"
+                                : "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
+                      }`}
+                    >
+                      {ret.status.charAt(0) + ret.status.slice(1).toLowerCase()}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    {new Date(ret.createdAt).toLocaleDateString("en-GB", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                    {ret.reason && (
+                      <span className="ml-2 text-gray-400 italic">
+                        · {ret.reason}
+                      </span>
+                    )}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <button
+                  onClick={() =>
+                    router.push(`/${lang}/admin/orders/${ret.orderId}`)
+                  }
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <Eye size={13} />
+                  <span className="hidden sm:inline">View Order</span>
+                </button>
+
+                <button
+                  onClick={() => setIsReturnOpen((prev: any) => ({ ...prev, [ret.id]: !prev[ret.id] }))}
+                  className={`p-1.5 rounded-lg border transition-all duration-200 ${
+                    isReturnOpen[ret.id]
+                      ? "bg-gray-900 border-gray-900 text-white"
+                      : "bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <ChevronDownCircleIcon
+                    size={16}
+                    className={`transition-transform duration-300 ${isReturnOpen[ret.id] ? "rotate-180" : ""}`}
+                  />
+                </button>
+              </div>
+            </div>
+
+            {/* Totals row */}
+            <div className="grid grid-cols-3 gap-2 sm:gap-3">
+              {/* Items count */}
+              <div className="rounded-xl border border-gray-100 bg-gray-50 p-3 sm:p-4">
+                <div className="flex items-center gap-1.5 mb-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-gray-400" />
+                  <p className="text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wide">
+                    Items
+                  </p>
+                </div>
+                <p className="text-base sm:text-xl font-bold text-gray-800 tabular-nums">
+                  {ret.items.length}
+                </p>
+                <p className="text-[10px] text-gray-400 mt-1">
+                  {ret.items.reduce((s: number, i: any) => s + i.quantity, 0)} units
+                </p>
+              </div>
+
+              {/* Refund total */}
+              <div className="rounded-xl border border-red-100 bg-red-50 p-3 sm:p-4">
+                <div className="flex items-center gap-1.5 mb-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-red-400" />
+                  <p className="text-[10px] sm:text-xs font-medium text-red-500 uppercase tracking-wide">
+                    <span className="hidden sm:inline">Refund</span>
+                    <span className="sm:hidden">Ref.</span>
+                  </p>
+                </div>
+                <p className="text-base sm:text-xl font-bold text-red-700 tabular-nums">
+                  {ret.refundTotal.toLocaleString()}
+                  <span className="text-xs font-medium text-red-400 ml-1">DA</span>
+                </p>
+                <p className="text-[10px] text-red-400 mt-1">to refund</p>
+              </div>
+
+              {/* Refund method */}
+              <div
+                className={`rounded-xl border p-3 sm:p-4 ${
+                  ret.refundMethod === "WALLET"
+                    ? "border-violet-100 bg-violet-50"
+                    : ret.refundMethod === "STORE_CREDIT"
+                      ? "border-blue-100 bg-blue-50"
+                      : "border-emerald-100 bg-emerald-50"
+                }`}
+              >
+                <div className="flex items-center gap-1.5 mb-2">
+                  <div
+                    className={`w-1.5 h-1.5 rounded-full ${
+                      ret.refundMethod === "WALLET"
+                        ? "bg-violet-400"
+                        : ret.refundMethod === "STORE_CREDIT"
+                          ? "bg-blue-400"
+                          : "bg-emerald-400"
+                    }`}
+                  />
+                  <p
+                    className={`text-[10px] sm:text-xs font-medium uppercase tracking-wide ${
+                      ret.refundMethod === "WALLET"
+                        ? "text-violet-500"
+                        : ret.refundMethod === "STORE_CREDIT"
+                          ? "text-blue-500"
+                          : "text-emerald-500"
+                    }`}
+                  >
+                    Method
+                  </p>
+                </div>
+                <p
+                  className={`text-xs sm:text-sm font-bold ${
+                    ret.refundMethod === "WALLET"
+                      ? "text-violet-700"
+                      : ret.refundMethod === "STORE_CREDIT"
+                        ? "text-blue-700"
+                        : "text-emerald-700"
+                  }`}
+                >
+                  {ret.refundMethod === "ORIGINAL_PAYMENT"
+                    ? "Original"
+                    : ret.refundMethod === "WALLET"
+                      ? "Wallet"
+                      : "Store Credit"}
+                </p>
+                <p
+                  className={`text-[10px] mt-1 ${
+                    ret.refundMethod === "WALLET"
+                      ? "text-violet-400"
+                      : ret.refundMethod === "STORE_CREDIT"
+                        ? "text-blue-400"
+                        : "text-emerald-400"
+                  }`}
+                >
+                  {ret.refundMethod === "ORIGINAL_PAYMENT"
+                    ? "payment method"
+                    : ret.refundMethod === "WALLET"
+                      ? "added to balance"
+                      : "as voucher"}
+                </p>
+              </div>
+            </div>
+
+            {/* Expanded items */}
+            {isReturnOpen[ret.id] && (
+              <div className="mt-4 space-y-4">
+                {/* Divider */}
+                <div className="flex items-center gap-2">
+                  <div className="h-px flex-1 bg-gray-100" />
+                  <span className="text-[10px] font-medium text-gray-400 uppercase tracking-widest">
+                    Returned Items
+                  </span>
+                  <div className="h-px flex-1 bg-gray-100" />
+                </div>
+
+                <div className="space-y-2">
+                  {ret.items.map((item: any) => (
+                    <div
+                      key={item.id}
+                      className="flex items-center gap-3 p-3 rounded-xl border border-red-50 bg-red-50/40 hover:bg-red-50 transition-colors"
+                    >
+                      {/* Image */}
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-red-100 flex-shrink-0 overflow-hidden flex items-center justify-center">
+                        {item.product?.images?.[0] ? (
+                          <img
+                            src={item.product.images[0]}
+                            alt={item.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <span className="text-xs text-red-400">No img</span>
+                        )}
+                      </div>
+
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          {item.name}
+                        </p>
+                        <div className="flex flex-wrap gap-2 text-[10px] text-gray-400 mt-0.5">
+                          {item.variant && (
+                            <span className="bg-white border border-gray-200 px-1.5 py-0.5 rounded-full">
+                              {item.variant}
+                            </span>
+                          )}
+                          <span>Qty: {item.quantity}</span>
+                          {item.reason && (
+                            <span className="italic text-gray-400">
+                              · {item.reason}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Price */}
+                      <div className="text-right flex-shrink-0">
+                        <div className="text-sm font-semibold text-gray-800">
+                          {item.total.toLocaleString()}{" "}
+                          <span className="text-xs font-normal text-gray-400">DA</span>
+                        </div>
+                        <div className="text-[10px] text-gray-400">
+                          {item.price.toLocaleString()} × {item.quantity}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    {returns.length === 0 && (
+      <div className="bg-white border border-gray-200 rounded-lg p-8 sm:p-12 text-center">
+        <p className="text-gray-500 text-sm">No returns found</p>
+      </div>
+    )}
+  </>
+)}
       </div>
     </div>
   );

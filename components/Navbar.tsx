@@ -164,37 +164,78 @@ const Navbar = () => {
               </button>
 
               {isLangOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                  <div className="p-2">
-                    <div className="px-3 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                      {dict.navbar.selectLanguage}
-                    </div>
-                    {languages.map((language) => (
-                      <button
-                        key={language.code}
-                        onClick={() => changeLanguage(language.code)}
-                        className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-all duration-150 ${
-                          lang === language.code
-                            ? "bg-emerald-50 text-emerald-700"
-                            : "hover:bg-slate-50 text-slate-700"
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className="text-2xl">{language.flag}</span>
-                          <div className="text-left">
-                            <div className="font-medium">{language.name}</div>
-                            <div className="text-xs text-slate-500">
-                              {language.nativeName}
-                            </div>
-                          </div>
-                        </div>
-                        {lang === language.code && (
-                          <Check className="w-5 h-5 text-emerald-600" />
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+             <div className="
+  absolute right-0 mt-2
+  w-56 sm:w-64
+  bg-white
+  border border-slate-200
+  rounded-2xl
+  shadow-lg shadow-slate-200/60
+  overflow-hidden
+  animate-in fade-in slide-in-from-top-1
+  duration-200
+">
+  <div className="p-2">
+    {/* Header */}
+    <div className="
+      px-3 py-2
+      text-[11px] font-semibold
+      text-slate-500
+      uppercase tracking-wider
+    ">
+      {dict.navbar.selectLanguage}
+    </div>
+
+    {/* Languages */}
+    <div className="space-y-1">
+      {languages.map((language) => {
+        const active = lang === language.code;
+
+        return (
+          <button
+            key={language.code}
+            onClick={() => changeLanguage(language.code)}
+            className={`
+              group
+              w-full
+              flex items-center justify-between
+              px-3 py-2.5
+              rounded-xl
+              transition-all duration-150
+              ${
+                active
+                  ? "bg-emerald-50 text-emerald-700"
+                  : "hover:bg-slate-50 text-slate-700"
+              }
+              focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40
+            `}
+          >
+            {/* Left */}
+            <div className="flex items-center gap-3 min-w-0">
+              <span className="text-xl leading-none">
+                {language.flag}
+              </span>
+
+              <div className="flex flex-col text-left min-w-0">
+                <span className="text-sm font-medium truncate">
+                  {language.name}
+                </span>
+                <span className="text-xs text-slate-500 truncate">
+                  {language.nativeName}
+                </span>
+              </div>
+            </div>
+
+            {/* Right */}
+            {active && (
+              <Check className="w-4.5 h-4.5 text-emerald-600 shrink-0" />
+            )}
+          </button>
+        );
+      })}
+    </div>
+  </div>
+</div>
               )}
             </div>
 

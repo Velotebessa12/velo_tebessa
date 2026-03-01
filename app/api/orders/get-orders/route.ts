@@ -26,7 +26,9 @@ export async function GET(req: NextRequest) {
                 }
               }
             }
-          }
+          },
+          exchanges : true,
+          returns : true
         },
         orderBy : {
           createdAt : "desc"

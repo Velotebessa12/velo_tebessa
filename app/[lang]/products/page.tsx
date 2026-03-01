@@ -270,7 +270,6 @@ const page = () => {
                     <Skeleton className="h-3 w-8 rounded bg-gray-200" />
                   </div>
                   <div className="flex items-center justify-between pt-1">
-                    <Skeleton className="h-6 w-16 rounded bg-gray-200" />
                     <Skeleton className="h-9 w-24 rounded-xl bg-gray-200" />
                   </div>
                 </div>

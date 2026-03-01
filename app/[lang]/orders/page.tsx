@@ -49,6 +49,31 @@ const Page = () => {
   const [isReturnOpen, setIsReturnOpen] = useState(false);
   const [quantities, setQuantities] = useState({});
 
+
+    useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const res = await fetch(
+          `/api/orders/get-orders?customerId=${user?.id}`,
+        );
+
+        if (!res.ok) {
+          throw new Error("Error fetching orders");
+        }
+
+        const { orders } = await res.json();
+        setOrders(orders);
+      } catch (error) {
+        toast.error("Error fetching orders");
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, [user?.id]);
+
   useEffect(() => {
     const updateStatus = async () => {
       if (!user?.id) return;
@@ -133,29 +158,7 @@ const Page = () => {
     }
   }, []);
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const res = await fetch(
-          `/api/orders/get-orders?customerId=${user?.id}`,
-        );
 
-        if (!res.ok) {
-          throw new Error("Error fetching orders");
-        }
-
-        const { orders } = await res.json();
-        setOrders(orders);
-      } catch (error) {
-        toast.error("Error fetching orders");
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchOrders();
-  }, [user?.id]);
 
 
  
@@ -285,6 +288,125 @@ const Page = () => {
                     </button>
                   </div>
                 </div>
+
+                {order.exchanges.length > 0 && (
+  <div className="flex flex-col gap-2 border-t pt-3">
+    <span className="text-xs font-semibold text-gray-500">
+      Échanges
+    </span>
+
+    {order.exchanges.map((exchange : any) => (
+      <div
+        key={exchange.id}
+        className="flex flex-wrap items-center gap-3 text-sm bg-gray-50 border rounded-xl px-3 py-2"
+      >
+        {/* Exchange number */}
+        <span className="font-medium text-gray-800">
+          #{exchange.exchangeNumber}
+        </span>
+
+        {/* Status */}
+        <span
+          className={`px-2 py-0.5 rounded-full text-xs font-medium border
+            ${
+              exchange.status === "PENDING"
+                ? "bg-yellow-50 text-yellow-700 border-yellow-200"
+                : exchange.status === "APPROVED"
+                ? "bg-blue-50 text-blue-700 border-blue-200"
+                : exchange.status === "COMPLETED"
+                ? "bg-green-50 text-green-700 border-green-200"
+                : "bg-red-50 text-red-700 border-red-200"
+            }`}
+        >
+          {exchange.status}
+        </span>
+
+        {/* Difference */}
+        <span className="text-gray-600 text-xs">
+          Différence :
+          <span
+            className={`ml-1 font-medium ${
+              exchange.difference > 0
+                ? "text-red-600"
+                : exchange.difference < 0
+                ? "text-green-600"
+                : "text-gray-700"
+            }`}
+          >
+            {exchange.difference.toLocaleString()} DA
+          </span>
+        </span>
+
+        {/* Date */}
+        <span className="ml-auto text-xs text-gray-400">
+          {new Date(exchange.createdAt).toLocaleDateString("fr-FR")}
+        </span>
+      </div>
+    ))}
+  </div>
+
+)}
+
+  {order.returns.length > 0 && (
+  <div className="flex flex-col gap-2 border-t pt-3">
+    <span className="text-xs font-semibold text-gray-500">
+      Retours
+    </span>
+
+    {order.returns.map((ret : any) => (
+      <div
+        key={ret.id}
+        className="flex flex-wrap items-center gap-3 text-sm bg-gray-50 border rounded-xl px-3 py-2"
+      >
+        {/* Return number */}
+        <span className="font-medium text-gray-800">
+          #{ret.returnNumber}
+        </span>
+
+        {/* Status */}
+        <span
+          className={`px-2 py-0.5 rounded-full text-xs font-medium border
+            ${
+              ret.status === "PENDING"
+                ? "bg-yellow-50 text-yellow-700 border-yellow-200"
+                : ret.status === "APPROVED"
+                ? "bg-blue-50 text-blue-700 border-blue-200"
+                : ret.status === "REFUNDED"
+                ? "bg-green-50 text-green-700 border-green-200"
+                : ret.status === "COMPLETED"
+                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                : "bg-red-50 text-red-700 border-red-200"
+            }`}
+        >
+          {ret.status}
+        </span>
+
+        {/* Refund total */}
+        <span className="text-gray-600 text-xs">
+          Remboursement :
+          <span className="ml-1 font-medium text-gray-800">
+            {ret.refundTotal.toLocaleString()} DA
+          </span>
+        </span>
+
+        {/* Refund method */}
+        <span className="text-xs text-gray-500">
+          {ret.refundMethod === "ORIGINAL_PAYMENT"
+            ? "Paiement original"
+            : ret.refundMethod === "WALLET"
+            ? "Portefeuille"
+            : "Avoir"}
+        </span>
+
+        {/* Date */}
+        <span className="ml-auto text-xs text-gray-400">
+          {new Date(ret.createdAt).toLocaleDateString("fr-FR")}
+        </span>
+      </div>
+    ))}
+  </div>
+)}
+
               </div>
             ))
           )}

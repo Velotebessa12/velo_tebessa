@@ -111,7 +111,7 @@ export default function ReturnPage() {
   };
 
   const selectedItems = Object.values(returnEntries);
-
+  
   const returnedValue = selectedItems.reduce((sum, entry) => {
     const item = order?.items.find((i) => i.id === entry.itemId);
     if (!item) return sum;
@@ -122,30 +122,51 @@ export default function ReturnPage() {
 
   // ── Submit ─────────────────────────────────────────────────────────────────
   const handleSubmit = async () => {
-    if (!canSubmit) return;
-    setIsSubmitting(true);
-    try {
-      const res = await fetch("/api/returns/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          orderId: id,
-          items: selectedItems,
-          reason,
-        }),
-      });
+  if (!canSubmit || !order) return;
 
-      if (!res.ok) throw new Error("Failed to submit return");
+  setIsSubmitting(true);
 
-      toast.success("Demande de retour soumise !");
-      router.push(`/${{ lang }}/orders`);
-    } catch (error) {
-      toast.error("Erreur lors de la soumission");
-      console.error(error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  try {
+    const returnItems = selectedItems.map((entry) => {
+      const item : any = order.items.find((i) => i.id === entry.itemId);
+      if (!item || !item.product) {
+        throw new Error("Invalid return item");
+      }
+
+      return {
+        id: item.product.id,
+        price: item.unitPrice,
+        quantity: entry.quantity,
+        name:
+          getTranslations(item.product.translations as any, lang, "name") ||
+          item.product.name,
+        variant: item.variantName || null,
+        reason,
+      };
+    });
+
+    const res = await fetch("/api/returns/create-return", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        orderId: id,
+        refundMethod: "ORIGINAL_PAYMENT",
+        reason,
+        returnItems,
+      }),
+    });
+
+    if (!res.ok) throw new Error("Failed to submit return");
+
+    toast.success("Demande de retour soumise !");
+    router.push(`/${lang}/orders`);
+  } catch (error) {
+    toast.error("Erreur lors de la soumission");
+    console.error(error);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   // ── Guards ─────────────────────────────────────────────────────────────────
   if (isLoading) return <Loader />;

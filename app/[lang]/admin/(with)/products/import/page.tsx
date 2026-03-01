@@ -3,11 +3,12 @@
 import React, { useState } from 'react'
 import { Upload, Download, Info, FileSpreadsheet, ArrowLeft } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { useRouter } from 'next/navigation'
 
 const Page = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [dragActive, setDragActive] = useState(false)
-
+  const router = useRouter()
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
@@ -66,20 +67,24 @@ try {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 p-4">
+     <div className="mb-6 flex items-center gap-3 bg-white border-b border-gray-200 p-4">
+  <button
+    type="button"
+    onClick={() => router.back()}
+    className="p-1.5 rounded-lg hover:bg-slate-100 transition-colors text-slate-500"
+  >
+    <ArrowLeft className="w-4 h-4" />
+  </button>
 
-         <div>
-          <button onClick={() => {}}>
-            <ArrowLeft/>
-          </button>
-         </div>
-            
-            <h1 className="text-2xl font-semibold text-gray-900">Import de produits en masse</h1>
-
-          <p className="text-sm text-gray-500">Importez plusieurs produits depuis un fichier Excel ou CSV</p>
-       
-      </div>
-
+  <div>
+    <h1 className="text-2xl font-bold text-slate-900">
+      Import de produits en masse
+    </h1>
+    <p className="text-slate-500 text-sm mt-0.5">
+      Importez plusieurs produits depuis un fichier Excel ou CSV
+    </p>
+  </div>
+</div>
       <div className="max-w-4xl mx-auto px-6 py-8">
         {/* Instructions Card */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">

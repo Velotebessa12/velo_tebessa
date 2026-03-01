@@ -147,9 +147,16 @@ export default function CheckoutPage() {
   // ── Load stored user ──
   useEffect(() => {
     try {
-      const savedUser = localStorage.getItem("user");
+      const savedUser = JSON.parse(localStorage.getItem("user")!);
       const auth = localStorage.getItem("isAuthenticated");
-      if (savedUser) setUser(JSON.parse(savedUser));
+      if (savedUser){
+         setUser(savedUser);
+      setFormData(prev => ({
+        ...prev,
+        fullName : savedUser.name,
+        phoneNumber : savedUser.phoneNumber?.replace(/\s+/g, "")
+      }))
+      }
       setIsAuthenticated(!!auth);
     } catch {
       // localStorage unavailable
@@ -470,7 +477,20 @@ export default function CheckoutPage() {
     return data.shippingPrice as number;
   }
 
-  console.log(cart);
+  const handleCommuneChange = (
+  e: React.ChangeEvent<HTMLSelectElement>
+) => {
+  const communeName = e.target.value;
+ 
+  setFormData((prev) => ({
+    ...prev,
+    commune: communeName,
+    shippingCompany:
+  communeName === "Tébessa" || communeName === "Tebessa"
+    ? null
+    : prev.shippingCompany,
+  }));
+};
 
   // ── Render ──
   return (
@@ -536,7 +556,7 @@ export default function CheckoutPage() {
                           ...prev,
                           deliveryMethod: "home",
                           shippingCompany: null,
-                          shippingPrice: 900,
+                          // shippingPrice: 900,
                         }))
                       }
                       className={`flex items-start gap-3 p-4 border-2 rounded-xl text-left transition-all ${
@@ -637,7 +657,7 @@ export default function CheckoutPage() {
                             setFormData((prev) => ({
                               ...prev,
                               shippingCompany: agency.id,
-                              shippingPrice: 500,
+                              // shippingPrice: 500,
                             }))
                           }
                           className={`flex items-center gap-3 p-4 border-2 rounded-xl text-left transition-all ${
@@ -725,7 +745,7 @@ export default function CheckoutPage() {
                       name="commune"
                       required
                       value={formData.commune}
-                      onChange={handleInputChange}
+                      onChange={handleCommuneChange}
                       disabled={loadingCommunes || !formData.wilaya}
                       className={`${inputClass} appearance-none pr-10 disabled:opacity-50 disabled:cursor-not-allowed`}
                     >

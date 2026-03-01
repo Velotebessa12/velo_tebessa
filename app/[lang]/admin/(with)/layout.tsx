@@ -10,7 +10,7 @@ export default function AdminLayout({
   return (
     <div className="min-h-screen flex">
   {/* Sidebar */}
-  <AdminSidebar />
+  {/* <AdminSidebar /> */}
 
   {/* Main Content Area */}
   <div className="flex-1 flex flex-col">

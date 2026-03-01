@@ -165,7 +165,7 @@ const Page = () => {
     if (!selectedOrder) {
       return toast.error("No order selected");
     }
-
+  
     try {
       // Build product description from items
       const produit =
@@ -201,7 +201,7 @@ const Page = () => {
         type_id: 1, // example: 1 = home delivery
         poids: 5, // default weight (change if you store real weight)
 
-        stop_desk: 1,
+        stop_desk: selectedOrder.deliveryMethod === "home" ? 0 : 1,
 
         remarque: selectedOrder.deliveryNote || "",
 

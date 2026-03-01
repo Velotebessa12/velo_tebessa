@@ -40,6 +40,7 @@ model User {
   
   permissions String[]
   exchanges    Exchange[]
+  returns Return[]
   coupons CouponUsage[]
 }
 
@@ -125,6 +126,7 @@ model Product {
   youtubeVideoUrls String[]
 
   exchangeItems ExchangeItem[]
+  returnItems ReturnItem[]
   operations Operation[]
   orderItems   OrderItem[]
   variants     ProductVariant[]
@@ -326,6 +328,7 @@ model Order {
   couponUsage CouponUsage?
   items OrderItem[]
   exchanges    Exchange[]
+  returns Return[]
   invoices Invoice[]
 }
 
@@ -536,6 +539,63 @@ enum ExchangeItemType {
   NEW
 }
 
+
+model Return {
+  id             String        @id @default(uuid())
+  returnNumber   String        @unique
+  status         ReturnStatus  @default(PENDING)
+
+  orderId        String
+  order          Order         @relation(fields: [orderId], references: [id])
+
+  customerId     String
+  customer       User          @relation(fields: [customerId], references: [id])
+
+  items          ReturnItem[]
+
+  refundTotal    Float         // total amount to refund
+  refundMethod   RefundMethod  // original / wallet / store_credit
+  reason         String?
+
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+
+
+model ReturnItem {
+  id          String   @id @default(uuid())
+
+  returnId    String
+  return      Return   @relation(fields: [returnId], references: [id], onDelete: Cascade)
+
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id])
+
+  name        String   // snapshot of product name
+  variant     String?  // size / color snapshot
+  price       Float    // price at time of purchase
+  quantity    Int
+  total       Float    // price * quantity
+
+  reason      String?  // optional per-item reason
+
+  createdAt   DateTime @default(now())
+}
+
+enum ReturnStatus {
+  PENDING      // requested by customer
+  APPROVED     // approved by admin
+  REJECTED     // denied
+  REFUNDED     // money sent
+  COMPLETED    // fully processed
+}
+
+enum RefundMethod {
+  ORIGINAL_PAYMENT
+  WALLET
+  STORE_CREDIT
+}
 
 model Discount {
   id          String   @id @default(uuid())

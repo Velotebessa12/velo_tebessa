@@ -24,13 +24,12 @@ export async function GET(req: NextRequest) {
     }, 0);
 
     // 2️⃣ Low stock products (stock < minimumStock)
-    const lowStockProducts = products.filter(
-      (p) =>
-        p.stock != null &&
-        p.minimumStock != null &&
-        p.stock > 0 &&
-        p.stock < p.minimumStock
-    );
+const lowStockProducts = products.filter(
+  (p) =>
+    p.stock != null &&
+    p.minimumStock != null &&
+    p.stock < p.minimumStock
+);
 
     // 3️⃣ Out of stock products
     const outOfStockProducts = products.filter(
