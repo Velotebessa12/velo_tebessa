@@ -76,7 +76,7 @@ useEffect(() => {
         <div className="flex items-start sm:items-center justify-between gap-3 mb-4 sm:mb-6">
           <div>
             <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-900">
-              Exchange / Returns Management
+              Exchanges / Returns Management
             </h1>
             <p className="text-xs sm:text-sm text-gray-600 mt-0.5 sm:mt-1">
               Review and approve product exchange requests
