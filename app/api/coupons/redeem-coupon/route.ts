@@ -42,6 +42,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Check usage limit
+if (
+  coupon.usageLimit !== null &&
+  coupon.usedCount >= coupon.usageLimit
+) {
+  return NextResponse.json(
+    { error: "Coupon usage limit reached" },
+    { status: 400 }
+  );
+}
+
     // Check minimum amount
     if (coupon.minAmount && cartTotal < coupon.minAmount) {
       return NextResponse.json(

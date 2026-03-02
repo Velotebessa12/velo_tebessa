@@ -58,12 +58,12 @@ export async function PATCH(req: Request, context: Context) {
     }
 
     // ✅ SAFE DATE HANDLING (THIS FIXES YOUR ERROR)
-    if (body.expirationDate !== undefined) {
-      if (!body.expirationDate) {
+    if (body.expiresAt  !== undefined) {
+      if (!body.expiresAt ) {
         // empty string / null → remove expiration
         data.expiresAt = null;
       } else {
-        const parsed = new Date(body.expirationDate);
+        const parsed = new Date(body.expiresAt );
 
         if (isNaN(parsed.getTime())) {
           return NextResponse.json(

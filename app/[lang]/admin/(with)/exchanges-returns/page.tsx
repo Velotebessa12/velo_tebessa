@@ -7,6 +7,8 @@ import {
   ChevronDown,
   ChevronDownCircleIcon,
   Plus,
+  X,
+  Check,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import PopUp from "@/components/PopUp";
@@ -23,8 +25,8 @@ export default function ExchangeManagementPage() {
   const router = useRouter();
   const { lang } = useLang();
   const [tab, setTab] = useState<"exchanges" | "returns">("exchanges");
-  const [exchanges, setExchanges] = useState([]);
-  const [returns , setReturns ] = useState([])
+  const [exchanges, setExchanges] = useState<any[]>([]);
+  const [returns , setReturns ] = useState<any[]>([])
   const [isReturnOpen, setIsReturnOpen] = useState<Record<string, boolean>>({});
 useEffect(() => {
   const fetchData = async () => {
@@ -53,6 +55,67 @@ useEffect(() => {
   fetchData();
 }, []);
 
+const updateExchange = async (
+  id: string,
+  data: Record<string, any>
+) => {
+  try {
+    const res = await fetch(`/api/exchanges/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      throw new Error("Error updating exchange");
+    }
+
+    const updatedExchange = await res.json();
+
+    // Optional: update state locally
+    setExchanges((prev) =>
+      prev.map((e) => (e.id === id ? updatedExchange : e))
+    );
+
+    toast.success("Exchange updated successfully");
+  } catch (error) {
+    toast.error("Error updating exchange");
+    console.error(error);
+  }
+};
+
+const updateReturn = async (
+  id: string,
+  data: Record<string, any>
+) => {
+  try {
+    const res = await fetch(`/api/returns/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      throw new Error("Error updating return");
+    }
+
+    const updatedReturn = await res.json();
+
+    // Optional: update state locally
+    setReturns((prev) =>
+      prev.map((r) => (r.id === id ? updatedReturn : r))
+    );
+
+    toast.success("Return updated successfully");
+  } catch (error) {
+    toast.error("Error updating return");
+    console.error(error);
+  }
+};
 
   if (isLoading) {
     return <Loader />;
@@ -139,6 +202,35 @@ useEffect(() => {
                   key={exchange.id}
                   className="bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
                 >
+
+{exchange.customer && (
+
+<div className="flex items-center gap-3 p-3 sm:p-4 rounded-xl border border-gray-100 bg-gray-50">
+  {/* Avatar */}
+  <div className="w-9 h-9 rounded-xl bg-gray-200 flex items-center justify-center flex-shrink-0">
+    <span className="text-sm font-bold text-gray-500">
+      {exchange.customer.name.charAt(0).toUpperCase()}
+    </span>
+  </div>
+
+  {/* Info */}
+  <div className="flex-1 min-w-0">
+    <p className="text-sm font-semibold text-gray-800 truncate">
+      {exchange.customer.name}
+    </p>
+    <p className="text-xs text-gray-400">{exchange.customer.phoneNumber}</p>
+  </div>
+
+  {/* Tag */}
+  <span className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-semibold text-gray-500 bg-white border border-gray-200 rounded-lg uppercase tracking-wide flex-shrink-0">
+    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+    </svg>
+    Customer
+  </span>
+</div>
+)}
+                  
                   {/* Top accent bar based on status */}
                   <div
                     className={`h-1 w-full ${
@@ -353,6 +445,26 @@ useEffect(() => {
                       </div>
                     </div>
 
+    {/* Action Buttons */}
+{exchange.status === "PENDING" && (
+  <div className="flex items-center justify-end gap-2 mt-4 pt-4 border-t border-gray-100">
+  <button
+    onClick={() => updateExchange(exchange.id, { status: "REJECTED" })}
+    className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-red-600 bg-red-50 border border-red-200 rounded-xl hover:bg-red-100 transition-colors"
+  >
+    <X size={13} />
+    Reject
+  </button>
+
+  <button
+    onClick={() => updateExchange(exchange.id, { status: "APPROVED" })}
+    className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl hover:bg-emerald-100 transition-colors"
+  >
+    <Check size={13} />
+    Approve
+  </button>
+</div>
+)}
                   {/* Expanded items */}
 {isExchangeOpen && (
   <div className="mt-4 space-y-4">
@@ -472,6 +584,8 @@ useEffect(() => {
         )}
       </div>
 
+  
+
     </div>
   </div>
 )}
@@ -497,6 +611,35 @@ useEffect(() => {
           key={ret.id}
           className="bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
         >
+
+{ret.customer && (
+
+<div className="flex items-center gap-3 p-3 sm:p-4 rounded-xl border border-gray-100 bg-gray-50">
+  {/* Avatar */}
+  <div className="w-9 h-9 rounded-xl bg-gray-200 flex items-center justify-center flex-shrink-0">
+    <span className="text-sm font-bold text-gray-500">
+      {ret.customer.name.charAt(0).toUpperCase()}
+    </span>
+  </div>
+
+  {/* Info */}
+  <div className="flex-1 min-w-0">
+    <p className="text-sm font-semibold text-gray-800 truncate">
+      {ret.customer.name}
+    </p>
+    <p className="text-xs text-gray-400">{ret.customer.phoneNumber}</p>
+  </div>
+
+  {/* Tag */}
+  <span className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-semibold text-gray-500 bg-white border border-gray-200 rounded-lg uppercase tracking-wide flex-shrink-0">
+    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+    </svg>
+    Customer
+  </span>
+</div>
+)}
+
           {/* Top accent bar based on status */}
           <div
             className={`h-1 w-full ${
@@ -692,6 +835,26 @@ useEffect(() => {
                 </p>
               </div>
             </div>
+
+             {ret.status === "PENDING" && (
+                     <div className="flex items-center justify-end gap-2 mt-4 pt-4 border-t border-gray-100">
+  <button
+    onClick={() => updateReturn(ret.id, { status: "REJECTED" })}
+    className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-red-600 bg-red-50 border border-red-200 rounded-xl hover:bg-red-100 transition-colors"
+  >
+    <X size={13} />
+    Reject
+  </button>
+
+  <button
+    onClick={() => updateReturn(ret.id, { status: "APPROVED" })}
+    className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl hover:bg-emerald-100 transition-colors"
+  >
+    <Check size={13} />
+    Approve
+  </button>
+</div>
+             )}
 
             {/* Expanded items */}
             {isReturnOpen[ret.id] && (

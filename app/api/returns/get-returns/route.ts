@@ -8,8 +8,13 @@ export async function GET(req: NextRequest) {
 
     const returns = await prisma.return.findMany({
         include : {
-         items : true,
+         items : {
+          include : {
+            product : true
+          }
+        },
          customer : true,
+         order : true
         },
         orderBy : {
           createdAt : "desc"
