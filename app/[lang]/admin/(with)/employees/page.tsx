@@ -289,7 +289,7 @@ export default function EmployeesPage() {
             <div className="w-full flex flex-col items-center justify-center p-6 text-center">
               <h2 className="text-lg font-semibold text-gray-900">Delete Employee</h2>
               <p className="mt-3 text-sm text-gray-600">
-                Are you sure you want to delete{' '}
+                Are you sure you want to delete
                 <span className="font-medium text-gray-900">{selectedEmployee?.name}</span>?
                 <br />
                 <span className="text-red-500 font-medium">This action cannot be undone.</span>
