@@ -769,70 +769,81 @@ export default function CheckoutPage() {
 
                 {formData.wilaya === "Tébessa" &&
                   formData.commune === "Tebessa" && (
-                    <div className="flex items-start gap-3 rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3">
-                      <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5" />
+         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
 
-                      <div className="text-sm">
-                        <p className="font-medium text-yellow-700">
-                          Delivery Fee Notice : Tebessa / Tebessa only !
-                        </p>
-                        <p className="text-yellow-600">
-                          <span className="font-medium">Free:</span> when you go
-                          to the delivery person.
-                          <br />
-                          <span className="font-medium">150–300 Da:</span> when
-                          the delivery person calls you and comes to your home.
-                          <br />
-                          <span className="italic">Status: Pending</span>
-                        </p>
-                        <div className="mt-3 flex gap-2 flex-wrap gap-2">
-                          <div className="flex gap-2">
-                            <div className="flex gap-4">
-                              {/* FREE */}
-                           <button
-  type="button"
-  onClick={() => {
-    setShippingOption("FREE");
-    setFormData((prev) => ({
-      ...prev,
-      shippingPrice: 0,
-    }));
-  }}
-  className={`rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200
-    focus:outline-none
-    ${
-      shippingOption === "FREE"
-        ? "bg-green-600 text-white shadow-md ring-2 ring-green-500 ring-offset-2"
-        : "bg-white text-gray-500 shadow-sm hover:shadow-md hover:-translate-y-[1px]"
-    }`}
->
-  Gratuit
-</button>
+  {/* FREE OPTION */}
+  <button
+    type="button"
+    onClick={() => {
+      setShippingOption("FREE");
+      setFormData((prev) => ({
+        ...prev,
+        shippingPrice: 0,
+      }));
+    }}
+    className={`flex items-start gap-3 p-4 border-2 rounded-xl text-left transition-all
+      ${
+        shippingOption === "FREE"
+          ? "border-green-500 bg-green-50"
+          : "border-gray-200 hover:border-green-300 bg-white"
+      }`}
+  >
+    <CheckCircle
+      className={`w-5 h-5 mt-0.5 flex-shrink-0
+        ${
+          shippingOption === "FREE"
+            ? "text-green-500"
+            : "text-gray-400"
+        }`}
+    />
 
-<button
-  type="button"
-  onClick={() => {
-    setShippingOption("PAID");
-    setFormData((prev) => ({
-      ...prev,
-      shippingPrice: 0,
-    }));
-  }}
-  className={`rounded-lg px-4 py-2 text-sm font-medium transition-all duration-200
-    focus:outline-none
-    ${
-      shippingOption === "PAID"
-        ? "bg-yellow-500 text-white shadow-md ring-2 ring-yellow-400 ring-offset-2"
-        : "bg-white text-gray-500 shadow-sm hover:shadow-md hover:-translate-y-[1px]"
-    }`}
->
-  150 – 300 DA
-</button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+    <div>
+      <div className="font-medium text-gray-900 text-sm">
+        Gratuit
+      </div>
+      <div className="text-xs text-gray-500 mt-0.5">
+        You go to the delivery person.
+      </div>
+    </div>
+  </button>
+
+  {/* PAID OPTION */}
+  <button
+    type="button"
+    onClick={() => {
+      setShippingOption("PAID");
+      setFormData((prev) => ({
+        ...prev,
+        shippingPrice: 150, // or dynamic later
+      }));
+    }}
+    className={`flex items-start gap-3 p-4 border-2 rounded-xl text-left transition-all
+      ${
+        shippingOption === "PAID"
+          ? "border-yellow-500 bg-yellow-50"
+          : "border-gray-200 hover:border-yellow-300 bg-white"
+      }`}
+  >
+    <Truck
+      className={`w-5 h-5 mt-0.5 flex-shrink-0
+        ${
+          shippingOption === "PAID"
+            ? "text-yellow-500"
+            : "text-gray-400"
+        }`}
+    />
+
+    <div>
+      <div className="font-medium text-gray-900 text-sm">
+        150 – 300 DA
+      </div>
+      <div className="text-xs text-gray-500 mt-0.5">
+        The delivery person calls and comes to your home.
+      </div>
+    </div>
+  </button>
+
+</div>
                   )}
 
                 {/* Station (office delivery) */}
