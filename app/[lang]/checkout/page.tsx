@@ -94,7 +94,7 @@ const textareaClass =
 export default function CheckoutPage() {
   const { cart, checkoutSnapshot, clearCart } = useShopStore();
 
-  const { lang , dict} = useLang();
+  const { lang, dict } = useLang();
   const router = useRouter();
 
   // Auth
@@ -149,13 +149,13 @@ export default function CheckoutPage() {
     try {
       const savedUser = JSON.parse(localStorage.getItem("user")!);
       const auth = localStorage.getItem("isAuthenticated");
-      if (savedUser){
-         setUser(savedUser);
-      setFormData(prev => ({
-        ...prev,
-        fullName : savedUser.name,
-        phoneNumber : savedUser.phoneNumber?.replace(/\s+/g, "")
-      }))
+      if (savedUser) {
+        setUser(savedUser);
+        setFormData((prev) => ({
+          ...prev,
+          fullName: savedUser.name,
+          phoneNumber: savedUser.phoneNumber?.replace(/\s+/g, ""),
+        }));
       }
       setIsAuthenticated(!!auth);
     } catch {
@@ -275,8 +275,8 @@ export default function CheckoutPage() {
     e: React.ChangeEvent<HTMLSelectElement>,
   ) => {
     const wilayaName = e.target.value;
-    if(wilayaName === "Tébessa") {
-      setFormData(prev => ({...prev , deliveryMethod : "home"}))
+    if (wilayaName === "Tébessa") {
+      setFormData((prev) => ({ ...prev, deliveryMethod: "home" }));
     }
     const wilayaObj = ALGERIAN_WILAYAS.find((w) => w.name === wilayaName);
 
@@ -383,7 +383,7 @@ export default function CheckoutPage() {
 
     setIsProcessing(true);
 
-    const items = cart.map((product : any) => ({
+    const items = cart.map((product: any) => ({
       productId: product.id,
       quantity: product.quantity,
       unitPrice: product.price,
@@ -391,7 +391,7 @@ export default function CheckoutPage() {
       variantName: product.variant
         ? product.variant.attribute || product.variant.color || ""
         : "",
-      addons: (product.addons || []).map((addon : any) => ({
+      addons: (product.addons || []).map((addon: any) => ({
         addOnId: addon.id,
         name: addon.translations?.[0]?.name || "Addon",
         unitPrice: addon.price,
@@ -419,7 +419,7 @@ export default function CheckoutPage() {
 
       if (!response.ok) {
         router.push(
-          `/${ lang }/order-failed?name=${data.fullName}&reason=${
+          `/${lang}/order-failed?name=${data.fullName}&reason=${
             data.message || "Failed to create order"
           }`,
         );
@@ -429,7 +429,7 @@ export default function CheckoutPage() {
       clearCart();
       toast.success("Commande confirmée !");
       router.push(
-        `/${ lang }/order-success?name=${data.fullName}&orderId=${data.id}`,
+        `/${lang}/order-success?name=${data.fullName}&orderId=${data.id}`,
       );
     } catch (error: any) {
       toast.error(error.message || "Une erreur s'est produite");
@@ -477,24 +477,22 @@ export default function CheckoutPage() {
     return data.shippingPrice as number;
   }
 
-  const handleCommuneChange = (
-  e: React.ChangeEvent<HTMLSelectElement>
-) => {
-  const communeName = e.target.value;
- 
-  setFormData((prev) => ({
-    ...prev,
-    commune: communeName,
-    shippingCompany:
-  communeName === "Tébessa" || communeName === "Tebessa"
-    ? null
-    : prev.shippingCompany,
-  }));
-};
+  const handleCommuneChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const communeName = e.target.value;
+
+    setFormData((prev) => ({
+      ...prev,
+      commune: communeName,
+      shippingCompany:
+        communeName === "Tébessa" || communeName === "Tebessa"
+          ? null
+          : prev.shippingCompany,
+    }));
+  };
 
   // ── Render ──
   return (
-   <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-6 sm:py-10">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
           {/* ── Left: Form ── */}
@@ -596,8 +594,8 @@ export default function CheckoutPage() {
                           formData.wilaya === "Tébessa"
                             ? "border-gray-200 bg-gray-100 cursor-not-allowed opacity-60"
                             : formData.deliveryMethod === "stopdesk"
-                            ? "border-teal-500 bg-teal-50"
-                            : "border-gray-200 hover:border-teal-300"
+                              ? "border-teal-500 bg-teal-50"
+                              : "border-gray-200 hover:border-teal-300"
                         }
                       `}
                     >
@@ -607,8 +605,8 @@ export default function CheckoutPage() {
                             formData.wilaya === "Tébessa"
                               ? "text-gray-300"
                               : formData.deliveryMethod === "stopdesk"
-                              ? "text-teal-500"
-                              : "text-gray-400"
+                                ? "text-teal-500"
+                                : "text-gray-400"
                           }
                         `}
                       />
@@ -696,13 +694,14 @@ export default function CheckoutPage() {
                       disabled={!formData.shippingCompany}
                       className={`${inputClass} appearance-none pr-10 disabled:opacity-50 disabled:cursor-not-allowed`}
                     >
-                     <option value="">{dict.checkout.selectWilaya}</option>
+                      <option value="">{dict.checkout.selectWilaya}</option>
 
-{ALGERIAN_WILAYAS.map((wilaya, index) => (
-  <option key={wilaya.code} value={wilaya.name}>
-    {wilaya.code} - {wilaya.name} - {ALGERIAN_WILAYAS_AR[index].name}
-  </option>
-))}
+                      {ALGERIAN_WILAYAS.map((wilaya, index) => (
+                        <option key={wilaya.code} value={wilaya.name}>
+                          {wilaya.code} - {wilaya.name} -{" "}
+                          {ALGERIAN_WILAYAS_AR[index].name}
+                        </option>
+                      ))}
                     </select>
                     <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                   </div>
