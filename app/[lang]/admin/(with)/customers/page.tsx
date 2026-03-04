@@ -34,7 +34,7 @@ const handleChange = (e : React.ChangeEvent<HTMLInputElement | HTMLTextAreaEleme
     const fetchCustomers = async () => {
       try {
 
-        const res = await fetch("/api/customers/get-customers");
+        const res = await fetch("/api/users/get-customers");
 
         if (!res.ok) {
           throw new Error("Error fetching Customers");
@@ -102,7 +102,7 @@ const handleChange = (e : React.ChangeEvent<HTMLInputElement | HTMLTextAreaEleme
 
   const editCustomer = async (id: string, data: Record<string, any>) => {
   try {
-    const res = await fetch(`/api/customers/${id}`, {
+    const res = await fetch(`/api/users/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -130,7 +130,7 @@ const handleChange = (e : React.ChangeEvent<HTMLInputElement | HTMLTextAreaEleme
 
 const deactivateCustomer = async (id: string) => {
   try {
-    const res = await fetch(`/api/customers/${id}`, {
+    const res = await fetch(`/api/users/${id}`, {
       method: "DELETE",
     });
 

@@ -237,6 +237,69 @@
     "active": "Actif",
     "admin": "Administrateur"
   },
+  "checkout": {
+    "title": "Finaliser la commande",
+
+    "customerInfo": "Informations client",
+    "fullName": "Nom complet",
+    "fullNamePlaceholder": "Votre nom complet",
+
+    "phone": "Téléphone",
+    "phoneHint": "Le numéro doit commencer par 05, 06 ou 07 et contenir 10 chiffres",
+
+    "deliveryMethod": "Méthode de livraison",
+    "homeDelivery": "Livraison à domicile",
+    "homeDeliveryDesc": "Livraison à votre adresse",
+
+    "officePickup": "Retrait au bureau",
+    "officePickupDesc": "Retrait au bureau de livraison",
+
+    "deliveryAgency": "Agence de livraison",
+
+    "location": "Localisation",
+    "wilaya": "Wilaya",
+    "selectWilaya": "Sélectionner votre wilaya",
+
+    "commune": "Commune",
+    "selectCommune": "Choisir une commune",
+    "selectWilayaFirst": "Sélectionnez une wilaya d'abord",
+    "loading": "Chargement…",
+
+    "station": "Station (Stop Desk)",
+    "selectStation": "Choisir une station",
+
+    "address": "Adresse détaillée",
+    "addressPlaceholder": "Numéro, rue, cité, résidence…",
+
+    "notes": "Notes",
+    "orderNote": "Note pour le confirmateur",
+    "orderNotePlaceholder": "Notes spéciales pour la commande…",
+
+    "deliveryNote": "Note sur l'horaire de livraison",
+    "deliveryNotePlaceholder": "Ex: Livraison après 14h",
+
+    "createAccount": "Créer un compte",
+    "optional": "optionnel",
+    "createAccountDesc": "Enregistrez vos informations et suivez facilement vos commandes",
+
+    "password": "Mot de passe",
+    "passwordPlaceholder": "Au moins 6 caractères",
+
+    "submit": "Confirmer la commande",
+    "update": "Mettre à jour",
+
+    "summary": "Résumé de la commande",
+    "subtotal": "Sous-total",
+    "discount": "Réduction",
+    "shipping": "Livraison",
+    "total": "Total",
+
+    "free": "Gratuit",
+    "freeDesc": "Vous allez chez le livreur",
+
+    "paidDelivery": "150 – 300 DA",
+    "paidDeliveryDesc": "Le livreur vous appelle et vient chez vous"
+  },
   "about": {
     "title": "À propos",
     "team": "Notre équipe"

@@ -237,6 +237,69 @@
     "active": "نشط",
     "admin": "مشرف"
   },
+    "checkout": {
+    "title": "إتمام الطلب",
+
+    "customerInfo": "معلومات العميل",
+    "fullName": "الاسم الكامل",
+    "fullNamePlaceholder": "اسمك الكامل",
+
+    "phone": "رقم الهاتف",
+    "phoneHint": "يجب أن يبدأ الرقم بـ 05 أو 06 أو 07 ويتكون من 10 أرقام",
+
+    "deliveryMethod": "طريقة التوصيل",
+    "homeDelivery": "توصيل إلى المنزل",
+    "homeDeliveryDesc": "توصيل إلى عنوانك",
+
+    "officePickup": "الاستلام من المكتب",
+    "officePickupDesc": "الاستلام من مكتب التوصيل",
+
+    "deliveryAgency": "شركة التوصيل",
+
+    "location": "الموقع",
+    "wilaya": "الولاية",
+    "selectWilaya": "اختر ولايتك",
+
+    "commune": "البلدية",
+    "selectCommune": "اختر بلدية",
+    "selectWilayaFirst": "اختر الولاية أولاً",
+    "loading": "جارٍ التحميل…",
+
+    "station": "المحطة (Stop Desk)",
+    "selectStation": "اختر محطة",
+
+    "address": "العنوان التفصيلي",
+    "addressPlaceholder": "رقم المنزل، الشارع، الحي…",
+
+    "notes": "ملاحظات",
+    "orderNote": "ملاحظة لمؤكد الطلب",
+    "orderNotePlaceholder": "ملاحظات خاصة بالطلب…",
+
+    "deliveryNote": "ملاحظة حول وقت التوصيل",
+    "deliveryNotePlaceholder": "مثال: التوصيل بعد الساعة 14:00",
+
+    "createAccount": "إنشاء حساب",
+    "optional": "اختياري",
+    "createAccountDesc": "احفظ معلوماتك وتتبع طلباتك بسهولة",
+
+    "password": "كلمة المرور",
+    "passwordPlaceholder": "6 أحرف على الأقل",
+
+    "submit": "تأكيد الطلب",
+    "update": "تحديث",
+
+    "summary": "ملخص الطلب",
+    "subtotal": "المجموع الفرعي",
+    "discount": "الخصم",
+    "shipping": "التوصيل",
+    "total": "المجموع",
+
+    "free": "مجاني",
+    "freeDesc": "تذهب إلى عامل التوصيل",
+
+    "paidDelivery": "150 – 300 دج",
+    "paidDeliveryDesc": "عامل التوصيل يتصل بك ويأتي إلى منزلك"
+  },
   "about": {
     "title": "معلومات عنا",
     "team": "فريقنا"

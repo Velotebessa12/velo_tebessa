@@ -49,21 +49,21 @@ const BottomNavbar = () => {
   {
     icon: Home,
     label: dict.bottomNav.home,
-    href: `/${lang}/`,
+    href: `/`,
     activeColor: "text-emerald-600",
     activeBg: "bg-emerald-50",
   },
   {
     icon: Heart,
     label: dict.bottomNav.favorites,
-    href: `/${lang}/favorites`,
+    href: `/favorites`,
     activeColor: "text-purple-600",
     activeBg: "bg-purple-50",
   },
   {
     icon: ShoppingCart,
     label: dict.bottomNav.cart,
-    href: `/${lang}/cart`,
+    href: `/cart`,
     activeColor: "text-orange-600",
     activeBg: "bg-orange-50",
     badge: totalQuantity,
@@ -73,18 +73,21 @@ const BottomNavbar = () => {
   
 
   const isActive = (href: string) => {
-    if (href === "/") {
-      return pathname === "/" || pathname === `/${ lang }`;
-    }
-    return pathname === href || pathname.startsWith(href + "/");
-  };
+  const cleanPath = pathname.replace(`/${lang}`, "") || "/";
+
+  if (href === "/") {
+    return cleanPath === "/";
+  }
+
+  return cleanPath === href || cleanPath.startsWith(href + "/");
+};
 
   const handleNavClick = (href: string) => {
     // Add haptic feedback for mobile devices
     if (typeof window !== "undefined" && "vibrate" in navigator) {
       navigator.vibrate(10);
     }
-    router.push(href);
+    router.push(`/${lang}${href}`)
   };
 
   return (

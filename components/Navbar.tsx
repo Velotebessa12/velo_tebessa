@@ -36,9 +36,9 @@ const Navbar = () => {
 
   // Language configurations
   const languages = [
-    { code: "ar", name: "العربية", nativeName: "Arabic", flag: "ar" },
-    { code: "fr", name: "Français", nativeName: "French", flag: "🇫🇷" },
-    { code: "en", name: "English", nativeName: "English", flag: "en" },
+    { code: "ar", name: "العربية", nativeName: "Arabic"},
+    { code: "fr", name: "Français", nativeName: "French"},
+    { code: "en", name: "English", nativeName: "English"},
   ];
 
   const currentLanguage =
@@ -77,8 +77,12 @@ const Navbar = () => {
   };
 
   const isActivePage = (path: string) => {
-    return pathname === path || pathname.startsWith(path + "/");
-  };
+  if (path === `/${lang}`) {
+    return pathname === `/${lang}` || pathname === `/${lang}/`;
+  }
+
+  return pathname === path || pathname.startsWith(path + "/");
+};
 
   function logout() {
     localStorage.removeItem("isAuthenticated");
@@ -115,38 +119,40 @@ const Navbar = () => {
           </a>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1">
-            <a
-              href={`/${lang}/`}
-              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                isActivePage(`/${lang}`)
-                  ? "text-teal-600 bg-teal-50"
-                  : "text-slate-700 hover:text-teal-600 hover:bg-slate-50"
-              }`}
-            >
-              {dict.navbar.home}
-            </a>
-            <a
-              href={`/${lang}/products`}
-              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                isActivePage(`/${lang}/products`)
-                  ? "text-teal-600 bg-teal-50"
-                  : "text-slate-700 hover:text-teal-600 hover:bg-slate-50"
-              }`}
-            >
-              {dict.navbar.products}
-            </a>
-            <a
-              href={`/${lang}/categories`}
-              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                isActivePage(`/${lang}/categories`)
-                  ? "text-teal-600 bg-teal-50"
-                  : "text-slate-700 hover:text-teal-600 hover:bg-slate-50"
-              }`}
-            >
-              {dict.navbar.categories}
-            </a>
-          </nav>
+    <nav className="hidden md:flex items-center gap-1">
+  <a
+    href={`/${lang}`}
+    className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+      isActivePage(`/${lang}`)
+        ? "text-teal-600 bg-teal-50"
+        : "text-slate-700 hover:text-teal-600 hover:bg-slate-50"
+    }`}
+  >
+    {dict.navbar.home}
+  </a>
+
+  <a
+    href={`/${lang}/products`}
+    className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+      isActivePage(`/${lang}/products`)
+        ? "text-teal-600 bg-teal-50"
+        : "text-slate-700 hover:text-teal-600 hover:bg-slate-50"
+    }`}
+  >
+    {dict.navbar.products}
+  </a>
+
+  <a
+    href={`/${lang}/categories`}
+    className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+      isActivePage(`/${lang}/categories`)
+        ? "text-teal-600 bg-teal-50"
+        : "text-slate-700 hover:text-teal-600 hover:bg-slate-50"
+    }`}
+  >
+    {dict.navbar.categories}
+  </a>
+</nav>
 
           {/* Actions */}
           <div className="flex items-center gap-2 sm:gap-3">
@@ -164,8 +170,7 @@ const Navbar = () => {
               </button>
 
               {isLangOpen && (
-             <div className="
-  absolute right-0 mt-2
+             <div className={`absolute left-1/2 -translate-x-1/2
   w-56 sm:w-64
   bg-white
   border border-slate-200
@@ -174,7 +179,7 @@ const Navbar = () => {
   overflow-hidden
   animate-in fade-in slide-in-from-top-1
   duration-200
-">
+`}>
   <div className="p-2">
     {/* Header */}
     <div className="
@@ -212,9 +217,6 @@ const Navbar = () => {
           >
             {/* Left */}
             <div className="flex items-center gap-3 min-w-0">
-              <span className="text-xl leading-none">
-                {language.flag}
-              </span>
 
               <div className="flex flex-col text-left min-w-0">
                 <span className="text-sm font-medium truncate">
@@ -277,7 +279,7 @@ const Navbar = () => {
 
               {isOpen && (
                 <div
-                  className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg z-50"
+                  className={`absolute ${lang === "ar" ? "left-0" : "right-0"} mt-2 w-48 bg-white border rounded-lg shadow-lg z-50`}
                   onMouseLeave={() => setIsOpen(false)}
                 >
                   <button

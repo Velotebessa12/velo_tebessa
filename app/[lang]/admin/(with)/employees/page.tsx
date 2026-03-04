@@ -251,6 +251,60 @@ export default function EmployeesPage() {
     setIsEditingOpen(true);
   }
 
+    const editEmployee = async (id: string, data: Record<string, any>) => {
+  try {
+    const res = await fetch(`/api/users/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      throw new Error("Error updating customer");
+    }
+
+    const updatedCustomer = await res.json();
+
+    // Optional: update state locally
+    setEmployees((prev) =>
+      prev.map((c) => (c.id === id ? updatedCustomer : c))
+    );
+    setIsEditingOpen(false)
+    toast.success("Customer updated successfully");
+  } catch (error) {
+    toast.error("Error updating customer");
+    console.error(error);
+  }
+};
+
+const deactivateEmployee = async (id: string) => {
+  try {
+    const res = await fetch(`/api/users/${id}`, {
+      method: "DELETE",
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || "Error deactivating customer");
+    }
+
+    // Optional: remove or mark inactive in UI
+    setEmployees((prev) =>
+      prev.map((c) =>
+        c.id === id ? { ...c, isActive: false } : c
+      )
+    );
+
+    setIsDeleteOpen(false)
+    toast.success("Customer deactivated successfully");
+  } catch (error: any) {
+    toast.error(error.message || "Error deactivating customer");
+    console.error(error);
+  }
+};
+
   function handleDelete(employee: Employee) {
     setSelectedEmployee(employee);
     setIsDeleteOpen(true);
@@ -287,10 +341,10 @@ export default function EmployeesPage() {
         <PopUp isOpen={isDeleteOpen} onClose={() => setIsDeleteOpen(false)}
           children={
             <div className="w-full flex flex-col items-center justify-center p-6 text-center">
-              <h2 className="text-lg font-semibold text-gray-900">Delete Employee</h2>
+              <h2 className="text-lg font-semibold text-gray-900">Deactivate "Employee"</h2>
               <p className="mt-3 text-sm text-gray-600">
-                Are you sure you want to delete
-                <span className="font-medium text-gray-900">{selectedEmployee?.name}</span>?
+                Are you sure you want to deactivate 
+                <span className="font-medium text-gray-900 mx-1 underline">{selectedEmployee?.name}</span>?
                 <br />
                 <span className="text-red-500 font-medium">This action cannot be undone.</span>
               </p>
@@ -302,10 +356,10 @@ export default function EmployeesPage() {
                   Cancel
                 </button>
                 <button
-                  onClick={() => { console.log('delete', selectedEmployee?.id); setIsDeleteOpen(false); }}
+                  onClick={() => deactivateEmployee(selectedEmployee?.id as any)}
                   className="px-4 py-2 text-sm rounded-md bg-red-500 text-white hover:bg-red-600"
                 >
-                  Yes, Delete
+                  Yes, Deactivate
                 </button>
               </div>
             </div>

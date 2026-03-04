@@ -236,6 +236,69 @@
     "active": "Active",
     "admin": "Admin"
   },
+   "checkout": {
+    "title": "Checkout",
+
+    "customerInfo": "Customer Information",
+    "fullName": "Full Name",
+    "fullNamePlaceholder": "Your full name",
+
+    "phone": "Phone",
+    "phoneHint": "The number must start with 05, 06 or 07 and contain 10 digits",
+
+    "deliveryMethod": "Delivery Method",
+    "homeDelivery": "Home Delivery",
+    "homeDeliveryDesc": "Delivery to your address",
+
+    "officePickup": "Office Pickup",
+    "officePickupDesc": "Pick up from delivery office",
+
+    "deliveryAgency": "Delivery Agency",
+
+    "location": "Location",
+    "wilaya": "Wilaya",
+    "selectWilaya": "Select your wilaya",
+
+    "commune": "Commune",
+    "selectCommune": "Choose a commune",
+    "selectWilayaFirst": "Select a wilaya first",
+    "loading": "Loading…",
+
+    "station": "Station (Stop Desk)",
+    "selectStation": "Choose a station",
+
+    "address": "Detailed Address",
+    "addressPlaceholder": "Number, street, district, residence…",
+
+    "notes": "Notes",
+    "orderNote": "Note for confirmation agent",
+    "orderNotePlaceholder": "Special notes for the order…",
+
+    "deliveryNote": "Delivery time note",
+    "deliveryNotePlaceholder": "Example: Delivery after 2 PM",
+
+    "createAccount": "Create an account",
+    "optional": "optional",
+    "createAccountDesc": "Save your information and track your orders easily",
+
+    "password": "Password",
+    "passwordPlaceholder": "At least 6 characters",
+
+    "submit": "Confirm Order",
+    "update": "Update",
+
+    "summary": "Order Summary",
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "shipping": "Shipping",
+    "total": "Total",
+
+    "free": "Free",
+    "freeDesc": "You go to the delivery person",
+
+    "paidDelivery": "150 – 300 DA",
+    "paidDeliveryDesc": "The delivery person calls and comes to your home"
+  },
   "about": {
     "title": "About Us",
     "team": "Our Team"

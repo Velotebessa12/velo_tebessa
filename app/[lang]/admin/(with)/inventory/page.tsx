@@ -196,6 +196,57 @@ export default function InventoryManagementPage() {
     }
   };
 
+  const editOperation = async (id: string, data: Record<string, any>) => {
+  try {
+    const res = await fetch(`/api/inventory/operations/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      throw new Error("Error updating operation");
+    }
+
+    const updatedOperation = await res.json();
+
+    setOperations((prev) =>
+      prev.map((op) => (op.id === id ? updatedOperation : op))
+    );
+
+    setIsEditingOpen(false);
+    toast.success("Operation updated successfully");
+  } catch (error) {
+    toast.error("Error updating operation");
+    console.error(error);
+  }
+};
+
+
+const deleteOperation = async (id: string) => {
+  try {
+    const res = await fetch(`/api/inventory/operations/${id}`, {
+      method: "DELETE",
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || "Error deleting operation");
+    }
+
+    setOperations((prev) => prev.filter((op) => op.id !== id));
+    setIsDeleteOpen(false)
+    toast.success("Operation deleted successfully");
+  } catch (error: any) {
+    toast.error(error.message || "Error deleting operation");
+    console.error(error);
+  }
+};
+
+
+
   const handleExportList = () => {
     console.log("Export low stock list");
   };
@@ -245,10 +296,7 @@ export default function InventoryManagementPage() {
                   Cancel
                 </button>
                 <button
-                  onClick={() => {
-                    console.log("Order deleted");
-                    setIsDeleteOpen(false);
-                  }}
+                  onClick={() => deleteOperation(selectedOperation.id)}
                   className="px-4 py-2 text-sm rounded-md bg-red-500 text-white hover:bg-red-600"
                 >
                   Yes, Delete

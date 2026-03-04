@@ -309,6 +309,7 @@ model Order {
   detailedAddress String?
 
   deliveryNote String?
+  orderNote String?
 
   deliveryPersonId String?
   deliveryPerson   User?   @relation("DeliveryOrders", fields: [deliveryPersonId], references: [id])

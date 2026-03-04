@@ -206,7 +206,7 @@ export default function OrderDetailsPage() {
               </select>
             </div>
 
-            <div>
+            {/* <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Note (Optional)
               </label>
@@ -217,7 +217,7 @@ export default function OrderDetailsPage() {
                 rows={3}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
               />
-            </div>
+            </div> */}
 
             <div className="flex space-x-3 pt-2">
               <button
@@ -396,22 +396,24 @@ export default function OrderDetailsPage() {
                   </div>
                 )}
 
-                {order.detailedAddress && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <p className="text-sm font-semibold text-blue-900 mb-1">
-                      Address
-                    </p>
-                    <div className="flex items-start mt-2">
-                      <MapPin
-                        size={16}
-                        className="text-blue-600 mr-1 mt-0.5 flex-shrink-0"
-                      />
-                      <p className="text-sm text-blue-700">
-                        {order.detailedAddress}
-                      </p>
-                    </div>
-                  </div>
-                )}
+               {order.detailedAddress && (
+  <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
+    <p className="text-sm font-semibold text-indigo-900 mb-1">
+      Address
+    </p>
+
+    <div className="flex items-start gap-2 mt-2">
+      <MapPin
+        size={16}
+        className="text-indigo-600 mt-0.5 flex-shrink-0"
+      />
+
+      <p className="text-sm text-indigo-700">
+        {order.detailedAddress}
+      </p>
+    </div>
+  </div>
+)}
 
                 <div>
                   <p className="text-sm text-gray-600">Wilaya</p>
@@ -423,27 +425,27 @@ export default function OrderDetailsPage() {
                   <p className="text-base font-medium">{order.commune}</p>
                 </div>
 
-                {order.orderNote && (
-                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                    <p className="text-sm font-semibold text-gray-900 mb-1">
-                      Delivery Note
-                    </p>
-                    <p className="text-sm text-gray-700">
-                      {order.orderNote}
-                    </p>
-                  </div>
-                )}
+             {order.orderNote && (
+  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+    <p className="text-sm font-semibold text-blue-900 mb-1">
+      Order Note
+    </p>
+    <p className="text-sm text-blue-800">
+      {order.orderNote}
+    </p>
+  </div>
+)}
 
-                {order.deliveryNote && (
-                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                    <p className="text-sm font-semibold text-gray-900 mb-1">
-                      Delivery Note
-                    </p>
-                    <p className="text-sm text-gray-700">
-                      {order.deliveryNote}
-                    </p>
-                  </div>
-                )}
+{order.deliveryNote && (
+  <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+    <p className="text-sm font-semibold text-amber-900 mb-1">
+      Delivery Note
+    </p>
+    <p className="text-sm text-amber-800">
+      {order.deliveryNote}
+    </p>
+  </div>
+)}
               </div>
             </div>
           </div>

@@ -142,70 +142,16 @@ export default function AdminNavbar() {
           <Menu size={20} className="text-gray-600" />
         </button>
 
-        {/* ── Period selector (custom dropdown) ── */}
-        <div className="relative hidden sm:block" ref={periodRef}>
-          <button
-            onClick={() => setPeriodOpen((p) => !p)}
-            className="flex items-center gap-2 px-3.5 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-sm font-medium text-gray-700 transition-colors"
-          >
-            {periodOptions[selectedPeriod]}
-            <ChevronDown size={14} className={`text-gray-500 transition-transform ${periodOpen ? "rotate-180" : ""}`} />
-          </button>
+     
 
-          {periodOpen && (
-            <div className="absolute top-full mt-2 left-0 w-48 bg-white border border-gray-200 rounded-xl shadow-lg z-50 py-1 overflow-hidden">
-              {Object.entries(periodOptions).map(([key, label]) => (
-                <button
-                  key={key}
-                  onClick={() => { setSelectedPeriod(key); setPeriodOpen(false); }}
-                  className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
-                    selectedPeriod === key
-                      ? "bg-teal-50 text-teal-700 font-semibold"
-                      : "text-gray-600 hover:bg-gray-50"
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* ── Search bar ── */}
-        <div className={`flex-1 max-w-sm transition-all ${searchOpen ? "block" : "hidden sm:block"}`}>
-          <div className="relative">
-            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Rechercher..."
-              className="w-full pl-9 pr-4 py-2 bg-gray-100 rounded-xl text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white transition-all"
-            />
-            {searchOpen && (
-              <button
-                onClick={() => setSearchOpen(false)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 sm:hidden"
-              >
-                <X size={15} className="text-gray-400" />
-              </button>
-            )}
-          </div>
-        </div>
+      
 
         {/* Spacer */}
         <div className="flex-1" />
 
         {/* ── Right actions ── */}
         <div className="flex items-center gap-1.5">
-          {/* Mobile search toggle */}
-          <button
-            onClick={() => setSearchOpen((p) => !p)}
-            className="sm:hidden p-2 rounded-xl hover:bg-gray-100 transition-colors"
-            aria-label="Search"
-          >
-            <Search size={18} className="text-gray-600" />
-          </button>
+        
 
           {/* Notifications */}
           <div className="relative" ref={notifRef}>
@@ -311,19 +257,7 @@ export default function AdminNavbar() {
           </button>
         </div>
 
-        {/* Mobile period selector */}
-        <div className="px-4 py-3 border-b border-gray-100 sm:hidden flex-shrink-0">
-          <select
-            value={selectedPeriod}
-            onChange={(e) => setSelectedPeriod(e.target.value)}
-            className="w-full px-3 py-2 bg-gray-100 rounded-xl text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-500"
-          >
-            {Object.entries(periodOptions).map(([key, label]) => (
-              <option key={key} value={key}>{label}</option>
-            ))}
-          </select>
-        </div>
-
+      
         {/* Nav items */}
         <nav className="flex-1 overflow-y-auto py-3 px-3">
           <ul className="space-y-0.5">

@@ -6,24 +6,27 @@ type Context = {
 };
 
 /* =========================
-   GET /api/customers/:id
+   GET /api/operations/:id
    ========================= */
 export async function GET(req: Request, context: Context) {
   try {
     const { id } = await context.params;
 
-    const customer = await prisma.user.findUnique({
+    const operation = await prisma.operation.findUnique({
       where: { id },
+      include: {
+        product: true,
+      },
     });
 
-    if (!customer) {
+    if (!operation) {
       return NextResponse.json(
-        { error: "Customer not found" },
+        { error: "Operation not found" },
         { status: 404 }
       );
     }
 
-    return NextResponse.json(customer);
+    return NextResponse.json(operation);
   } catch (error) {
     console.error(error);
     return NextResponse.json(
@@ -34,33 +37,33 @@ export async function GET(req: Request, context: Context) {
 }
 
 /* =========================
-   PATCH /api/customers/:id
+   PATCH /api/operations/:id
    ========================= */
 export async function PATCH(req: Request, context: Context) {
   try {
     const { id } = await context.params;
     const data = await req.json();
 
-    const customer = await prisma.user.findUnique({
+    const operation = await prisma.operation.findUnique({
       where: { id },
     });
 
-    if (!customer) {
+    if (!operation) {
       return NextResponse.json(
-        { error: "Customer not found" },
+        { error: "Operation not found" },
         { status: 404 }
       );
     }
 
-    const updatedCustomer = await prisma.user.update({
+    const updatedOperation = await prisma.operation.update({
       where: { id },
-      data: data,
-      include : {
-        customerOrders : true
-      }
+      data,
+      include: {
+        product: true,
+      },
     });
 
-    return NextResponse.json(updatedCustomer);
+    return NextResponse.json(updatedOperation);
   } catch (error) {
     console.error(error);
     return NextResponse.json(
@@ -71,36 +74,30 @@ export async function PATCH(req: Request, context: Context) {
 }
 
 /* =========================
-   DELETE /api/customers/:id
-   (soft delete / deactivate)
+   DELETE /api/operations/:id
    ========================= */
 export async function DELETE(req: Request, context: Context) {
   try {
     const { id } = await context.params;
 
-    // Optional safety check: block if customer has orders
-    const orderCount = await prisma.order.count({
-      where: { customerId: id },
+    const operation = await prisma.operation.findUnique({
+      where: { id },
     });
 
-    if (orderCount > 0) {
+    if (!operation) {
       return NextResponse.json(
-        {
-          error:
-            "This customer cannot be deactivated because they have associated orders.",
-        },
-        { status: 409 }
+        { error: "Operation not found" },
+        { status: 404 }
       );
     }
 
-    await prisma.user.update({
+    await prisma.operation.delete({
       where: { id },
-      data: { isActive: false },
     });
 
     return NextResponse.json({
       success: true,
-      message: "Customer deactivated successfully",
+      message: "Operation deleted successfully",
     });
   } catch (error) {
     console.error(error);

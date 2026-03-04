@@ -206,15 +206,7 @@ const Page = () => {
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-medium border whitespace-nowrap ${getStatusColor(order.status)}`}
                   >
-                    {order.status === "PENDING"
-                      ? "En attente"
-                      : order.status === "SHIPPED"
-                        ? "Expédiée"
-                        : order.status === "DELIVERED"
-                          ? "Livrée"
-                          : order.status === "CANCELLED"
-                            ? "Annulée"
-                            : "Retournée"}
+                    {order.status}
                   </span>
                 </div>
 
@@ -271,7 +263,7 @@ const Page = () => {
                         ({dict.orders.payLater})
                       </span>
                     ) : order.shippingPrice > 0 ? (
-                      <span className="text-xs text-gray-500 ml-2">
+                      <span className="text-xs text-gray-500 mx-2">
                         (+ {order.shippingPrice.toLocaleString()} DA {dict.orders.deliveryFee})
                       </span>
                     ) : null}
