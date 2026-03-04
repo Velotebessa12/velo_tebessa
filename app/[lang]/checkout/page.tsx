@@ -11,7 +11,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import Image from "next/image";
-import { ALGERIAN_WILAYAS } from "@/data";
+import { ALGERIAN_WILAYAS, ALGERIAN_WILAYAS_AR } from "@/data";
 import useShopStore from "@/store/useShopStore";
 import toast from "react-hot-toast";
 import { useLang } from "@/components/LanguageContext";
@@ -693,14 +693,16 @@ export default function CheckoutPage() {
                       value={formData.wilaya}
                       onChange={handleWilayaChange}
                       required
-                      className={`${inputClass} appearance-none pr-10`}
+                      disabled={!formData.shippingCompany}
+                      className={`${inputClass} appearance-none pr-10 disabled:opacity-50 disabled:cursor-not-allowed`}
                     >
-                      <option value="">{dict.checkout.selectWilaya}</option>
-                      {ALGERIAN_WILAYAS.map((wilaya) => (
-                        <option key={wilaya.code} value={wilaya.name}>
-                          {wilaya.code} - {wilaya.name}
-                        </option>
-                      ))}
+                     <option value="">{dict.checkout.selectWilaya}</option>
+
+{ALGERIAN_WILAYAS.map((wilaya, index) => (
+  <option key={wilaya.code} value={wilaya.name}>
+    {wilaya.code} - {wilaya.name} - {ALGERIAN_WILAYAS_AR[index].name}
+  </option>
+))}
                     </select>
                     <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                   </div>
