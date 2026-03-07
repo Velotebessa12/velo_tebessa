@@ -14,14 +14,12 @@ export default async function RootLayout({
 }) {
 
   return (
-    <html>
-      <body>
+    <>
           <Navbar />
           <main>
             {children}
             <BottomNavbar />
           </main>
-      </body>
-    </html>
+          </>
   );
 }

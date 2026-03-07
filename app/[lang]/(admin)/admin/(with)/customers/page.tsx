@@ -58,7 +58,7 @@ const handleChange = (e : React.ChangeEvent<HTMLInputElement | HTMLTextAreaEleme
 
   // Calculate stats
   const totalCustomers = customers.length;
-  const returningCustomers = customers.filter(c => c.orders > 1).length;
+  const uniqueCustomers = customers.filter(c => c.isUnique === true).length;
   const newCustomers = customers.filter(c => c.orders === 1).length;
 
   // Filter customers
@@ -351,7 +351,7 @@ const deactivateCustomer = async (id: string) => {
         <span className="sm:hidden">Unique.</span>
       </p>
       <p className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
-        {returningCustomers}
+        {uniqueCustomers}
       </p>
     </div>
    

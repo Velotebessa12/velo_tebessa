@@ -15,8 +15,6 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-     <html>
-      <body>
         <div className="min-h-screen flex bg-slate-50">
 
           {/* Desktop Sidebar space */}
@@ -38,7 +36,5 @@ export default async function RootLayout({
 
           </div>
         </div>
-      </body>
-    </html>
   );
 }

@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLang } from "@/components/LanguageContext";
 import toast from "react-hot-toast";
-import { ImageIcon, Plus, Trash2, X } from "lucide-react";
+import { ImageIcon, Plus, Search, Trash2, X } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import PopUp from "@/components/PopUp";
@@ -21,6 +21,7 @@ const Page = () => {
   const [newCategoryImage, setNewCategoryImage] = useState<File | null>(null);
   const [newCategoryImagePreview, setNewCategoryImagePreview] =
     useState<string>("");
+    const [searchQuery , setSearchQuery] = useState("")
   const [images, setImages] = useState<any[]>([]);
   const [categoryId, setCategoryId] = useState("");
   const [nameAr, setNameAr] = useState("");
@@ -604,6 +605,24 @@ const Page = () => {
         <Plus className="w-4 h-4" />
         <span className="hidden sm:inline">New Category</span>
       </button>
+
+       <div className="relative flex-1 group mb-2">
+          <Search
+            className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2
+                       w-4 h-4 text-slate-400 group-focus-within:text-teal-600
+                       transition-colors pointer-events-none"
+          />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search categories..."
+            className="w-full pl-9 sm:pl-12 pr-4 py-2.5
+                       bg-white border border-slate-200 rounded-xl
+                       text-sm focus:outline-none focus:border-teal-500
+                       focus:ring-2 focus:ring-teal-100 transition-all shadow-sm"
+          />
+        </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-5">
         {isLoading

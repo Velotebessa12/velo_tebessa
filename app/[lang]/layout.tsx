@@ -20,14 +20,10 @@ export default async function RootLayout({
   const { lang } = await params;
   const dict = await getDictionary(lang);
   return (
-    <html lang={lang} dir={lang === "ar" ? "rtl" : "ltr"}>
-      <body>
         <LanguageProvider lang={lang} dict={dict}>
           <main>
             {children}
           </main>
         </LanguageProvider>
-      </body>
-    </html>
   );
 }

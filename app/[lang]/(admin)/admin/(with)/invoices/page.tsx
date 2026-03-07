@@ -12,6 +12,7 @@ import {
   Package,
   Calculator,
   Edit,
+  X,
 } from "lucide-react";
 import PopUp from "@/components/PopUp";
 import toast from "react-hot-toast";
@@ -463,7 +464,8 @@ const cancelInvoice = async (id: string) => {
                           }
                           className="w-full text-left px-4 py-2 text-sm hover:bg-teal-50 transition"
                         >
-                          {getTranslations(product.translations, lang, "name")}
+                          {getTranslations(product.translations, lang, "name")} - Stock:{" "}
+                        {product.stock} - UnitPrice: {product.buyingPrice} Da
                         </button>
                       ))}
                     </div>
@@ -485,106 +487,169 @@ const cancelInvoice = async (id: string) => {
                 {/* Product rows */}
                 <div className="flex flex-col gap-2">
                   {rows.map((row) => (
-                    <div
-                      key={row.id}
-                      className="flex flex-col xs:flex-row items-stretch xs:items-center gap-2 p-2 bg-gray-50 rounded-xl border border-gray-100"
-                    >
-                      {/* Product select — full width on mobile, flex-1 on xs+ */}
-                      <select
-                        value={row.productId}
-                        onChange={(e) =>
-                          updateRow(row.id, "productId", e.target.value)
-                        }
-                        className="w-full xs:flex-1 rounded-lg border border-gray-300 bg-white px-2 py-2 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition"
-                      >
-                        <option value="">Choisir produit</option>
-                        {products.map((product) => (
-                          <option key={product.id} value={product.id}>
-                            {getTranslations(
-                              product.translations,
-                              lang,
-                              "name",
-                            )}
-                          </option>
-                        ))}
-                      </select>
+                  <div
+  key={row.id}
+  className="group relative bg-white rounded-xl border border-gray-200 hover:border-gray-300 transition-all duration-200 overflow-hidden"
+>
+  <div className="absolute left-0 top-0 bottom-0 w-1 bg-teal-400 rounded-l-xl" />
 
-                      {/* Qty + Price + Total + Remove in a row */}
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        {/* Qty */}
-                        <input
-                          type="number"
-                          min={1}
-                          value={row.qty}
-                          onChange={(e) =>
-                            updateRow(row.id, "qty", Number(e.target.value))
-                          }
-                          className="w-14 rounded-lg border border-gray-300 px-2 py-2 text-sm text-center focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition"
-                          placeholder="Qty"
-                        />
+  <div className="pl-4 pr-3 py-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
 
-                        {/* Unit price */}
-                        <input
-                          type="number"
-                          min={0}
-                          value={row.unitPrice}
-                          onChange={(e) =>
-                            updateRow(
-                              row.id,
-                              "unitPrice",
-                              Number(e.target.value),
-                            )
-                          }
-                          className="w-16 sm:w-20 rounded-lg border border-gray-300 px-2 py-2 text-sm text-center focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition"
-                          placeholder="Prix"
-                        />
+    {/* Product select */}
+    <select
+      value={row.productId}
+      onChange={(e) => {
+        const product = products.find(p => p.id === e.target.value)
+        updateRow(row.id, "productId", e.target.value)
+        if (product) {
+          updateRow(row.id, "unitPrice", Number(product.buyingPrice))
+          updateRow(row.id, "newPrice",  0)
+        }
+      }}
+      className="flex-1 min-w-0 rounded-lg border border-gray-200 bg-gray-50 hover:bg-white px-3 py-2.5 text-sm text-gray-700 focus:ring-2 focus:ring-teal-400 focus:border-teal-400 focus:bg-white outline-none transition cursor-pointer"
+    >
+      <option value="">— Choisir produit —</option>
+      {products.map((product) => (
+        <option key={product.id} value={product.id}>
+          {getTranslations(product.translations, lang, "name")}
+          {" · "}Stock: {product.stock}
+          {" · "}Price: {product.buyingPrice} DA
+        </option>
+      ))}
+    </select>
 
-                        {/* Row total */}
-                        <span className="w-20 sm:w-24 text-xs sm:text-sm text-gray-700 text-right shrink-0 font-medium">
-                          {(row.qty * row.unitPrice).toLocaleString()} DA
-                        </span>
+    <div className="flex items-center gap-2 flex-shrink-0 flex-wrap sm:flex-nowrap">
 
-                        {/* AveragePricePopUp */}
-                    
+      {/* Qty */}
+      <div className="flex flex-col items-center gap-0.5">
+        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Qty</span>
+        <input
+          type="number"
+          min={1}
+          value={row.qty}
+          onChange={(e) => updateRow(row.id, "qty", Number(e.target.value))}
+          className="w-16 rounded-lg border border-gray-200 bg-gray-50 focus:bg-white px-2 py-2 text-sm text-center font-semibold focus:ring-2 focus:ring-teal-400 focus:border-teal-400 outline-none transition"
+        />
+      </div>
 
-                        {/* Remove */}
-                        <button
-                          onClick={() => removeRow(row.id)}
-                          className="text-red-400 hover:text-red-600 transition shrink-0 p-1"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    </div>
+      <span className="text-gray-200 text-lg hidden sm:block">×</span>
+
+      {/* Current price — auto-filled, editable */}
+      <div className="flex flex-col items-center gap-0.5">
+        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Current Price</span>
+        <div className="relative">
+          <input
+            type="number"
+            min={0}
+            value={row.unitPrice}
+            onChange={(e) => updateRow(row.id, "unitPrice", Number(e.target.value))}
+            className="w-24 rounded-lg border border-gray-200 bg-gray-50 focus:bg-white pl-2 pr-7 py-2 text-sm text-center font-semibold focus:ring-2 focus:ring-teal-400 focus:border-teal-400 outline-none transition"
+          />
+          <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-gray-400 font-bold pointer-events-none">DA</span>
+        </div>
+      </div>
+
+      <span className="text-gray-200 text-lg hidden sm:block">=</span>
+
+      {/* Row total */}
+      <div className="flex flex-col items-center gap-0.5">
+        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Total</span>
+        <div className={`w-24 px-2 py-2 rounded-lg text-sm font-bold text-center border transition-colors ${
+          row.qty && row.unitPrice
+            ? "bg-teal-50 border-teal-200 text-teal-700"
+            : "bg-gray-50 border-gray-200 text-gray-400"
+        }`}>
+          {row.qty && row.unitPrice
+            ? (row.qty * row.unitPrice).toLocaleString()
+            : "—"
+          } <span className="text-[10px] font-semibold">DA</span>
+        </div>
+      </div>
+
+      <span className="text-gray-200 text-lg hidden sm:block">·</span>
+
+      {/* New Price — for PMP calc */}
+      <div className="flex flex-col items-center gap-0.5">
+        <span className="text-[9px] font-bold text-orange-400 uppercase tracking-wider">New Price</span>
+        <div className="relative">
+          <input
+            type="number"
+            min={0}
+            value={row.newPrice || ""}
+            placeholder="0"
+            onChange={(e) => updateRow(row.id, "newPrice", Number(e.target.value))}
+            className={`w-24 rounded-lg border pl-2 pr-7 py-2 text-sm text-center font-semibold focus:ring-2 focus:ring-orange-300 focus:border-orange-300 outline-none transition ${
+              row.newPrice
+                ? "border-orange-300 bg-orange-50/40 text-orange-700"
+                : "border-gray-200 bg-gray-50 text-gray-400"
+            }`}
+          />
+          <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-gray-400 font-bold pointer-events-none">DA</span>
+        </div>
+      </div>
+
+      {/* PMP button */}
+      {(() => {
+        const rowProduct = products.find(p => p.id === row.productId)
+        const canCalc    = !!rowProduct && !!row.qty && !!row.newPrice
+
+        const previewPmp = canCalc
+          ? (
+              (Number(rowProduct!.stock) * Number(rowProduct!.buyingPrice) + Number(row.qty) * Number(row.newPrice))
+              / (Number(rowProduct!.stock) + Number(row.qty))
+            ).toFixed(2)
+          : null
+
+        return (
+          <div className="flex flex-col items-center gap-0.5">
+            <span className={`text-[9px] font-bold uppercase tracking-wider transition-colors ${
+              canCalc ? "text-teal-500" : "text-gray-400"
+            }`}>
+              {previewPmp ? `→ ${previewPmp} DA` : "PMP"}
+            </span>
+            <button
+              type="button"
+              disabled={!canCalc}
+              onClick={() => {
+                if (!rowProduct) return
+                const currentValue = Number(rowProduct.stock)  * Number(rowProduct.buyingPrice)
+                const newValue     = Number(row.qty)           * Number(row.newPrice)
+                const totalQty     = Number(rowProduct.stock)  + Number(row.qty)
+                const pmp          = (currentValue + newValue) / totalQty
+                updateRow(row.id, "unitPrice", Number(pmp.toFixed(2)))
+                updateRow(row.id, "newPrice",  0)
+                toast.success(`PMP: ${pmp.toFixed(2)} DA`)
+              }}
+              className={`h-[38px] flex items-center gap-1.5 px-3 rounded-lg border text-xs font-semibold transition-all active:scale-95 ${
+                canCalc
+                  ? "bg-teal-50 hover:bg-teal-100 text-teal-700 border-teal-200 hover:border-teal-300 cursor-pointer"
+                  : "bg-gray-50 text-gray-300 border-gray-200 cursor-not-allowed"
+              }`}
+            >
+              <Calculator className={`w-3.5 h-3.5 ${canCalc ? "text-teal-600" : "text-gray-300"}`} />
+              <span className="hidden md:inline">PMP</span>
+            </button>
+          </div>
+        )
+      })()}
+
+      {/* Remove */}
+      <div className="flex flex-col items-center gap-0.5">
+        <span className="text-[9px] font-bold text-transparent uppercase tracking-wider select-none">·</span>
+        <button
+          onClick={() => removeRow(row.id)}
+          className="h-[38px] w-[38px] flex items-center justify-center rounded-lg border border-red-100 bg-red-50 text-red-400 hover:bg-red-100 hover:text-red-600 hover:border-red-200 transition-all active:scale-95"
+        >
+          <X className="w-3.5 h-3.5" />
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
                   ))}
 
-                  {/* <button
-    type="button"
-    onClick={() => {
-      if (!selectedProduct) return;
-
-      const currentPrice = Number(selectedProduct.buyingPrice);
-      const currentQty = Number(selectedProduct.stock);
-      const newQty = Number(quantity);
-      const newPrice = Number(purchasePrice);
-
-      if (!newQty || !newPrice) {
-        toast.error("Enter quantity and purchase price first");
-        return;
-      }
-
-      const totalValue = currentQty * currentPrice + newQty * newPrice;
-      const totalQty = currentQty + newQty;
-      const pmp = totalValue / totalQty;
-
-      setPurchasePrice(Number(pmp.toFixed(2)));
-      toast.success("PMP calculated");
-    }}
-    className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-700 border border-teal-200 text-sm font-medium transition"
-  >
-    <Calculator className="w-4 h-4" />
-    Calculer le PMP
-  </button> */}
+          
                 </div>
               </div>
 
@@ -766,7 +831,8 @@ const cancelInvoice = async (id: string) => {
                           }
                           className="w-full text-left px-4 py-2 text-sm hover:bg-teal-50 transition"
                         >
-                          {getTranslations(product.translations, lang, "name")}
+                          {getTranslations(product.translations, lang, "name")} - Stock:{" "}
+                        {product.stock} - UnitPrice: {product.buyingPrice} Da
                         </button>
                       ))}
                     </div>
@@ -787,107 +853,172 @@ const cancelInvoice = async (id: string) => {
 
                 {/* Product rows */}
                 <div className="flex flex-col gap-2">
-                  {rows.map((row) => (
-                    <div
-                      key={row.id}
-                      className="flex flex-col xs:flex-row items-stretch xs:items-center gap-2 p-2 bg-gray-50 rounded-xl border border-gray-100"
-                    >
-                      {/* Product select — full width on mobile, flex-1 on xs+ */}
-                      <select
-                        value={row.productId}
-                        onChange={(e) =>
-                          updateRow(row.id, "productId", e.target.value)
-                        }
-                        className="w-full xs:flex-1 rounded-lg border border-gray-300 bg-white px-2 py-2 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition"
-                      >
-                        <option value="">Choisir produit</option>
-                        {products.map((product) => (
-                          <option key={product.id} value={product.id}>
-                            {getTranslations(
-                              product.translations,
-                              lang,
-                              "name",
-                            )}
-                          </option>
-                        ))}
-                      </select>
-
-                      {/* Qty + Price + Total + Remove in a row */}
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        {/* Qty */}
-                        <input
-                          type="number"
-                          min={1}
-                          value={row.qty}
-                          onChange={(e) =>
-                            updateRow(row.id, "qty", Number(e.target.value))
-                          }
-                          className="w-14 rounded-lg border border-gray-300 px-2 py-2 text-sm text-center focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition"
-                          placeholder="Qty"
-                        />
-
-                        {/* Unit price */}
-                        <input
-                          type="number"
-                          min={0}
-                          value={row.unitPrice}
-                          onChange={(e) =>
-                            updateRow(
-                              row.id,
-                              "unitPrice",
-                              Number(e.target.value),
-                            )
-                          }
-                          className="w-16 sm:w-20 rounded-lg border border-gray-300 px-2 py-2 text-sm text-center focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition"
-                          placeholder="Prix"
-                        />
-
-                        {/* Row total */}
-                        <span className="w-20 sm:w-24 text-xs sm:text-sm text-gray-700 text-right shrink-0 font-medium">
-                          {(row.qty * row.unitPrice).toLocaleString()} DA
-                        </span>
-
-                        {/* AveragePricePopUp */}
+                  {rows.map((row) => {
                     
+                    const hasPmpData = !!row.qty && !!row.unitPrice
+                    
+                    return (
+                 <div
+  key={row.id}
+  className="group relative bg-white rounded-xl border border-gray-200 hover:border-gray-300 transition-all duration-200 overflow-hidden"
+>
+  <div className="absolute left-0 top-0 bottom-0 w-1 bg-teal-400 rounded-l-xl" />
 
-                        {/* Remove */}
-                        <button
-                          onClick={() => removeRow(row.id)}
-                          className="text-red-400 hover:text-red-600 transition shrink-0 p-1"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+  <div className="pl-4 pr-3 py-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
 
-                  {/* <button
-    type="button"
-    onClick={() => {
-      if (!selectedProduct) return;
+    {/* Product select */}
+    <select
+      value={row.productId}
+      onChange={(e) => {
+        const product = products.find(p => p.id === e.target.value)
+        updateRow(row.id, "productId", e.target.value)
+        if (product) {
+          updateRow(row.id, "unitPrice", Number(product.buyingPrice))
+          updateRow(row.id, "newPrice",  0)
+        }
+      }}
+      className="flex-1 min-w-0 rounded-lg border border-gray-200 bg-gray-50 hover:bg-white px-3 py-2.5 text-sm text-gray-700 focus:ring-2 focus:ring-teal-400 focus:border-teal-400 focus:bg-white outline-none transition cursor-pointer"
+    >
+      <option value="">— Select a product —</option>
+      {products.map((product) => (
+        <option key={product.id} value={product.id}>
+          {getTranslations(product.translations, lang, "name")}
+          {" · "}Stock: {product.stock}
+          {" · "}Price: {product.buyingPrice} DA
+        </option>
+      ))}
+    </select>
 
-      const currentPrice = Number(selectedProduct.buyingPrice);
-      const currentQty = Number(selectedProduct.stock);
-      const newQty = Number(quantity);
-      const newPrice = Number(purchasePrice);
+    <div className="flex items-center gap-2 flex-shrink-0 flex-wrap sm:flex-nowrap">
 
-      if (!newQty || !newPrice) {
-        toast.error("Enter quantity and purchase price first");
-        return;
-      }
+      {/* Qty */}
+      <div className="flex flex-col items-center gap-0.5">
+        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Qty</span>
+        <input
+          type="number"
+          min={1}
+          value={row.qty}
+          onChange={(e) => updateRow(row.id, "qty", Number(e.target.value))}
+          className="w-16 rounded-lg border border-gray-200 bg-gray-50 focus:bg-white px-2 py-2 text-sm text-center font-semibold focus:ring-2 focus:ring-teal-400 focus:border-teal-400 outline-none transition"
+        />
+      </div>
 
-      const totalValue = currentQty * currentPrice + newQty * newPrice;
-      const totalQty = currentQty + newQty;
-      const pmp = totalValue / totalQty;
+      <span className="text-gray-200 text-lg hidden sm:block">×</span>
 
-      setPurchasePrice(Number(pmp.toFixed(2)));
-      toast.success("PMP calculated");
-    }}
-    className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-700 border border-teal-200 text-sm font-medium transition"
-  >
-    <Calculator className="w-4 h-4" />
-    Calculer le PMP
-  </button> */}
+      {/* Current unit price — read-only, auto-filled from product */}
+      <div className="flex flex-col items-center gap-0.5">
+        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Current Price</span>
+        <div className="relative">
+          <input
+            type="number"
+            min={0}
+            value={row.unitPrice}
+            onChange={(e) => updateRow(row.id, "unitPrice", Number(e.target.value))}
+            className="w-24 rounded-lg border border-gray-200 bg-gray-50 focus:bg-white pl-2 pr-7 py-2 text-sm text-center font-semibold focus:ring-2 focus:ring-teal-400 focus:border-teal-400 outline-none transition"
+          />
+          <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-gray-400 font-bold pointer-events-none">DA</span>
+        </div>
+      </div>
+
+      <span className="text-gray-200 text-lg hidden sm:block">=</span>
+
+      {/* Row total */}
+      <div className="flex flex-col items-center gap-0.5">
+        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Total</span>
+        <div className={`w-24 px-2 py-2 rounded-lg text-sm font-bold text-center border transition-colors ${
+          row.qty && row.unitPrice
+            ? "bg-teal-50 border-teal-200 text-teal-700"
+            : "bg-gray-50 border-gray-200 text-gray-400"
+        }`}>
+          {row.qty && row.unitPrice
+            ? (row.qty * row.unitPrice).toLocaleString()
+            : "—"
+          } <span className="text-[10px] font-semibold">DA</span>
+        </div>
+      </div>
+
+      <span className="text-gray-200 text-lg hidden sm:block">·</span>
+
+      {/* New purchase price — user types this for PMP */}
+      <div className="flex flex-col items-center gap-0.5">
+        <span className="text-[9px] font-bold text-orange-400 uppercase tracking-wider">New Price</span>
+        <div className="relative">
+          <input
+            type="number"
+            min={0}
+            value={row.newPrice || ""}
+            placeholder="0"
+            onChange={(e) => updateRow(row.id, "newPrice", Number(e.target.value))}
+            className={`w-24 rounded-lg border pl-2 pr-7 py-2 text-sm text-center font-semibold focus:ring-2 focus:ring-orange-300 focus:border-orange-300 outline-none transition bg-white ${
+              row.newPrice
+                ? "border-orange-300 bg-orange-50/40 text-orange-700"
+                : "border-gray-200 bg-gray-50 text-gray-400"
+            }`}
+          />
+          <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-gray-400 font-bold pointer-events-none">DA</span>
+        </div>
+      </div>
+
+      {/* PMP button */}
+      {(() => {
+        const rowProduct = products.find(p => p.id === row.productId)
+        const canCalc    = !!rowProduct && !!row.qty && !!row.newPrice
+
+        const previewPmp = canCalc
+          ? (
+              (Number(rowProduct!.stock) * Number(rowProduct!.buyingPrice) + Number(row.qty) * Number(row.newPrice))
+              / (Number(rowProduct!.stock) + Number(row.qty))
+            ).toFixed(2)
+          : null
+
+        return (
+          <div className="flex flex-col items-center gap-0.5">
+            <span className={`text-[9px] font-bold uppercase tracking-wider transition-colors ${
+              canCalc ? "text-teal-500" : "text-gray-400"
+            }`}>
+              {previewPmp ? `→ ${previewPmp} DA` : "PMP"}
+            </span>
+            <button
+              type="button"
+              disabled={!canCalc}
+              onClick={() => {
+                if (!rowProduct) return
+                const currentValue = Number(rowProduct.stock)      * Number(rowProduct.buyingPrice)
+                const newValue     = Number(row.qty)               * Number(row.newPrice)
+                const totalQty     = Number(rowProduct.stock)      + Number(row.qty)
+                const pmp          = (currentValue + newValue)     / totalQty
+                updateRow(row.id, "unitPrice", Number(pmp.toFixed(2)))
+                updateRow(row.id, "newPrice",  0)
+                toast.success(`PMP applied: ${pmp.toFixed(2)} DA`)
+              }}
+              className={`h-[38px] flex items-center gap-1.5 px-3 rounded-lg border text-xs font-semibold transition-all active:scale-95 ${
+                canCalc
+                  ? "bg-teal-50 hover:bg-teal-100 text-teal-700 border-teal-200 hover:border-teal-300 cursor-pointer"
+                  : "bg-gray-50 text-gray-300 border-gray-200 cursor-not-allowed"
+              }`}
+            >
+              <Calculator className={`w-3.5 h-3.5 ${canCalc ? "text-teal-600" : "text-gray-300"}`} />
+              <span className="hidden md:inline">PMP</span>
+            </button>
+          </div>
+        )
+      })()}
+
+      {/* Remove */}
+      <div className="flex flex-col items-center gap-0.5">
+        <span className="text-[9px] font-bold text-transparent uppercase tracking-wider select-none">·</span>
+        <button
+          onClick={() => removeRow(row.id)}
+          className="h-[38px] w-[38px] flex items-center justify-center rounded-lg border border-red-100 bg-red-50 text-red-400 hover:bg-red-100 hover:text-red-600 hover:border-red-200 transition-all active:scale-95"
+        >
+          <X className="w-3.5 h-3.5" />
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+                  )})}
                 </div>
               </div>
 
@@ -952,7 +1083,7 @@ const cancelInvoice = async (id: string) => {
         </div>
 
         {/* ── Stats Cards ──────────────────────────────────────────────────────── */}
-        <div className="grid grid-cols-3 gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div className="bg-white rounded-lg p-3 sm:p-4 md:p-6 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div className="min-w-0 flex-1 mr-2">
@@ -1184,14 +1315,20 @@ const cancelInvoice = async (id: string) => {
                     )}
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
-                    {invoice.orderId && (
+                    {/* {invoice.orderId && (
                       <button
                         onClick={() => handleView(invoice.orderId)}
                         className="text-xs text-teal-600 hover:underline font-medium"
                       >
                         View
                       </button>
-                    )}
+                    )} */}
+                    <button
+                          onClick={() => openEditPopup(invoice)}
+                          className="text-teal-600 hover:underline font-medium text-sm"
+                        >
+                          <Edit className="w-4 h-4 text-gray-600" />
+                        </button>
                     <button
                       onClick={() => handleDownload(invoice.id)}
                       className="p-1.5 text-teal-600 hover:bg-teal-50 rounded-lg transition-colors"
