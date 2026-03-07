@@ -256,18 +256,6 @@ const page = () => {
                       >
                         <Eye className="w-4 h-4 text-gray-600" />
                       </button>
-                      <button
-                        onClick={() => openEditPopup(order)}
-                        className="p-1.5 hover:bg-gray-100 rounded transition"
-                      >
-                        <Edit className="w-4 h-4 text-gray-600" />
-                      </button>
-                      <button
-                        onClick={() => openDeletePopup(order)}
-                        className="p-1.5 hover:bg-red-50 rounded transition"
-                      >
-                        <Trash2 className="w-4 h-4 text-red-600" />
-                      </button>
                     </div>
                   </td>
                 </tr>
