@@ -1,10 +1,12 @@
-import puppeteer from "puppeteer";
 import { prisma } from "@/lib/prisma";
 import { generateInvoiceHTML } from "@/lib/generateInvoiceHtml";
-
+import puppeteer from "puppeteer-core";
+import chromium from "@sparticuz/chromium";
 type Context = {
   params: Promise<{ id: string }>;
 };
+
+export const runtime = "nodejs";
 
 export async function GET(req: Request, context: Context) {
   try {
@@ -30,7 +32,11 @@ export async function GET(req: Request, context: Context) {
 
     const html = generateInvoiceHTML(invoice);
 
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({
+  args: chromium.args,
+  executablePath: await chromium.executablePath(),
+  headless: true,
+});
     const page = await browser.newPage();
 
     await page.setContent(html, { waitUntil: "networkidle0" });

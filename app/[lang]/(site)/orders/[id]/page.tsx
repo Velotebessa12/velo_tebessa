@@ -22,6 +22,7 @@ import {
   RefreshCcw,
   Plus,
   Receipt,
+  ArrowDown,
 } from "lucide-react";
 import PopUp from "@/components/PopUp";
 import toast from "react-hot-toast";
@@ -326,14 +327,15 @@ export default function OrderDetailsMobilePage() {
 
               
       
-      <button
+      {order.status === "DELIVERED" && (
+        <button
         onClick={() => handleDownloadInvoice(order.id)}
         className="flex mb-1 items-center gap-1.5 px-3 sm:px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white rounded-lg transition-colors text-xs sm:text-sm font-medium"
       >
-        <Receipt size={16} className="flex-shrink-0" />
-        <span className="hidden xs:inline">Download invoice</span>
-        <span className="xs:hidden">Invoice</span>
+        <ArrowDown size={16} className="flex-shrink-0" />
+        <span className="">Download invoice</span>
       </button>
+      )}
 
       {/* Order Progress */}
       <div className="mb-6">
