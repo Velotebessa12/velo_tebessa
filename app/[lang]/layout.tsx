@@ -23,10 +23,8 @@ export default async function RootLayout({
     <html lang={lang} dir={lang === "ar" ? "rtl" : "ltr"}>
       <body>
         <LanguageProvider lang={lang} dict={dict}>
-          <Navbar />
           <main>
             {children}
-            <BottomNavbar />
           </main>
         </LanguageProvider>
       </body>

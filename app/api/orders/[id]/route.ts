@@ -46,32 +46,34 @@ export async function GET(req: Request, context: Context) {
    ========================= */
 export async function PATCH(req: Request, context: Context) {
   try {
-    const { id } = await context.params
-    const data = await req.json()
-
-    const order = await prisma.order.findUnique({
-      where: { id },
-    })
-
-    if (!order) {
-      return NextResponse.json(
-        { error: "Order not found" },
-        { status: 404 }
-      )
-    }
+     const { id } = await context.params
+    const body = await req.json();
 
     const updatedOrder = await prisma.order.update({
       where: { id },
-      data,
-    })
+      data: {
+        status: body.status,
+        fullName: body.fullName,
+        phoneNumber: body.phoneNumber,
+        wilaya: body.wilaya,
+        commune: body.commune,
+        detailedAddress: body.detailedAddress,
+        deliveryMethod: body.deliveryMethod,
+        shippingCompany: body.shippingCompany,
+        trackingId: body.trackingId,
+        orderNote: body.orderNote,
+        deliveryNote: body.deliveryNote,
+        deliveredAt: body.deliveredAt,
+      },
+    });
 
-    return NextResponse.json(updatedOrder)
+    return NextResponse.json(updatedOrder);
   } catch (error) {
-    console.error(error)
+    console.error(error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Failed to update order" },
       { status: 500 }
-    )
+    );
   }
 }
 

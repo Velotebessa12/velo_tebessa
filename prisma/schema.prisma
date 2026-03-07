@@ -61,35 +61,49 @@ enum Role {
 model Wilaya {
   name String
   wilaya_id Int @id
-  /// Official Wilaya ID (matches NOEST wilaya_id)
-  /// Example: 16 = Alger, 9 = Blida
 
+  // Cost from shipping company
   delivery_tarif Int
-  /// Home delivery price (DZD)
-  /// Used when delivery type = "home"
-  /// Seller → Customer doorstep
-
   delivery_stopdesk Int
-  /// StopDesk / relay point delivery price (DZD)
-  /// Used when delivery type = "stopdesk"
-  /// Customer picks up package from agency
-
   return_tarif Int
-  /// Return shipping price (DZD)
-  /// Charged to seller if customer refuses the order
-  /// Door-to-agency return
-
   return_stopdesk Int
-  /// Return price for StopDesk delivery (DZD)
-  /// Used if a StopDesk order is returned
+
+  // Price you charge customers
+  seller_delivery_tarif Int
+  seller_delivery_stopdesk Int
+  seller_return_tarif Int
+  seller_return_stopdesk Int
 
   shippingCompany String
 
-  createdAt DateTime @default(now())
-  /// Record creation timestamp
+  profits Profit[]
 
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  /// Automatically updated on every change
+}
+
+model Profit {
+  id String @id @default(uuid())
+
+  wilayaId Int?
+  wilaya   Wilaya? @relation(fields: [wilayaId], references: [wilaya_id])
+
+  type ProfitType
+
+  cost Int      // what you pay to shipping company
+  price Int     // what you charge the customer
+  profit Int    // price - cost
+
+  shippingCompany String?
+
+  createdAt DateTime @default(now())
+}
+
+enum ProfitType {
+  DELIVERY
+  STOPDESK
+  RETURN
+  RETURN_STOPDESK
 }
 
 model Product {
@@ -130,8 +144,9 @@ model Product {
   operations Operation[]
   orderItems   OrderItem[]
   variants     ProductVariant[]
-  discounts    DiscountProduct[]
+  discounts    DiscountExcludedProduct[]
   invoiceItems InvoiceItem[]
+  packItems PackItem[]
 }
 
 
@@ -205,7 +220,7 @@ model Category {
   updatedAt DateTime @updatedAt
   translations CategoryTranslation[]
   products Product[]
-  discounts   DiscountCategory[]
+  discounts   DiscountExcludedCategory[]
 }
 
 model CategoryTranslation {
@@ -283,9 +298,6 @@ enum CouponScope {
   PRODUCTS
   CATEGORIES
 }
-
-
-
 
 
 model Order {
@@ -607,6 +619,12 @@ model Discount {
   type        DiscountType
   value       Float
 
+  customerType CustomerType @default(ALL)
+
+  minimumAmount Float?   // minimum order amount
+  maxDiscount   Float?   // max discount cap
+  usageLimit    Int?     // max usage
+
   startsAt    DateTime?
   endsAt      DateTime?
 
@@ -617,8 +635,8 @@ model Discount {
   updatedAt   DateTime @updatedAt
 
   // RELATIONS
-  products    DiscountProduct[]
-  categories  DiscountCategory[]
+  excludedProducts    DiscountExcludedProduct[]
+excludedCategories  DiscountExcludedCategory[]
 }
 
 enum DiscountType {
@@ -626,8 +644,15 @@ enum DiscountType {
   FIXED
 }
 
+enum CustomerType {
+  ALL
+  NEW
+  EXISTING
+  VIP
+}
 
-model DiscountProduct {
+
+model DiscountExcludedProduct {
   id          String   @id @default(uuid())
 
   discountId  String
@@ -641,7 +666,7 @@ model DiscountProduct {
 
 
 
-model DiscountCategory {
+model DiscountExcludedCategory {
   id          String   @id @default(uuid())
 
   discountId  String
@@ -663,3 +688,56 @@ model Image {
 }
 
 
+model Pack {
+  id String @id @default(uuid())
+
+  translations PackTranslation[]
+
+  isActive Boolean @default(true)
+
+  imageUrl String?
+
+  regularPrice        Float?
+  promoPrice Float?
+  regularPriceText    String?
+  promoPriceText String?
+  /// Final bundle price shown to customer
+
+  items PackItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+model PackItem {
+  id String @id @default(uuid())
+
+  packId String
+  pack Pack @relation(fields: [packId], references: [id], onDelete: Cascade)
+
+  productId String
+  product Product @relation(fields: [productId], references: [id])
+
+  quantity Int @default(1)
+
+  price Float
+  priceText Float
+  /// price of this product inside pack
+
+  createdAt DateTime @default(now())
+}
+
+model PackTranslation {
+  id String @id @default(uuid())
+
+  packId String
+  pack Pack @relation(fields: [packId], references: [id], onDelete: Cascade)
+
+  language String  // "ar" | "fr" | "en"
+
+  name String
+  description String?
+
+  @@unique([packId, language])
+}

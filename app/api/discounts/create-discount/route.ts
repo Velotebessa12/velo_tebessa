@@ -10,11 +10,15 @@ export async function POST(req: Request) {
       description,
       type,
       value,
+      customerType = "ALL",
+      minimumAmount,
+      maxDiscount,
+      usageLimit,
       startsAt,
       endsAt,
       priority = 0,
-      productIds = [],
-      categoryIds = [],
+      excludedProductIds = [],
+      excludedCategoryIds = [],
     } = body;
 
     if (!name || !type || value == null) {
@@ -30,16 +34,20 @@ export async function POST(req: Request) {
           name,
           description,
           type,
-          value,
+          value: Number(value),
+          customerType,
+          minimumAmount: minimumAmount ? Number(minimumAmount) : null,
+          maxDiscount: maxDiscount ? Number(maxDiscount) : null,
+          usageLimit: usageLimit ? Number(usageLimit) : null,
           startsAt: startsAt ? new Date(startsAt) : null,
           endsAt: endsAt ? new Date(endsAt) : null,
           priority,
         },
       });
 
-      if (productIds.length > 0) {
-        await tx.discountProduct.createMany({
-          data: productIds.map((productId: string) => ({
+      if (excludedProductIds.length > 0) {
+        await tx.discountExcludedProduct.createMany({
+          data: excludedProductIds.map((productId: string) => ({
             discountId: createdDiscount.id,
             productId,
           })),
@@ -47,9 +55,9 @@ export async function POST(req: Request) {
         });
       }
 
-      if (categoryIds.length > 0) {
-        await tx.discountCategory.createMany({
-          data: categoryIds.map((categoryId: string) => ({
+      if (excludedCategoryIds.length > 0) {
+        await tx.discountExcludedCategory.createMany({
+          data: excludedCategoryIds.map((categoryId: string) => ({
             discountId: createdDiscount.id,
             categoryId,
           })),
@@ -61,6 +69,7 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json(discount, { status: 201 });
+
   } catch (error) {
     console.error(error);
     return NextResponse.json(

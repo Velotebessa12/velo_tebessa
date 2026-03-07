@@ -5,29 +5,7 @@ export const runtime = "nodejs";
 
 
 
-// model CouponUsage {
-//   id        String   @id @default(uuid())
 
-//   // relations
-//   couponId  String
-//   coupon    Coupon   @relation(fields: [couponId], references: [id])
-
-//   userId    String
-//   user      User     @relation(fields: [userId], references: [id])
-
-//   orderId   String   @unique
-//   order     Order    @relation(fields: [orderId], references: [id])
-
-//   // SNAPSHOT (this is the key change)
-//   code            String
-//   discountType    CouponType
-//   discountValue   Float
-//   discountAmount  Float
-
-//   appliedAt DateTime @default(now())
-// }
-
-// not working because of variantId and variantName
 
 export async function POST(request: Request) {
   try {
@@ -45,6 +23,7 @@ export async function POST(request: Request) {
       detailedAddress,
       station_code,
       wilaya,
+      wilaya_id,
       commune,
       phoneNumber,
       fullName,
@@ -61,6 +40,7 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+
 
    
 
@@ -172,6 +152,51 @@ if (couponId) {
           },
         },
       });
+
+
+
+if (shippingCompany === "noest-express") {
+
+  const wilayaData = await tx.wilaya.findUnique({
+    where: { wilaya_id: Number(wilaya_id) },
+  });
+
+  if (wilayaData) {
+
+    let cost = 0;
+    let price = 0;
+    let type: "DELIVERY" | "STOPDESK" = "DELIVERY";
+
+    const method = deliveryMethod?.toLowerCase();
+
+    if (method === "home") {
+      cost = wilayaData.delivery_tarif;
+      price = wilayaData.seller_delivery_tarif;
+      type = "DELIVERY";
+    }
+
+    if (method === "stopdesk") {
+      cost = wilayaData.delivery_stopdesk;
+      price = wilayaData.seller_delivery_stopdesk;
+      type = "STOPDESK";
+    }
+
+    const profit = price - cost;
+
+    if (profit !== 0) {
+      await tx.profit.create({
+        data: {
+          wilayaId: wilayaData.wilaya_id,
+          type,
+          cost,
+          price,
+          profit,
+        },
+      });
+    }
+
+  }
+}
 
       if (coupon) {
   await tx.couponUsage.create({

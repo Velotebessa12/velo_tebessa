@@ -34,6 +34,8 @@ interface CartItem {
     description?: string;
   }[];
 
+  totalPrice : any, 
+
   /** Pricing snapshot (variant + addons already applied) */
   price: number; // FINAL UNIT price
 

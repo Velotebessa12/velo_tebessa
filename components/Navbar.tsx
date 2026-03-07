@@ -21,13 +21,11 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const langRef = useRef<HTMLDivElement>(null);
   const { cart } = useShopStore();
-  const { lang , dict} = useLang();
+  const { lang, dict } = useLang();
   const pathname = usePathname();
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-
-  
 
   useEffect(() => {
     const auth = localStorage.getItem("isAuthenticated");
@@ -36,13 +34,13 @@ const Navbar = () => {
 
   // Language configurations
   const languages = [
-    { code: "ar", name: "العربية", nativeName: "Arabic"},
-    { code: "fr", name: "Français", nativeName: "French"},
-    { code: "en", name: "English", nativeName: "English"},
+    { code: "ar", name: "العربية", nativeName: "Arabic" },
+    { code: "fr", name: "Français", nativeName: "French" },
+    { code: "en", name: "English", nativeName: "English" },
   ];
 
   const currentLanguage =
-    languages.find((l) => l.code ===  lang ) || languages[0];
+    languages.find((l) => l.code === lang) || languages[0];
 
   // Handle scroll effect
   useEffect(() => {
@@ -77,12 +75,12 @@ const Navbar = () => {
   };
 
   const isActivePage = (path: string) => {
-  if (path === `/${lang}`) {
-    return pathname === `/${lang}` || pathname === `/${lang}/`;
-  }
+    if (path === `/${lang}`) {
+      return pathname === `/${lang}` || pathname === `/${lang}/`;
+    }
 
-  return pathname === path || pathname.startsWith(path + "/");
-};
+    return pathname === path || pathname.startsWith(path + "/");
+  };
 
   function logout() {
     localStorage.removeItem("isAuthenticated");
@@ -95,7 +93,7 @@ const Navbar = () => {
   );
 
   return (
-   <header
+    <header
       className={`sticky top-0 z-50 transition-all duration-300 ${
         scrolled
           ? "bg-white/95 backdrop-blur-xl border-b border-slate-200 shadow-lg"
@@ -119,40 +117,40 @@ const Navbar = () => {
           </a>
 
           {/* Desktop Navigation */}
-    <nav className="hidden md:flex items-center gap-1">
-  <a
-    href={`/${lang}`}
-    className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-      isActivePage(`/${lang}`)
-        ? "text-teal-600 bg-teal-50"
-        : "text-slate-700 hover:text-teal-600 hover:bg-slate-50"
-    }`}
-  >
-    {dict.navbar.home}
-  </a>
+          <nav className="hidden md:flex items-center gap-1">
+            <a
+              href={`/${lang}`}
+              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                isActivePage(`/${lang}`)
+                  ? "text-teal-600 bg-teal-50"
+                  : "text-slate-700 hover:text-teal-600 hover:bg-slate-50"
+              }`}
+            >
+              {dict.navbar.home}
+            </a>
 
-  <a
-    href={`/${lang}/products`}
-    className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-      isActivePage(`/${lang}/products`)
-        ? "text-teal-600 bg-teal-50"
-        : "text-slate-700 hover:text-teal-600 hover:bg-slate-50"
-    }`}
-  >
-    {dict.navbar.products}
-  </a>
+            <a
+              href={`/${lang}/products`}
+              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                isActivePage(`/${lang}/products`)
+                  ? "text-teal-600 bg-teal-50"
+                  : "text-slate-700 hover:text-teal-600 hover:bg-slate-50"
+              }`}
+            >
+              {dict.navbar.products}
+            </a>
 
-  <a
-    href={`/${lang}/categories`}
-    className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-      isActivePage(`/${lang}/categories`)
-        ? "text-teal-600 bg-teal-50"
-        : "text-slate-700 hover:text-teal-600 hover:bg-slate-50"
-    }`}
-  >
-    {dict.navbar.categories}
-  </a>
-</nav>
+            <a
+              href={`/${lang}/categories`}
+              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                isActivePage(`/${lang}/categories`)
+                  ? "text-teal-600 bg-teal-50"
+                  : "text-slate-700 hover:text-teal-600 hover:bg-slate-50"
+              }`}
+            >
+              {dict.navbar.categories}
+            </a>
+          </nav>
 
           {/* Actions */}
           <div className="flex items-center gap-2 sm:gap-3">
@@ -170,7 +168,8 @@ const Navbar = () => {
               </button>
 
               {isLangOpen && (
-             <div className={`absolute left-1/2 -translate-x-1/2
+                <div
+                  className={`absolute left-1/2 -translate-x-1/2
   w-56 sm:w-64
   bg-white
   border border-slate-200
@@ -179,28 +178,31 @@ const Navbar = () => {
   overflow-hidden
   animate-in fade-in slide-in-from-top-1
   duration-200
-`}>
-  <div className="p-2">
-    {/* Header */}
-    <div className="
+`}
+                >
+                  <div className="p-2">
+                    {/* Header */}
+                    <div
+                      className="
       px-3 py-2
       text-[11px] font-semibold
       text-slate-500
       uppercase tracking-wider
-    ">
-      {dict.navbar.selectLanguage}
-    </div>
+    "
+                    >
+                      {dict.navbar.selectLanguage}
+                    </div>
 
-    {/* Languages */}
-    <div className="space-y-1">
-      {languages.map((language) => {
-        const active = lang === language.code;
+                    {/* Languages */}
+                    <div className="space-y-1">
+                      {languages.map((language) => {
+                        const active = lang === language.code;
 
-        return (
-          <button
-            key={language.code}
-            onClick={() => changeLanguage(language.code)}
-            className={`
+                        return (
+                          <button
+                            key={language.code}
+                            onClick={() => changeLanguage(language.code)}
+                            className={`
               group
               w-full
               flex items-center justify-between
@@ -214,30 +216,29 @@ const Navbar = () => {
               }
               focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40
             `}
-          >
-            {/* Left */}
-            <div className="flex items-center gap-3 min-w-0">
+                          >
+                            {/* Left */}
+                            <div className="flex items-center gap-3 min-w-0">
+                              <div className="flex flex-col text-left min-w-0">
+                                <span className="text-sm font-medium truncate">
+                                  {language.name}
+                                </span>
+                                <span className="text-xs text-slate-500 truncate">
+                                  {language.nativeName}
+                                </span>
+                              </div>
+                            </div>
 
-              <div className="flex flex-col text-left min-w-0">
-                <span className="text-sm font-medium truncate">
-                  {language.name}
-                </span>
-                <span className="text-xs text-slate-500 truncate">
-                  {language.nativeName}
-                </span>
-              </div>
-            </div>
-
-            {/* Right */}
-            {active && (
-              <Check className="w-4.5 h-4.5 text-emerald-600 shrink-0" />
-            )}
-          </button>
-        );
-      })}
-    </div>
-  </div>
-</div>
+                            {/* Right */}
+                            {active && (
+                              <Check className="w-4.5 h-4.5 text-emerald-600 shrink-0" />
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
 

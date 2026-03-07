@@ -6,7 +6,16 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET (req : NextRequest){
     try {
         
-        const invoices = await prisma.invoice.findMany()
+      const invoices = await prisma.invoice.findMany({
+  include: {
+    items: {
+      include: {
+        product: true
+      }
+    },
+    order: true
+  }
+});
      
 
 

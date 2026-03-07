@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Package, ShoppingCart, BarChart2 } from "lucide-react";
+import { Home, Package, ShoppingCart, BarChart2, Users } from "lucide-react";
+import { useLang } from "./LanguageContext";
 
 const AdminBottomNavbar = () => {
   const pathname = usePathname();
+  const {lang} = useLang()
 
   const links = [
     {
@@ -24,25 +26,36 @@ const AdminBottomNavbar = () => {
       icon: ShoppingCart,
     },
     {
-      name: "Analytics",
-      href: "/admin/analytics",
-      icon: BarChart2,
+      name: "Customers",
+      href: "/admin/customers",
+      icon: Users,
     },
   ];
+
+  
+  const isActive = (href: string) => {
+  const cleanPath = pathname.replace(`/${lang}`, "") || "/";
+
+  if (href === "/") {
+    return cleanPath === "/";
+  }
+
+  return cleanPath === href || cleanPath.startsWith(href + "/");
+};
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 sm:hidden z-50">
       <div className="grid grid-cols-4">
 
         {links.map((link) => {
-          const isActive = pathname === link.href;
+         const active = isActive(link.href);
 
           return (
             <Link
               key={link.href}
-              href={link.href}
+              href={`/${lang}${link.href}`}
               className={`flex flex-col items-center justify-center py-2 transition ${
-                isActive
+                active
                   ? "text-teal-600"
                   : "text-gray-500 hover:text-gray-900"
               }`}

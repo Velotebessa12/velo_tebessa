@@ -9,10 +9,11 @@ export async function GET(req: NextRequest) {
     const searchQuery = searchParams.get("query");
     const price = searchParams.get("price");
     const sort = searchParams.get("sort");
+    const type = searchParams.get("type") || "PRODUCT";
 
     let categoryId: string | undefined = undefined;
 
-    // If slug provided → find category id
+    // Find category from slug
     if (slug) {
       const category = await prisma.category.findUnique({
         where: { slug },
@@ -25,14 +26,12 @@ export async function GET(req: NextRequest) {
       categoryId = category.id;
     }
 
-    // Build dynamic filters
     const where: any = {};
 
     if (categoryId) {
       where.categoryId = categoryId;
     }
 
-    // SEARCH BY NAME INSIDE TRANSLATIONS
     if (searchQuery) {
       where.translations = {
         some: {
@@ -45,30 +44,27 @@ export async function GET(req: NextRequest) {
     }
 
     if (price) {
-      where.price = {
+      where.regularPrice = {
         lte: Number(price),
       };
     }
 
-    // Build sorting logic
-    let orderBy: any = { createdAt: "desc" }; // default sorting
+    let orderBy: any = { createdAt: "desc" };
 
     if (sort) {
       switch (sort) {
         case "price_asc":
-          orderBy = { price: "asc" };
+          orderBy = { regularPrice: "asc" };
           break;
 
         case "price_desc":
-          orderBy = { price: "desc" };
+          orderBy = { regularPrice: "desc" };
           break;
 
         case "name_asc":
           orderBy = {
             translations: {
-              _min: {
-                name: "asc",
-              },
+              _min: { name: "asc" },
             },
           };
           break;
@@ -76,9 +72,7 @@ export async function GET(req: NextRequest) {
         case "name_desc":
           orderBy = {
             translations: {
-              _max: {
-                name: "desc",
-              },
+              _max: { name: "desc" },
             },
           };
           break;
@@ -94,10 +88,10 @@ export async function GET(req: NextRequest) {
     }
 
     const products = await prisma.product.findMany({
-      where : {
+      where: {
         ...where,
-        type : "PRODUCT",
-        isActive : true
+        type,
+        isActive: true,
       },
       orderBy,
       include: {
@@ -105,7 +99,75 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({ products });
+    // Fetch active discounts
+    const discounts = await prisma.discount.findMany({
+      where: {
+        isActive: true,
+        OR: [
+          { startsAt: null },
+          { startsAt: { lte: new Date() } }
+        ],
+        AND: [
+          {
+            OR: [
+              { endsAt: null },
+              { endsAt: { gte: new Date() } }
+            ]
+          }
+        ]
+      },
+      include: {
+        excludedProducts: true,
+        excludedCategories: true
+      }
+    });
+
+    // Calculate final price
+    const productsWithPrice = products.map((product: any) => {
+      let finalPrice = product.promoPrice ?? product.regularPrice;
+      let appliedDiscount = null;
+
+      // If promo exists → ignore discounts
+      if (!product.promoPrice) {
+        for (const discount of discounts) {
+
+          const excludedProduct = discount.excludedProducts.find(
+            (p: any) => p.productId === product.id
+          );
+
+          const excludedCategory = discount.excludedCategories.find(
+            (c: any) => c.categoryId === product.categoryId
+          );
+
+          if (excludedProduct || excludedCategory) continue;
+
+          if (discount.type === "PERCENTAGE") {
+            let amount = finalPrice * (discount.value / 100);
+
+            if (discount.maxDiscount) {
+              amount = Math.min(amount, discount.maxDiscount);
+            }
+
+            finalPrice = finalPrice - amount;
+          }
+
+          if (discount.type === "FIXED") {
+            finalPrice = finalPrice - discount.value;
+          }
+
+          appliedDiscount = discount;
+          break;
+        }
+      }
+
+      return {
+        ...product,
+        finalPrice,
+        discount: appliedDiscount
+      };
+    });
+
+    return NextResponse.json({ products: productsWithPrice });
 
   } catch (error) {
     console.error("Get products error:", error);

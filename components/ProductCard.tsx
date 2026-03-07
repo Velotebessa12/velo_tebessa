@@ -11,14 +11,7 @@ const ProductCard = ({ product, lang }: { product: any; lang: string }) => {
     useShopStore();
   const router = useRouter();
 
-  const basePrice = useMemo(() => {
-    if (product) {
-      return product.promoPrice && product.promoPrice > 0
-        ? product.promoPrice
-        : product.regularPrice;
-    }
-    return 0;
-  }, [product]);
+  
 
   return (
     <a
@@ -26,6 +19,9 @@ const ProductCard = ({ product, lang }: { product: any; lang: string }) => {
       href={`/${lang}/products/${product.id}`}
       className="group block bg-white rounded-lg sm:rounded-xl lg:rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 hover:border-emerald-200"
     >
+
+    
+
       {/* Image Container */}
       <div className="relative aspect-square bg-gradient-to-br from-slate-50 to-slate-100 overflow-hidden">
         <img
@@ -33,6 +29,18 @@ const ProductCard = ({ product, lang }: { product: any; lang: string }) => {
           alt={product.name}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
         />
+
+          {product.discount && (
+  <div className="absolute top-0 left-0 w-full bg-red-500/80 text-white text-[10px] sm:text-xs font-semibold text-center py-1">
+    {product.discount.name} {product.discount && (
+  <span className=" text-[10px] sm:text-xs font-semibold text-center py-1 backdrop-blur-sm">
+    {product.discount.type === "PERCENTAGE"
+      ? `-${product.discount.value}%`
+      : product.discount.name}
+  </span>
+)} 
+  </div>
+)}
 
         {/* Favorite Button */}
         <button
@@ -90,27 +98,19 @@ const ProductCard = ({ product, lang }: { product: any; lang: string }) => {
         </div>
 
         {/* Price */}
-        <div className="mb-3 flex items-end gap-1.5 sm:gap-2 leading-none">
-          {/* Crossed regular price (only if promo exists AND is valid) */}
-          {product.promoPrice !== null &&
-            product.promoPrice !== undefined &&
-            product.promoPrice > 0 && (
-              <span className="text-[10px] sm:text-xs text-slate-400 line-through whitespace-nowrap">
-                {product.regularPrice?.toLocaleString()} DA
-              </span>
-            )}
+       <div className="mb-3 flex items-end gap-1.5 sm:gap-2 leading-none">
+  {/* Crossed regular price */}
+  {product.finalPrice < product.regularPrice && (
+    <span className="text-[10px] sm:text-xs text-slate-400 line-through whitespace-nowrap">
+      {product.regularPrice?.toLocaleString()} DA
+    </span>
+  )}
 
-          {/* Current price */}
-          <span className="font-bold text-xs sm:text-sm md:text-base text-teal-600 whitespace-nowrap">
-            {(product.promoPrice !== null &&
-            product.promoPrice !== undefined &&
-            product.promoPrice > 0
-              ? product.promoPrice
-              : product.regularPrice
-            )?.toLocaleString()}{" "}
-            DA
-          </span>
-        </div>
+  {/* Final price */}
+  <span className="font-bold text-xs sm:text-sm md:text-base text-teal-600 whitespace-nowrap">
+    {product.finalPrice?.toLocaleString()} DA
+  </span>
+</div>
 
         {/* Add to Cart Button */}
         <button

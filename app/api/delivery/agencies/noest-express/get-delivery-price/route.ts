@@ -62,17 +62,17 @@ export async function GET(req: NextRequest) {
 
     let shippingPrice = 0;
 
-    if (isReturn) {
-      shippingPrice =
-        deliveryType === "home"
-          ? wilaya.return_tarif
-          : wilaya.return_stopdesk;
-    } else {
-      shippingPrice =
-        deliveryType === "home"
-          ? wilaya.delivery_tarif
-          : wilaya.delivery_stopdesk;
-    }
+if (isReturn) {
+  shippingPrice =
+    deliveryType === "home"
+      ? wilaya.seller_return_tarif
+      : wilaya.seller_return_stopdesk;
+} else {
+  shippingPrice =
+    deliveryType === "home"
+      ? wilaya.seller_delivery_tarif
+      : wilaya.seller_delivery_stopdesk;
+}
 
     return NextResponse.json({
       wilayaId,

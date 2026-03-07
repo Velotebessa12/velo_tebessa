@@ -6,29 +6,32 @@ type Context = {
 };
 
 /* =========================
-   GET /api/categories/:id
+   GET /api/invoices/:id
    ========================= */
 export async function GET(req: Request, context: Context) {
   try {
     const { id } = await context.params;
 
-    const category = await prisma.category.findUnique({
+    const invoice = await prisma.invoice.findUnique({
       where: { id },
       include: {
-        translations: true,
-        products: true,
-        discounts: true,
+        items: {
+          include: {
+            product: true,
+          },
+        },
+        order: true,
       },
     });
 
-    if (!category) {
+    if (!invoice) {
       return NextResponse.json(
-        { error: "Category not found" },
+        { error: "Invoice not found" },
         { status: 404 }
       );
     }
 
-    return NextResponse.json(category);
+    return NextResponse.json(invoice);
   } catch (error) {
     console.error(error);
     return NextResponse.json(
@@ -39,35 +42,43 @@ export async function GET(req: Request, context: Context) {
 }
 
 /* =========================
-   PATCH /api/categories/:id
+   PATCH /api/invoices/:id
    ========================= */
 export async function PATCH(req: Request, context: Context) {
   try {
     const { id } = await context.params;
-    const body = await req.json();
+    const data = await req.json();
 
-    const category = await prisma.category.findUnique({
+    const invoice = await prisma.invoice.findUnique({
       where: { id },
     });
 
-    if (!category) {
+    if (!invoice) {
       return NextResponse.json(
-        { error: "Category not found" },
+        { error: "Invoice not found" },
         { status: 404 }
       );
     }
 
-    const data: any = {};
-
-    if (body.slug !== undefined) data.slug = body.slug;
-    if (body.imageUrl !== undefined) data.imageUrl = body.imageUrl;
-
-    const updatedCategory = await prisma.category.update({
+    const updatedInvoice = await prisma.invoice.update({
       where: { id },
-      data,
+      data: {
+        supplierName: data.supplierName,
+        contact: data.contact,
+        invoiceNumber: data.invoiceNumber,
+        status: data.status,
+        notes: data.notes,
+      },
+      include: {
+        items: {
+          include: {
+            product: true,
+          },
+        },
+      },
     });
 
-    return NextResponse.json(updatedCategory);
+    return NextResponse.json(updatedInvoice);
   } catch (error) {
     console.error(error);
     return NextResponse.json(
@@ -78,37 +89,36 @@ export async function PATCH(req: Request, context: Context) {
 }
 
 /* =========================
-   DELETE /api/categories/:id
+   DELETE /api/invoices/:id
+   (cancel invoice)
    ========================= */
 export async function DELETE(req: Request, context: Context) {
   try {
     const { id } = await context.params;
 
-    // 1️⃣ Delete category translations
-    await prisma.categoryTranslation.deleteMany({
-      where: { categoryId: id },
-    });
-
-    // 2️⃣ Delete discount relations (pivot table)
-    await prisma.discountExcludedCategory.deleteMany({
-      where: { categoryId: id },
-    });
-
-    // 3️⃣ Disconnect category from products (if relation table exists)
-    await prisma.product.updateMany({
-      where: { categoryId: id },
-      data: { categoryId: null },
-    });
-
-    // 4️⃣ Finally delete the category itself
-    await prisma.category.delete({
+    const invoice = await prisma.invoice.findUnique({
       where: { id },
+    });
+
+    if (!invoice) {
+      return NextResponse.json(
+        { error: "Invoice not found" },
+        { status: 404 }
+      );
+    }
+
+    await prisma.invoice.update({
+      where: { id },
+      data: {
+        status: "CANCELLED",
+      },
     });
 
     return NextResponse.json({
       success: true,
-      message: "Category and all related data deleted successfully",
+      message: "Invoice cancelled successfully",
     });
+
   } catch (error) {
     console.error(error);
     return NextResponse.json(
