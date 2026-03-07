@@ -196,8 +196,9 @@ export default function OrderDetailsMobilePage() {
   }
 
 
-  const handleDownloadInvoice = async (orderId: string) => {
-    try {
+const handleDownloadInvoice = async (orderId: string) => {
+  await toast.promise(
+    (async () => {
       const res = await fetch(`/api/orders/${orderId}/pdf`);
 
       if (!res.ok) {
@@ -205,7 +206,6 @@ export default function OrderDetailsMobilePage() {
       }
 
       const blob = await res.blob();
-
       const url = window.URL.createObjectURL(blob);
 
       const a = document.createElement("a");
@@ -217,10 +217,15 @@ export default function OrderDetailsMobilePage() {
 
       a.remove();
       window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error(err);
+    })(),
+    {
+      loading: "Generating invoice...",
+      success: "Invoice downloaded!",
+      error: "Failed to download invoice",
     }
-  };
+  );
+};
+
 
   if (isLoading) return <Loader />;
 

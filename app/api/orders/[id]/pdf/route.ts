@@ -1,5 +1,5 @@
 import puppeteer from "puppeteer-core";
-import _chromium from "@sparticuz/chromium";
+import _chromium from "@sparticuz/chromium-min"; // Swapped to -min
 import { prisma } from "@/lib/prisma";
 import { generateOrderInvoiceHTML } from "@/lib/generateOrderInvoiceHtml";
 
@@ -11,8 +11,9 @@ type Context = {
 };
 
 export const runtime = "nodejs";
+// Crucial: Vercel needs extra time to download the browser in production
+export const maxDuration = 30; 
 
-// Helper for local Windows/Mac paths
 const getLocalPath = () => {
   if (process.platform === "win32") return "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
   if (process.platform === "darwin") return "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
@@ -49,18 +50,19 @@ export async function GET(req: Request, context: Context) {
     const html = generateOrderInvoiceHTML(order);
     const isLocal = process.env.NODE_ENV === "development";
 
-    // Launch with 'any' config to ignore type mismatches
     const launchConfig: any = {
       args: isLocal ? [] : chromium.args,
       defaultViewport: chromium.defaultViewport,
-      executablePath: isLocal ? getLocalPath() : await chromium.executablePath(),
+      // In production, we pull the browser from a stable remote source
+      executablePath: isLocal 
+        ? getLocalPath() 
+        : await chromium.executablePath('https://github.com/Sparticuz/chromium/releases/download/v131.0.1/chromium-v131.0.1-pack.tar'),
       headless: isLocal ? true : chromium.headless,
     };
 
     browser = await puppeteer.launch(launchConfig);
     const page = await browser.newPage();
 
-    // Wait for content to load properly
     await page.setContent(html, { 
       waitUntil: "networkidle0",
       timeout: 30000 
@@ -83,7 +85,6 @@ export async function GET(req: Request, context: Context) {
     console.error("ORDER PDF ERROR:", error);
     return new Response(`Internal server error: ${error.message}`, { status: 500 });
   } finally {
-    // Kill the process even if it fails to prevent memory leaks
     if (browser) {
       await browser.close();
     }

@@ -1,15 +1,18 @@
 import { prisma } from "@/lib/prisma";
 import { generateInvoiceHTML } from "@/lib/generateInvoiceHtml";
 import puppeteer from "puppeteer-core";
-import _chromium from "@sparticuz/chromium";
+import _chromium from "@sparticuz/chromium-min"; // Changed to -min
+
 const chromium = _chromium as any;
+
 type Context = {
   params: Promise<{ id: string }>;
 };
 
 export const runtime = "nodejs";
+// Vercel production needs more time to download the browser binary
+export const maxDuration = 30; 
 
-// Local Chrome path helper
 const getLocalPath = () => {
   if (process.platform === "win32") return "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
   if (process.platform === "darwin") return "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
@@ -38,11 +41,12 @@ export async function GET(req: Request, context: Context) {
     const html = generateInvoiceHTML(invoice);
     const isLocal = process.env.NODE_ENV === "development";
 
-    // Use 'any' for the config object to ignore all library type mismatches
     const launchConfig: any = {
       args: isLocal ? [] : chromium.args,
       defaultViewport: chromium.defaultViewport,
-      executablePath: isLocal ? getLocalPath() : await chromium.executablePath(),
+      executablePath: isLocal 
+        ? getLocalPath() 
+        : await chromium.executablePath('https://github.com/Sparticuz/chromium/releases/download/v131.0.1/chromium-v131.0.1-pack.tar'),
       headless: isLocal ? true : chromium.headless,
     };
 

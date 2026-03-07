@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.19.2",
-    "@sparticuz/chromium": "^143.0.4",
+    "@sparticuz/chromium-min": "^143.0.4",
     "bcrypt": "^6.0.0",
     "class-variance-authority": "^0.7.1",
     "cloudinary": "^2.9.0",

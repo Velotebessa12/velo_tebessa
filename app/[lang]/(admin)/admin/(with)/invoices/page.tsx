@@ -301,7 +301,8 @@ const cancelInvoice = async (id: string) => {
 
 
   const handleDownload = async (invoiceId: string) => {
-    try {
+  await toast.promise(
+    (async () => {
       const res = await fetch(`/api/invoices/${invoiceId}/pdf`);
 
       if (!res.ok) {
@@ -309,7 +310,6 @@ const cancelInvoice = async (id: string) => {
       }
 
       const blob = await res.blob();
-
       const url = window.URL.createObjectURL(blob);
 
       const a = document.createElement("a");
@@ -321,10 +321,14 @@ const cancelInvoice = async (id: string) => {
 
       a.remove();
       window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error(err);
+    })(),
+    {
+      loading: "Generating invoice PDF...",
+      success: "Invoice downloaded!",
+      error: "Failed to download invoice",
     }
-  };
+  );
+};
 
   return (
     <div className="min-h-screen bg-gray-50 p-3 sm:p-4">
