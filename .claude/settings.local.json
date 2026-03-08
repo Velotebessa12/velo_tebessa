@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:docs.testsprite.com)",
+      "Bash(claude mcp:*)",
+      "Bash(node:*)",
+      "Bash(npx:*)",
+      "mcp__TestSprite__testsprite_check_account_info",
+      "mcp__TestSprite__testsprite_bootstrap",
+      "Bash(npm run:*)",
+      "Bash(curl:*)",
+      "mcp__TestSprite__testsprite_generate_code_summary",
+      "mcp__TestSprite__testsprite_generate_frontend_test_plan",
+      "mcp__TestSprite__testsprite_generate_code_and_execute"
+    ]
+  }
+}

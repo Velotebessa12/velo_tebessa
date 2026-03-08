@@ -45,6 +45,8 @@ const Page = () => {
   const router = useRouter();
   const { lang } = useLang();
   const [selectedPerson, setSelectedPerson] = useState<any | null>(null);
+  const [status , setStatus ] = useState("")
+  const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchDeliveryPersons = async () => {
@@ -87,29 +89,41 @@ const Page = () => {
     setIsDeliveryPersonOpen(true);
   }
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        setIsLoading(true);
+  const toggleOrder = (id: string) => {
+  setSelectedOrders((prev) =>
+    prev.includes(id)
+      ? prev.filter((orderId) => orderId !== id)
+      : [...prev, id]
+  );
+};
 
-        const res = await fetch("/api/orders/get-orders");
+useEffect(() => {
+  const fetchOrders = async () => {
+    try {
+      setIsLoading(true);
 
-        if (!res.ok) {
-          throw new Error("Error fetching orders");
-        }
+      const url = status
+        ? `/api/orders/get-orders?status=${status}`
+        : `/api/orders/get-orders`;
 
-        const { orders } = await res.json();
-        setOrders(orders);
-      } catch (error) {
-        toast.error("Error fetching orders");
-        console.error(error);
-      } finally {
-        setIsLoading(false);
+      const res = await fetch(url);
+
+      if (!res.ok) {
+        throw new Error("Error fetching orders");
       }
-    };
 
-    fetchOrders();
-  }, []);
+      const { orders } = await res.json();
+      setOrders(orders);
+    } catch (error) {
+      toast.error("Error fetching orders");
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  fetchOrders();
+}, [status]);
 
   const editOrder = async (id: string, data: Record<string, any>) => {
   try {
@@ -285,9 +299,50 @@ const Page = () => {
     }
   }
 
-  if (isLoading) {
-    return <Loader />;
+  const handleBulkDelete = async () => {
+  try {
+    await Promise.all(selectedOrders.map((id) => deleteOrder(id)));
+    setSelectedOrders([]);
+  } catch (error) {
+    console.error("Bulk delete error:", error);
   }
+};
+
+const confirmPayment = async (id: string) => {
+  try {
+    const res = await fetch("/api/cash-register/push-transaction", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || "Failed to confirm payment");
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error("Confirm payment error:", error);
+    throw error;
+  }
+};
+
+const handleConfirmPayment = async () => {
+  try {
+    const count = selectedOrders.length;
+
+    await Promise.all(selectedOrders.map((id) => confirmPayment(id)));
+
+    setSelectedOrders([]);
+    toast.success(`${count} order${count > 1 ? "s" : ""} payment confirmed`);
+  } catch (error: any) {
+    console.error("Bulk confirm payment error:", error);
+    toast.error(error?.message || "Failed to confirm payment");
+  }
+};
 
   return (
     <div className="min-h-screen bg-white">
@@ -459,6 +514,7 @@ const Page = () => {
       />
     </div>
   </div>
+
 
   {/* Commune */}
   <div className="flex flex-col gap-1.5">
@@ -729,6 +785,8 @@ const Page = () => {
         />
       )}
 
+   
+
       <div className="p-3 sm:p-4">
         {/* ── Statistics Grid ──────────────────────────────────────────────── */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6">
@@ -770,7 +828,7 @@ const Page = () => {
         <div>
           <select
             value={status}
-            // onChange={(e) => setStatus(e.target.value)}
+            onChange={(e) => setStatus(e.target.value)}
             className="w-full sm:w-44 px-3 py-2.5 mb-6 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
           >
               <option value="">All</option>
@@ -786,6 +844,28 @@ const Page = () => {
           </select>
         </div>
 
+         {selectedOrders.length > 0 && (
+  <div className="flex items-center gap-3 mb-4 p-3 bg-teal-50 border border-teal-100 rounded-xl">
+    <span className="text-sm font-semibold text-teal-700">
+      {selectedOrders.length} orders selected
+    </span>
+
+    <button
+      onClick={handleBulkDelete}
+      className="bg-red-500 hover:bg-red-600 text-white px-4 py-1.5 rounded-lg text-sm font-medium transition-colors"
+    >
+      Delete
+    </button>
+
+    <button
+      onClick={handleConfirmPayment}
+      className="bg-green-400 hover:bg-green-500 text-white px-4 py-1.5 rounded-lg text-sm font-medium transition-colors"
+    >
+      Mark as Paid
+    </button>
+  </div>
+)}
+
         {/* ── Table ────────────────────────────────────────────────────────── */}
         <div className="rounded-2xl border overflow-hidden">
           {/* ── Desktop table (md+) ── */}
@@ -795,9 +875,17 @@ const Page = () => {
                 <tr className="bg-gray-50 border-b border-gray-100">
                   <th className="px-4 py-3 w-8">
                     <input
-                      type="checkbox"
-                      className="w-4 h-4 rounded border-gray-300"
-                    />
+  type="checkbox"
+  checked={selectedOrders.length === orders.length}
+  onChange={(e) => {
+    if (e.target.checked) {
+      setSelectedOrders(orders.map((o) => o.id));
+    } else {
+      setSelectedOrders([]);
+    }
+  }}
+  className="w-4 h-4 rounded border-gray-300"
+/>
                   </th>
                   <th className="px-4 lg:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">
                     Commande
@@ -837,9 +925,11 @@ const Page = () => {
                   >
                     <td className="px-4 py-3">
                       <input
-                        type="checkbox"
-                        className="w-4 h-4 rounded border-gray-300"
-                      />
+  type="checkbox"
+  checked={selectedOrders.includes(order.id)}
+  onChange={() => toggleOrder(order.id)}
+  className="w-4 h-4 rounded border-gray-300"
+/>
                     </td>
                     <td className="px-4 lg:px-6 py-3 whitespace-nowrap">
                       <span className="font-medium text-gray-900">

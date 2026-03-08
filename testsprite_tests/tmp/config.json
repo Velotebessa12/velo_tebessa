@@ -1,0 +1,18 @@
+{
+  "status": "commited",
+  "type": "frontend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:3000",
+  "executionArgs": {
+    "projectName": "Project",
+    "projectPath": "D:\\Sites\\Velo-tebassa\\Project",
+    "testIds": [],
+    "additionalInstruction": "The app entry point is http://localhost:3000/en. All routes use a language prefix, e.g. /en/login, /en/products, /en/admin/dashboard.",
+    "serverMode": "production",
+    "envs": {
+      "API_KEY": "sk-user-G3-5oqoG_NiP36gTaK0vFv4LYd2NuTcqpfG1Gc4WDoWJgsOy7E-GZ15My8fjXpAaL8U49vxh5TMc-Jt-6rkh5abk-g-_9ItP_oVJ7EkhTkH1VRKOrN7mDqBtsgW6LsYyPUE"
+    }
+  },
+  "serverPort": 56292,
+  "proxy": "http://af2ee268-9ea0-4d09-bf7d-0e3c3ad5be37:1xhnUJu6O45jwmiQFRcWSc1wl0nhh4lV@tun.testsprite.com:8080"
+}

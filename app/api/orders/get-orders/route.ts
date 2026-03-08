@@ -7,10 +7,15 @@ export async function GET(req: NextRequest) {
    const { searchParams } = new URL(req.url);
 
     const customerId = searchParams.get("customerId");
+    const status = searchParams.get("status");
 
     const where : any = {}
     if(customerId){
       where.customerId = customerId
+    }
+
+     if (status) {
+      where.status = status;
     }
 
 
