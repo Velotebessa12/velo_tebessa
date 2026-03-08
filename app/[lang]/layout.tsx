@@ -19,11 +19,13 @@ export default async function RootLayout({
 }) {
   const { lang } = await params;
   const dict = await getDictionary(lang);
+
+  const dir = lang === "ar" ? "rtl" : "ltr";
   return (
         <LanguageProvider lang={lang} dict={dict}>
-          <main>
-            {children}
-          </main>
+          <div dir={dir} className="min-h-screen">
+        <main>{children}</main>
+      </div>
         </LanguageProvider>
   );
 }
