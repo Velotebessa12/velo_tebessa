@@ -20,19 +20,57 @@ import ProductCard from "@/components/ProductCard";
 import Image from "next/image";
 import Link from "next/link";
 import { getTranslations } from "@/lib/getTranslations";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Home() {
   const {lang , dict} = useLang();
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
-  const [products, setProducts] = useState<any[]>([]);
-  const [categories, setCategories] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // const [products, setProducts] = useState<any[]>([]);
+  // const [categories, setCategories] = useState<any[]>([]);
+  // const [isLoading, setIsLoading] = useState(true);
   const [selectedSort, setSelectedSort] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [filtersOpen, setFiltersOpen] = useState(false);
 
+
+
+  const {
+    data,
+    isLoading,
+    error,
+    refetch
+  } = useQuery({
+    queryKey: ["products-categories"],
+    queryFn: async () => {
+      const [productsRes, categoriesRes] = await Promise.all([
+        fetch("/api/products/get-products"),
+        fetch("/api/categories/get-categories"),
+      ]);
+
+      if (!productsRes.ok || !categoriesRes.ok) {
+        throw new Error("Failed to fetch");
+      }
+
+      const { products } = await productsRes.json();
+      const { categories } = await categoriesRes.json();
+
+      return { products, categories };
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+
+  // 🔥 clean destructuring
+  const products = data?.products ?? [];
+  const categories = data?.categories ?? [];
+
   useEffect(() => {
+    if (error) {
+      toast.error("Error loading data. Please try again.");
+    }
+  }, [error]);
+
+    useEffect(() => {
     const params = new URLSearchParams();
     if (selectedCategory) params.append("slug", selectedCategory);
     if (selectedSort) params.append("sort", selectedSort);
@@ -40,44 +78,19 @@ export default function Home() {
 
     const delay = setTimeout(async () => {
       try {
-        setIsLoading(true);
         const res = await fetch(
           `/api/products/get-products?${params.toString()}`,
         );
         if (!res.ok) throw new Error();
         const { products } = await res.json();
-        setProducts(products);
+        refetch()
       } catch {
         toast.error("Failed to load products");
-      } finally {
-        setIsLoading(false);
       }
     }, 400);
 
     return () => clearTimeout(delay);
   }, [selectedCategory, selectedSort, searchQuery]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
-        const [productsRes, categoriesRes] = await Promise.all([
-          fetch("/api/products/get-products"),
-          fetch("/api/categories/get-categories"),
-        ]);
-        if (!productsRes.ok || !categoriesRes.ok) throw new Error();
-        const { products } = await productsRes.json();
-        const { categories } = await categoriesRes.json();
-        setProducts(products);
-        setCategories(categories);
-      } catch {
-        toast.error("Error loading data. Please try again.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
 
   
 
@@ -148,7 +161,7 @@ export default function Home() {
                 className="appearance-none bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold pl-3 pr-7 py-2 rounded-full cursor-pointer outline-none transition-colors"
               >
                 <option value="">{dict.home.allCategories}</option>
-                {categories.map((cat) => (
+                {categories.map((cat : any) => (
                   <option key={cat.id} value={cat.slug}>
                     {getTranslations(cat.translations, lang, "name")}
                   </option>
@@ -237,7 +250,7 @@ export default function Home() {
                 className="w-full appearance-none bg-gray-100 text-gray-700 text-sm font-semibold pl-3 pr-8 py-2.5 rounded-xl cursor-pointer outline-none"
               >
                 <option value="">{dict.home.allCategories}</option>
-                {categories.map((cat) => (
+                {categories.map((cat : any) => (
                   <option key={cat.id} value={cat.slug}>
                     {getTranslations(cat.translations, lang, "name")}
                   </option>
@@ -291,7 +304,7 @@ export default function Home() {
                       <Skeleton className="w-12 h-3 rounded bg-gray-200" />
                     </div>
                   ))
-                : categories.map((cat) => (
+                : categories.map((cat : any) => (
                     <Link
                       key={cat.id}
                       href={`/${lang}/categories/${cat.slug}`}
@@ -344,7 +357,7 @@ export default function Home() {
               </p>
             </div>
           ) : (
-            products.map((product, index) => (
+            products.map((product : any, index : any) => (
               <ProductCard
                 key={product.id ?? index}
                 product={product}

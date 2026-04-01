@@ -15,26 +15,24 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-        <div className="min-h-screen flex bg-slate-50">
+<div className="min-h-screen flex bg-slate-50">
 
-          {/* Desktop Sidebar space */}
-          <div className="hidden md:block w-72 flex-shrink-0" />
+  {/* Main Area */}
+  <div className="flex-1 flex flex-col min-h-screen min-w-0 md:ms-72 rtl:md:ms-0 rtl:md:me-72">
 
-          {/* Main Area */}
-          <div className="flex-1 flex flex-col min-h-screen">
+    {/* Navbar */}
+    <AdminNavbar />
 
-            {/* Navbar */}
-            <AdminNavbar />
+    {/* Page Content */}
+    <main className="flex-1 p-4 md:p-6">
+      {children}
+    </main>
 
-            {/* Page Content */}
-            <main className="flex-1 p-4 md:p-6">
-              {children}
-            </main>
+    {/* Mobile Bottom Navbar */}
+    <AdminBottomNavbar />
 
-            {/* Mobile Bottom Navbar */}
-            <AdminBottomNavbar />
+  </div>
 
-          </div>
-        </div>
+</div>
   );
 }

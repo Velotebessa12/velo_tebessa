@@ -50,63 +50,53 @@ const Page = () => {
   const [quantities, setQuantities] = useState({});
 
 
-    useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const res = await fetch(
-          `/api/orders/get-orders?customerId=${user?.id}`,
-        );
+   useEffect(() => {
+  if (!user?.id) return;
 
-        if (!res.ok) {
-          throw new Error("Error fetching orders");
-        }
+  const controller = new AbortController();
 
-        const { orders } = await res.json();
-        setOrders(orders);
-      } catch (error) {
-        toast.error("Error fetching orders");
-        console.error(error);
-      } finally {
-        setIsLoading(false);
+  const loadOrders = async () => {
+    try {
+      setIsLoading(true);
+
+      // 1️⃣ Sync delivery status first
+      await fetch("/api/delivery/agencies/orders/sync-status", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ customerId: user.id }),
+        signal: controller.signal,
+      });
+
+      // 2️⃣ Then fetch orders
+      const res = await fetch(
+        `/api/orders/get-orders?customerId=${user.id}`,
+        { signal: controller.signal }
+      );
+
+      if (!res.ok) {
+        throw new Error("Error fetching orders");
       }
-    };
 
-    fetchOrders();
-  }, [user?.id]);
+      const { orders } = await res.json();
+      setOrders(orders);
+    } catch (error : any) {
+      if (error.name === "AbortError") return;
 
-  useEffect(() => {
-    const updateStatus = async () => {
-      if (!user?.id) return;
-      try {
-        setIsLoading(true);
+      console.error(error);
+      toast.error("Error fetching orders");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-        // 1️⃣ Trigger backend sync with delivery agency
-        const res = await fetch("/api/delivery/agencies/orders/sync-status", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            customerId: user?.id,
-          }),
-        });
+  loadOrders();
 
-        if (!res.ok) {
-          throw new Error("Failed to sync order statuses");
-        }
-
-        // 2️⃣ Re-fetch orders AFTER sync
-        // await fetchOrders(); // 👈 your existing orders fetch function
-      } catch (error) {
-        console.error(error);
-        toast.error("Impossible de synchroniser les commandes");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    updateStatus();
-  }, [user?.id]);
+  return () => {
+    controller.abort(); // 🚀 prevent stale updates
+  };
+}, [user?.id]);
 
   useEffect(() => {
     const fetchProducts = async () => {

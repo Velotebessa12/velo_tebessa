@@ -95,10 +95,14 @@ export async function DELETE(req: Request, context: Context) {
     });
 
     // 3️⃣ Disconnect category from products (if relation table exists)
-    await prisma.product.updateMany({
-      where: { categoryId: id },
-      data: { categoryId: null },
-    });
+    await prisma.category.update({
+  where: { id },
+  data: {
+    products: {
+      set: [], // disconnect all products from this category
+    },
+  },
+});
 
     // 4️⃣ Finally delete the category itself
     await prisma.category.delete({

@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
     const product = await prisma.product.findUnique({
       where: { id: productId },
       include: {
-        category: true,
+        categories: true,
         translations: true,
         addonsAsMain: {
           include: {
@@ -27,6 +27,7 @@ export async function GET(req: NextRequest) {
             },
           },
         },
+        youtubeVideos : true,
         variants: true,
       },
     });
@@ -59,7 +60,7 @@ export async function GET(req: NextRequest) {
           );
 
           const excludedCategory = discount.excludedCategories.find(
-            (c: any) => c.categoryId === product.categoryId
+            (c: any) => c.categoryId === product.categories
           );
 
           if (excludedProduct || excludedCategory) continue;

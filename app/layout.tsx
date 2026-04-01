@@ -7,6 +7,7 @@ import { LanguageContext } from "@/components/LanguageContext";
 import LanguageProvider from "@/components/LanguageProvider";
 import BottomNavbar from "@/components/BottomNavbar";
 import { AuthProvider } from "@/components/AuthContext";
+import TanStackProvider from "@/components/TanStackProvider";
 
 export const metadata: Metadata = {
   title: {
@@ -96,10 +97,13 @@ export default async function RootLayout({ children }: Readonly<{
     <html>
       <body>
         <main>
+          <TanStackProvider>
           <AuthProvider>{children}</AuthProvider>
 
           {/* <BottomNavbar/> */}
+          </TanStackProvider>
         </main>
+        
         <Toaster />
 
         <div

@@ -15,7 +15,7 @@ export async function GET (req : NextRequest){
             }
         })
 
-console.log(categories)
+
         return NextResponse.json({categories})
     } catch (error) {
         return NextResponse.json({error : "Internal error"}, {status : 500})

@@ -44,6 +44,34 @@ model User {
   coupons CouponUsage[]
 }
 
+model StoreSettings {
+  id String @id @default(uuid())
+
+  // 🏪 General
+  storeName String?
+  currency  String @default("DZD")
+
+  // 🟢 WhatsApp (simple & controlled)
+  whatsappEnabled Boolean @default(false)
+  whatsappNumber  String?
+
+  // 🟡 Popup (generic system)
+  popupEnabled Boolean @default(false)
+  popupTitle   String?
+  popupMessage String?
+  popupDelayMs Int? @default(3000)
+  popupLink    String?
+
+  // 🔴 Marquee / Announcement bar
+  marqueeEnabled Boolean @default(false)
+  marqueeText    String?
+  marqueeSpeed   Int? @default(50)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
 // add orders 
 // add how many orders have been done on a product
 // add salary or money to give to DeliveryPerson and when you give him itwill get 0
@@ -115,13 +143,17 @@ model Product {
   promoPrice Float?
   regularPriceText    String?
   promoPriceText String?
+
+
   stock        Int?
+
+  maxOrderQuantity Int?
+
   minimumStock Int?
 
   images       String[]
 
-  categoryId   String?
-  category     Category? @relation(fields: [categoryId], references: [id])
+  categories Category[]
 
   type         Type
   isActive     Boolean @default(true)
@@ -137,7 +169,7 @@ model Product {
 
   similarProducts String[]
 
-  youtubeVideoUrls String[]
+  youtubeVideos ProductYouTubeVideo[]
 
   exchangeItems ExchangeItem[]
   returnItems ReturnItem[]
@@ -147,6 +179,17 @@ model Product {
   discounts    DiscountExcludedProduct[]
   invoiceItems InvoiceItem[]
   packItems PackItem[]
+}
+
+model ProductYouTubeVideo {
+  id        String   @id @default(uuid())
+  title     String
+  url       String
+
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+
+  createdAt DateTime @default(now())
 }
 
 

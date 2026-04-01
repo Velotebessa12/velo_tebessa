@@ -6,11 +6,15 @@ import toast from "react-hot-toast";
 const CreateCategory = ({
     categories ,
     setCategories,
-    setShowCategoryModal
+    setShowCategoryModal,
+    setCategoryId,
+    onCategoryCreated // 👈 add this
 }: {
     categories : any[],
     setCategories : React.Dispatch<React.SetStateAction<any[]>>,
-    setShowCategoryModal : React.Dispatch<React.SetStateAction<boolean>>
+    setShowCategoryModal : React.Dispatch<React.SetStateAction<boolean>>,
+    setCategoryId? : React.Dispatch<React.SetStateAction<string>>,
+    onCategoryCreated?: (cat: any) => void // 👈 type it
 }) => {
   const [images, setImages] = useState([]);
 
@@ -99,7 +103,13 @@ const normalizeLanguages = () => {
       const data = await res.json();
 
       setShowCategoryModal(false)
-      setCategories([ data.category , ...categories]);
+      if (onCategoryCreated) {
+  onCategoryCreated(data.category);
+} else {
+  // fallback (optional)
+  setCategories((prev) => [data.category, ...prev]);
+  setCategoryId?.(data.category.id);
+}
     //   setCategoryId(data.category.id);
 
       setNameAr("");

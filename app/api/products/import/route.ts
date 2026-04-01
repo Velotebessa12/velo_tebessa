@@ -36,73 +36,90 @@ export async function POST(req: NextRequest) {
     const text = await file.text();
     const rows = parseCSV(text);
 
-    // remove header
-    rows.shift();
+    rows.shift(); // remove header
 
-    // csvId -> real productId
     const productMap = new Map<string, string>();
 
     /* =========================
        PASS 1 — PRODUCTS
-       (simple | variable | addition)
     ========================= */
 
     for (const row of rows) {
       const [
-        csvId,               // 0
-        type,                // 1
-        ,                    // 2 parentId (ignored here)
-        nameAr,              // 3
-        descAr,              // 4
-        nameFr,              // 5
-        descFr,              // 6
-        nameEn,              // 7
-        descEn,              // 8
-        buyingPrice,         // 9
-        regularPrice,        // 10
-        promoPrice,          // 11
-        regularPriceText,    // 12
-        promoPriceText,      // 13
-        stock,               // 14
-        minimumStock,        // 15
-        images,              // 16
-        categoryId,          // 17
-        isActive,            // 18
-        youtubeUrls,         // 19
-        similarIds,          // 20
-        createdAt,           // 21
+        csvId,
+        type,
+        ,
+        nameAr,
+        descAr,
+        nameFr,
+        descFr,
+        nameEn,
+        descEn,
+        buyingPrice,
+        regularPrice,
+        promoPrice,
+        regularPriceText,
+        promoPriceText,
+        stock,
+        minimumStock,
+        images,
+        categoryIds, // ✅ updated
+        isActive,
+        youtubeUrls,
+        similarIds,
+        maxOrderQuantity,
+        createdAt,
       ] = row;
 
-      // variations are handled in pass 2
       if (type === "variation") continue;
 
-      const productType =
-        type === "addition" ? "ADDITION" : "PRODUCT";
+      const normalizedStock = Number(stock ?? 0);
+      const normalizedBuyingPrice = Number(buyingPrice ?? 0);
 
       const product = await prisma.product.create({
         data: {
-          type: productType,
+          type: type === "addition" ? "ADDITION" : "PRODUCT",
           isActive: isActive === "true",
 
-          // ✅ Product keeps prices & stock ALWAYS
           buyingPrice: num(buyingPrice),
           regularPrice: num(regularPrice),
           promoPrice: num(promoPrice),
           regularPriceText: regularPriceText || null,
           promoPriceText: promoPriceText || null,
 
-          stock: num(stock),
+          stock: normalizedStock,
           minimumStock: num(minimumStock),
 
           images: images ? images.split("|").filter(Boolean) : [],
-          youtubeVideoUrls: youtubeUrls
-            ? youtubeUrls.split("|").filter(Boolean)
-            : [],
+
+          // ✅ categories relation
+          categories: categoryIds
+            ? {
+                connect: categoryIds
+                  .split("|")
+                  .filter(Boolean)
+                  .map((id) => ({ id })),
+              }
+            : undefined,
+
+          // ✅ youtubeVideos relation
+          youtubeVideos: youtubeUrls
+            ? {
+                create: youtubeUrls
+                  .split("|")
+                  .filter(Boolean)
+                  .map((url) => ({
+                    title: "",
+                    url,
+                  })),
+              }
+            : undefined,
+
           similarProducts: similarIds
             ? similarIds.split("|").filter(Boolean)
             : [],
 
-          categoryId: categoryId || null,
+          maxOrderQuantity: num(maxOrderQuantity),
 
           ...(createdAt
             ? { createdAt: new Date(createdAt) }
@@ -124,6 +141,20 @@ export async function POST(req: NextRequest) {
         },
       });
 
+      // ✅ inventory operation
+      if (normalizedStock > 0) {
+        await prisma.operation.create({
+          data: {
+            productId: product.id,
+            quantity: normalizedStock,
+            type: "IN",
+            price: normalizedBuyingPrice * normalizedStock,
+            stock: normalizedStock,
+            reason: "Initial stock via import",
+          },
+        });
+      }
+
       if (csvId) {
         productMap.set(csvId, product.id);
       }
@@ -131,25 +162,29 @@ export async function POST(req: NextRequest) {
 
     /* =========================
        PASS 2 — VARIANTS
-       (variation only)
     ========================= */
 
     for (const row of rows) {
       const [
-        ,              // 0
-        type,           // 1
-        parentId,       // 2
-        , , , , , ,     // 3–8 translations (ignored)
-        buyingPrice,    // 9
-        regularPrice,   // 10
-        promoPrice,     // 11
-        ,               // 12
-        priceText,      // 13
-        stock,           // 14 (ignored logically)
-        minimumStock,   // 15
-        imageUrl,       // 16
-        ,               // 17
-        isActive,       // 18
+        ,
+        type,
+        parentId,
+        ,
+        ,
+        ,
+        ,
+        ,
+        ,
+        buyingPrice,
+        regularPrice,
+        promoPrice,
+        ,
+        priceText,
+        stock,
+        minimumStock,
+        imageUrl,
+        ,
+        isActive,
       ] = row;
 
       if (type !== "variation") continue;
@@ -159,15 +194,12 @@ export async function POST(req: NextRequest) {
 
       if (!resolvedParentId) continue;
 
-     
       const parentProduct = await prisma.product.findUnique({
         where: { id: resolvedParentId },
         select: { type: true },
       });
 
-      if (!parentProduct || parentProduct.type !== "PRODUCT") {
-        continue;
-      }
+      if (!parentProduct || parentProduct.type !== "PRODUCT") continue;
 
       await prisma.productVariant.create({
         data: {
@@ -178,7 +210,6 @@ export async function POST(req: NextRequest) {
           promoPrice: num(promoPrice),
           priceText: priceText || null,
 
-          // ⚠️ Variant stock is NOT the source of truth
           stock: num(stock) ?? 0,
           minimumStock: num(minimumStock) ?? 0,
 

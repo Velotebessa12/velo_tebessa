@@ -23,6 +23,7 @@ import {
   Users2Icon,
   UsersRound,
   PictureInPicture2,
+  Settings,
 } from "lucide-react";
 import { useLang } from "@/components/LanguageContext";
 import { PERMISSIONS } from "@/data";
@@ -172,6 +173,12 @@ const AdminSidebar = () => {
       label: "Upload images",
       icon: <PictureInPicture2 size={20} />,
       href: "/admin/images",
+      // requiredPermissions: [PERMISSIONS.MANAGE_EMPLOYEES],
+    },
+    {
+      label: "Settings",
+      icon: <Settings size={20} />,
+      href: "/admin/settings",
       // requiredPermissions: [PERMISSIONS.MANAGE_EMPLOYEES],
     },
   ];

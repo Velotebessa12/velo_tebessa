@@ -5,11 +5,12 @@ export async function GET() {
   try {
     const products = await prisma.product.findMany({
       include: {
-        category: {
+        categories: {
           include: { translations: true },
         },
         translations: true,
         variants: true,
+        youtubeVideos: true,
       },
       orderBy: { createdAt: "desc" },
     });
@@ -18,24 +19,31 @@ export async function GET() {
       "ID",
       "Type",
       "Parent ID",
+
       "Name (ar)",
       "Description (ar)",
       "Name (fr)",
       "Description (fr)",
       "Name (en)",
       "Description (en)",
+
       "Buying price",
       "Regular price",
       "Promo price",
       "Regular price text",
       "Promo price text",
+
       "Stock",
       "Minimum stock",
+
       "Images",
-      "Category ID",
+      "Category IDs",
       "Is active",
+
       "YouTube URLs",
       "Similar Product IDs",
+
+      "Max Order Quantity",
       "Created at",
     ];
 
@@ -47,73 +55,96 @@ export async function GET() {
       const en = t(product.translations, "en");
 
       const images = product.images.join("|");
-      const youtubeUrls = product.youtubeVideoUrls.join("|");
-      const similarIds = product.similarProducts.join("|");
+
+      // ✅ FIXED youtubeVideos relation
+      const youtubeUrls = product.youtubeVideos
+        .map((y) => y.url)
+        .join("|");
+
+      const similarIds = (product.similarProducts || []).join("|");
+
+      // ✅ categories array
+      const categoryIds = product.categories.map((c) => c.id).join("|");
 
       const hasVariants = product.variants.length > 0;
-      let wcType: string;
 
-if (product.type === "ADDITION") {
-  wcType = "addition";
-} else if (product.variants.length > 0) {
-  wcType = "variable";
-} else {
-  wcType = "simple";
-}
+      let wcType: string;
+      if (product.type === "ADDITION") {
+        wcType = "addition";
+      } else if (hasVariants) {
+        wcType = "variable";
+      } else {
+        wcType = "simple";
+      }
 
       /* ============================
-         SIMPLE / VARIABLE (parent)
+         PARENT PRODUCT
       ============================ */
       rows.push(
         [
           product.id,
           wcType,
-          "",                               // no parent
-          q(ar?.name ?? ""),
-          q(ar?.description ?? ""),
-          q(fr?.name ?? ""),
-          q(fr?.description ?? ""),
-          q(en?.name ?? ""),
-          q(en?.description ?? ""),
-          hasVariants ? "" : (product.buyingPrice ?? ""),
-          hasVariants ? "" : (product.regularPrice ?? ""),
-          hasVariants ? "" : (product.promoPrice ?? ""),
-          hasVariants ? "" : q(product.regularPriceText ?? ""),
-          hasVariants ? "" : q(product.promoPriceText ?? ""),
-          hasVariants ? "" : (product.stock ?? ""),
-          hasVariants ? "" : (product.minimumStock ?? ""),
+          "",
+
+          q(ar?.name),
+          q(ar?.description),
+          q(fr?.name),
+          q(fr?.description),
+          q(en?.name),
+          q(en?.description),
+
+          hasVariants ? "" : product.buyingPrice ?? "",
+          hasVariants ? "" : product.regularPrice ?? "",
+          hasVariants ? "" : product.promoPrice ?? "",
+          hasVariants ? "" : q(product.regularPriceText),
+          hasVariants ? "" : q(product.promoPriceText),
+
+          hasVariants ? "" : product.stock ?? "",
+          hasVariants ? "" : product.minimumStock ?? "",
+
           q(images),
-          product.categoryId ?? "",
+          q(categoryIds),
           product.isActive,
+
           q(youtubeUrls),
           q(similarIds),
+
+          product.maxOrderQuantity ?? "",
           product.createdAt.toISOString(),
-        ].join(","),
+        ].join(",")
       );
 
       /* ============================
-         VARIATIONS
+         VARIANTS
       ============================ */
       for (const v of product.variants) {
         rows.push(
           [
             v.id,
             "variation",
-            product.id,                     // parent
-            "", "", "", "", "", "",          // no translations on variants
+            product.id,
+
+            "", "", "", "", "", "",
+
             v.buyingPrice ?? "",
             v.regularPrice ?? "",
             v.promoPrice ?? "",
-            "",                             // no regularPriceText on variants
-            q(v.priceText ?? ""),
+            "",
+            q(v.priceText),
+
             v.stock ?? "",
             v.minimumStock ?? "",
-            q(v.imageUrl ?? ""),
-            product.categoryId ?? "",       // inherit from parent
+
+            q(v.imageUrl),
+            q(categoryIds),
             v.isActive,
-            "", "",                         // no youtube/similar on variants
+
+            "",
+            "",
+
+            "",
             v.createdAt.toISOString(),
-          ].join(","),
+          ].join(",")
         );
       }
     }
@@ -132,8 +163,13 @@ if (product.type === "ADDITION") {
   }
 }
 
-function t(translations: { language: string; name: string; description?: string | null }[], lang: string) {
-  return translations.find(x => x.language === lang);
+/* ---------------- HELPERS ---------------- */
+
+function t(
+  translations: { language: string; name: string; description?: string | null }[],
+  lang: string
+) {
+  return translations.find((x) => x.language === lang);
 }
 
 function q(v: string | null | undefined): string {

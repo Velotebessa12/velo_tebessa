@@ -8,14 +8,15 @@ export async function POST(req: NextRequest) {
     const {
       prices,
       stock,
-      categoryId,
+      categoryIds,
       type,
       images,
-      youtubeVideoUrls,
+      youtubeVideos,
       variants,
       addons,
       translations,
-     similarProductIds
+     similarProductIds,
+     maxOrderQuantity
     } = body;
 
     // ---- VALIDATION ----
@@ -69,11 +70,20 @@ const normalizedBuyingPrice = Number(prices?.buyingPrice ?? 0);
       minimumStock: normalizedMinimumStock,
 
       type,
-      categoryId: categoryId || undefined,
+      categories : {
+        connect : categoryIds.map((id : any) => ({id}))
+      },
 
       similarProducts: similarProductIds,
       images,
-      youtubeVideoUrls: youtubeVideoUrls ?? [],
+      youtubeVideos : {
+        create :  youtubeVideos.map((u : any) => ({
+          title : u.title,
+          url : u.url
+        }))
+      },
+
+      maxOrderQuantity,
 
       translations: {
         create: validTranslations.map((t: any) => ({
